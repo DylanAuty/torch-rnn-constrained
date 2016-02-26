@@ -1,3 +1,12 @@
+# torch-rnn-constrained
+This repository is a fork of the [torch-rnn](https://github.com/jcjohnson/torch-rnn) repository, which itself is a reimplementaton of the [char-rnn](https://github.com/karpathy/char-rnn) repository made by Andrey Karpathy.
+
+This fork will aim to implement and run tests on various novel methods of semantic constraint. The target dataset will be [Percy Liang](http://cs.stanford.edu/~pliang/)'s WEATHERGOV dataset, used with permission. This dataset was created in 2009 for Prof. Liang's paper "[Learning semantic correspondences with less supervision](http://cs.stanford.edu/~pliang/papers/semantics-acl2009.pdf)".
+
+The dataset itself is extremely large and unwieldy, and makes development with git difficult. In it's raw form it will be used read-only, no new data points will be created nor will any existing data-points be modified. A zip containing the dataset can be downloaded [here](http://cs.stanford.edu/~pliang/data/weather-data.zip).
+
+Below is copied the full text of the existing README for torch-rnn.
+
 # torch-rnn
 torch-rnn provides high-performance, reusable RNN and LSTM modules for torch7, and uses these modules for character-level
 language modeling similar to [char-rnn](https://github.com/karpathy/char-rnn).
