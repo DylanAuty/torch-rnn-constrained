@@ -19,10 +19,18 @@ if [ $# != 1 ]; then
 	exit 1
 else
 	# Note - use find depth to get list of folders, then xargs to a for loop for each folder?
-	find "$1" -mindepth 2 -maxdepth 2 -print0 | xargs -0 -I '{}' sh -c "for FILE in {}/*.text; do
-		BASE=${FILE%.text};
-		"
+	find "$1" -mindepth 2 -maxdepth 2 -print0 | xargs -0 -I '{}' bash -c 'for FILE in {}/*.text; do
+		BASE=${FILE%.text}
+		echo "Working on {}/$BASE"
+		echo "\n* ===== BEGIN DATA ===== *\n" >> concatOutput.txt
+		cat {}/$BASE.events >> concatOutput.txt
+		echo "\n* === BEGIN FORECAST === *\n" >> concatOutput.txt
+		cat {}/$BASE.text >> concatOutput.txt
+		echo "\n* ======== END ========= *\n\0" >> concatOutput.txt
+	done'
 
 	#find "$1" -name "*.text" -print0 | xargs -0 -I '{}' sh -c "cat {} >> concatOutput.txt ; cat endForecast.txt >> concatOutput.txt"
 fi
+
+
 
