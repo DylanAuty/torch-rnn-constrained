@@ -1,0 +1,47 @@
+* ===== BEGIN DATA ===== * 
+
+.id:0   .type:temperature   .date:2009-02-07    .label:Tonight  @time:17-30 #min:16 #mean:18    #max:25 
+.id:1   .type:windChill .date:2009-02-07    .label:Tonight  @time:17-30 #min:6  #mean:10    #max:16 
+.id:2   .type:windSpeed .date:2009-02-07    .label:Tonight  @time:17-30 #min:6  #mean:6 #max:10 @mode-bucket-0-20-2:0-10
+.id:3   .type:windDir   .date:2009-02-07    .label:Tonight  @time:17-30 @mode:S 
+.id:4   .type:gust  .date:2009-02-07    .label:Tonight  @time:17-30 #min:0  #mean:0 #max:0
+.id:5   .type:skyCover  .date:2009-02-07    .label:Tonight  @time:17-30 @mode-bucket-0-100-4:25-50
+.id:6   .type:skyCover  .date:2009-02-07    .label:Tonight  @time:17-21 @mode-bucket-0-100-4:50-75
+.id:7   .type:skyCover  .date:2009-02-07    .label:Tonight  @time:17-26 @mode-bucket-0-100-4:25-50
+.id:8   .type:skyCover  .date:2009-02-07    .label:Tonight  @time:21-30 @mode-bucket-0-100-4:25-50
+.id:9   .type:skyCover  .date:2009-02-07    .label:Tonight  @time:26-30 @mode-bucket-0-100-4:25-50
+.id:10  .type:precipPotential   .date:2009-02-07    .label:Tonight  @time:17-30 #min:2  #mean:4 #max:12 
+.id:11  .type:thunderChance .date:2009-02-07    .label:Tonight  @time:17-30 @mode:--
+.id:12  .type:thunderChance .date:2009-02-07    .label:Tonight  @time:17-21 @mode:--
+.id:13  .type:thunderChance .date:2009-02-07    .label:Tonight  @time:17-26 @mode:--
+.id:14  .type:thunderChance .date:2009-02-07    .label:Tonight  @time:21-30 @mode:--
+.id:15  .type:thunderChance .date:2009-02-07    .label:Tonight  @time:26-30 @mode:--
+.id:16  .type:rainChance    .date:2009-02-07    .label:Tonight  @time:17-30 @mode:--
+.id:17  .type:rainChance    .date:2009-02-07    .label:Tonight  @time:17-21 @mode:--
+.id:18  .type:rainChance    .date:2009-02-07    .label:Tonight  @time:17-26 @mode:--
+.id:19  .type:rainChance    .date:2009-02-07    .label:Tonight  @time:21-30 @mode:--
+.id:20  .type:rainChance    .date:2009-02-07    .label:Tonight  @time:26-30 @mode:--
+.id:21  .type:snowChance    .date:2009-02-07    .label:Tonight  @time:17-30 @mode:--
+.id:22  .type:snowChance    .date:2009-02-07    .label:Tonight  @time:17-21 @mode:--
+.id:23  .type:snowChance    .date:2009-02-07    .label:Tonight  @time:17-26 @mode:--
+.id:24  .type:snowChance    .date:2009-02-07    .label:Tonight  @time:21-30 @mode:--
+.id:25  .type:snowChance    .date:2009-02-07    .label:Tonight  @time:26-30 @mode:--
+.id:26  .type:freezingRainChance    .date:2009-02-07    .label:Tonight  @time:17-30 @mode:--
+.id:27  .type:freezingRainChance    .date:2009-02-07    .label:Tonight  @time:17-21 @mode:--
+.id:28  .type:freezingRainChance    .date:2009-02-07    .label:Tonight  @time:17-26 @mode:--
+.id:29  .type:freezingRainChance    .date:2009-02-07    .label:Tonight  @time:21-30 @mode:--
+.id:30  .type:freezingRainChance    .date:2009-02-07    .label:Tonight  @time:26-30 @mode:--
+.id:31  .type:sleetChance   .date:2009-02-07    .label:Tonight  @time:17-30 @mode:--
+.id:32  .type:sleetChance   .date:2009-02-07    .label:Tonight  @time:17-21 @mode:--
+.id:33  .type:sleetChance   .date:2009-02-07    .label:Tonight  @time:17-26 @mode:--
+.id:34  .type:sleetChance   .date:2009-02-07    .label:Tonight  @time:21-30 @mode:--
+.id:35  .type:sleetChance   .date:2009-02-07    .label:Tonight  @time:26-30 @mode:--
+
+* === BEGIN FORECAST === *
+
+Partly cloudy ,
+with a low around 15 .
+Northwest wind around 6 mph becoming south . 
+
+* ======== END ========= *
+
