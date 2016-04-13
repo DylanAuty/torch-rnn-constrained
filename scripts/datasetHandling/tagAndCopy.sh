@@ -14,6 +14,10 @@
 # │   ├── 000001.txt
 # │   ├── 000002.txt
 # │   └── [etc.]
+# ├── dataForecastPairs
+# │   ├── 000001.pair
+# │   ├── 000002.pair
+# │   └── [etc.]
 # ├── Experiment_1
 # ├── Experiment_2
 # ├── Experiment_3
@@ -21,6 +25,9 @@
 # 
 # By processing this data in one go and storing a copy of the files, it is hoped that an overhead may be
 # removed when running experiments.
+#
+# data/Forecast pairs will be exported in JSON format for ease of access
+# This also allows me to check that the script is tagging things properly.
 #
 # Script expects 2 arguments:
 #	1) The path to the root of the dataset
@@ -36,6 +43,11 @@ function cpToStructure(){
 		echo "$fileCounter: $BASE"
 		cp $BASE.events ./rawData/$fileCounter.data
 		cp $BASE.text ./referenceForecasts/$fileCounter.txt
+		echo '{"data": "' >> ./dataForecastPairs/$fileCounter.pair
+		cat $BASE.events >> ./dataForecastPairs/$fileCounter.pair
+		echo '", "text" : "' >> ./dataForecastPairs/$fileCounter.pair
+		cat $BASE.text >> ./dataForecastPairs/$fileCounter.pair
+		echo '"}' >> ./dataForecastPairs/$fileCounter.pair	
 		((fileCounter++))
 		echo $fileCounter > ./tmp.dat
 	done
@@ -47,6 +59,7 @@ function makeStructure(){
 	cd $1/weatherDataProcessed
 	mkdir rawData
 	mkdir referenceForecasts
+	mkdir dataForecastPairs
 	echo "Done creating directory structure."
 }
 
