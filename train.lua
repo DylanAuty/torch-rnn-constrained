@@ -3,6 +3,7 @@ require 'nn'
 require 'optim'
 
 require 'LanguageModel'
+require 'LanguageModelSkipCon'
 require 'util.DataLoader'
 
 local utils = require 'util.utils'
@@ -15,6 +16,10 @@ cmd:option('-input_h5', 'data/tiny-shakespeare.h5')
 cmd:option('-input_json', 'data/tiny-shakespeare.json')
 cmd:option('-batch_size', 50)
 cmd:option('-seq_length', 50)
+
+-- Architecture options
+-- This section will allow the user to switch between different network architectures
+-- Skip connections, methods of constraint etc.
 
 -- Model options
 cmd:option('-model_type', 'lstm')
