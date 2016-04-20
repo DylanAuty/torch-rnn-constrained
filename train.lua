@@ -20,6 +20,7 @@ cmd:option('-seq_length', 50)
 -- Architecture options
 -- This section will allow the user to switch between different network architectures
 -- Skip connections, methods of constraint etc.
+cmd:option('-arch', 'reg')
 
 -- Model options
 cmd:option('-model_type', 'lstm')
@@ -86,7 +87,19 @@ end
 -- Initialize the model and criterion
 local opt_clone = torch.deserialize(torch.serialize(opt))
 opt_clone.idx_to_token = idx_to_token
-local model = nn.LanguageModel(opt_clone):type(dtype)
+	
+local model = {}
+	-- Select the architecture to use
+if opt.arch == 'reg' then
+	model = nn.LanguageModel(opt_clone):type(dtype)
+elseif opt.arch == 'skipcon' then
+	model = nn.LanguageModelSkipCon(opt_clone):type(dtype)
+	print('Architecture: Skip connections')
+else
+	model = nn.LanguageModel(opt_clone):type(dtype)
+end
+
+print(model.net)
 local params, grad_params = model:getParameters()
 local crit = nn.CrossEntropyCriterion():type(dtype)
 
