@@ -27,14 +27,43 @@ function LM:__init(kwargs)
   self.batchnorm = utils.get_kwarg(kwargs, 'batchnorm')
 
   local V, D, H = self.vocab_size, self.wordvec_dim, self.rnn_size
-
-  self.net = nn.Sequential()
-  self.rnns = {}
-  self.bn_view_in = {}
+  --self.net = nn.Sequential()
+  self.rnns = {}					-- This is used by LM:resetStates to clear all LSTM/RNN states.
+  self.bn_view_in = {}	
   self.bn_view_out = {}
+	
+  --self.net:add(nn.LookupTable(V, D))
+  local LUT = nn.LookupTable(V, D)
+	
+	-- Creating a skip connected LSTM with self.num_layers hidden layers
+	for i = 1, self.num_layers do
+		local prev_dim = (D+H)					-- All layers above the first layer have input size D+H
+		if i == 1 then prev_dim = D end	-- First layer input size will be only D.
+		
+		-- Select the model type, VanillaRNN.lua or LSTM.lua
+		-- All layers will have output size H.
+		local rnn
+		if self.model_type == 'rnn' then
+			rnn = nn.VanillaRNN(prev_dim, H)
+		elseif self.model_type == 'lstm' then
+			rnn = nn.LSTM(prev_dim, H)
+		end
+		
+		-- self.net:add(rnn)	-- This line was used when self.net was an nn.Sequential().
+		
 
-  self.net:add(nn.LookupTable(V, D))
-  for i = 1, self.num_layers do
+		-- Set the layer up and insert it into a reference table of all layers
+		rnn.remember_states = true
+		table.insert(self.rnns, rnn)
+		
+		--[[BATCHNORM GOES HERE --]]
+
+		--[[DROPOUT GOES HERE --]]	
+
+	end
+
+	--[[
+	for i = 1, self.num_layers do
     local prev_dim = H
     if i == 1 then prev_dim = D end
     local rnn
@@ -59,6 +88,7 @@ function LM:__init(kwargs)
       self.net:add(nn.Dropout(self.dropout))
     end
   end
+	--]]
 
   -- After all the RNNs run, we will have a tensor of shape (N, T, H);
   -- we want to apply a 1D temporal convolution to predict scores for each
@@ -69,7 +99,7 @@ function LM:__init(kwargs)
   -- to set them in the forward pass.
   self.view1 = nn.View(1, 1, -1):setNumInputDims(3)
   self.view2 = nn.View(1, -1):setNumInputDims(2)
-
+	
   self.net:add(self.view1)
   self.net:add(nn.Linear(H, V))
   self.net:add(self.view2)
@@ -103,8 +133,9 @@ end
 
 
 function LM:resetStates()
-  for i, rnn in ipairs(self.rnns) do
-    rnn:resetStates()
+  -- Iterates over every RNN or LSTM in the network and resets the states.
+	for i, rnn in ipairs(self.rnns) do
+    rnn:resetStates()	-- This is a method contained within the LSTM/RNN definition
   end
 end
 
