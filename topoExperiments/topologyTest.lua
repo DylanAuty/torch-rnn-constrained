@@ -21,9 +21,10 @@ x = nn.Identity()():annotate{
 	name = 'INPUT LAYER',
 	graphAttributes = {color = 'red'}
 }
+h0 = nn.Identity()()
 
 jt = x
-h = x
+h = h0
 
 -- Define the layers
 for i=1, len do
@@ -31,7 +32,7 @@ for i=1, len do
    	name = 'Dummy LSTM layer',
 		graphAttributes = {color = 'blue'}
 		}
-		jt = nn.JoinTable(1)({jt, h}){ -- Create a join table for the outgoing skip connections
+		jt = nn.JoinTable(1)({jt, h}):annotate{ -- Create a join table for the outgoing skip connections
 			name = 'Concatenation node',
 			graphAttributes = {color = 'yellow'}
 		}
