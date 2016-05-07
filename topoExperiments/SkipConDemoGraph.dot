@@ -1,0 +1,354 @@
+digraph G {
+	graph [bb="0,0,1038,3960"];
+	node [label="\N",
+		shape=oval
+	];
+	n1	 [color=red,
+		height=1.041,
+		label="OUTPUT LAYER (1)\nmodule = nn.Linear(8 -> 1)\lreverseMap = {}",
+		pos="789,150",
+		tooltip="[topologyTest.lua]:42_",
+		width=3.3125];
+	n2	 [height=1.041,
+		label="Node2\ninput = {}\lreverseMap = {}",
+		pos="789,38",
+		tooltip="[[C]]:-1_",
+		width=2.1497];
+	n1 -> n2	 [pos="e,789,75.844 789,112.37 789,103.93 789,94.829 789,86.011"];
+	n3	 [color=yellow,
+		height=1.3356,
+		label="Concatenation node (3)\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node4,Node5}",
+		pos="789,272",
+		tooltip="[topologyTest.lua]:35_",
+		width=3.4507];
+	n3 -> n1	 [pos="e,789,187.72 789,223.57 789,215.1 789,206.27 789,197.81"];
+	n4	 [color=yellow,
+		height=1.3356,
+		label="Concatenation node (4)\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node6,Node7}",
+		pos="639,516",
+		tooltip="[topologyTest.lua]:35_",
+		width=3.4507];
+	n4 -> n3	 [pos="e,760.54,318.92 667.57,468.91 692.54,428.63 728.83,370.08 755.23,327.48"];
+	n5	 [color=blue,
+		height=1.041,
+		label="Dummy LSTM layer (5)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
+		pos="879,394",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.3125];
+	n5 -> n3	 [pos="e,823.18,318.57 852.24,357.32 845.04,347.73 837.1,337.13 829.34,326.79"];
+	n6	 [color=yellow,
+		height=1.3356,
+		label="Concatenation node (6)\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node9,Node10}",
+		pos="518,760",
+		tooltip="[topologyTest.lua]:35_",
+		width=3.5652];
+	n6 -> n4	 [pos="e,615.69,563.63 541.19,712.63 561.13,672.73 589.96,615.09 611.15,572.7"];
+	n7	 [color=blue,
+		height=1.041,
+		label="Dummy LSTM layer (7)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
+		pos="798,638",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.3125];
+	n7 -> n4	 [pos="e,694.71,559.05 753.29,603.25 737.66,591.46 719.79,577.98 702.91,565.23"];
+	n8	 [height=1.3356,
+		label="Node8\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node7,Node12}",
+		pos="910,516",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.5652];
+	n7 -> n8	 [pos="e,868.08,561.92 831,601.65 840.43,591.53 850.93,580.29 861.1,569.39"];
+	n8 -> n5	 [pos="e,888.44,431.56 897.84,467.92 895.59,459.23 893.25,450.17 891.01,441.5"];
+	n9	 [color=yellow,
+		height=1.3356,
+		label="Concatenation node (9)\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node13,Node14}",
+		pos="475,1004",
+		tooltip="[topologyTest.lua]:35_",
+		width=3.7034];
+	n9 -> n6	 [pos="e,509.63,808.12 483.39,955.77 490.39,916.37 500.39,860.11 507.84,818.18"];
+	n10	 [color=blue,
+		height=1.041,
+		label="Dummy LSTM layer (10)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
+		pos="760,882",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.3125];
+	n10 -> n6	 [pos="e,594.19,798.78 697.36,849.94 668.68,835.72 634.25,818.65 603.26,803.28"];
+	n11	 [height=1.3356,
+		label="Node11\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node10,Node12}",
+		pos="798,760",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.7034];
+	n10 -> n11	 [pos="e,783.16,807.86 771.5,844.67 774.23,836.07 777.2,826.69 780.13,817.43"];
+	n11 -> n7	 [pos="e,798,675.72 798,711.57 798,703.1 798,694.27 798,685.81"];
+	n12	 [color=red,
+		height=1.041,
+		label="INPUT LAYER (12)\nmodule = nn.Identity\lreverseMap = {}",
+		pos="694,3566",
+		tooltip="[topologyTest.lua]:20_",
+		width=2.6117];
+	n12 -> n8	 [pos="e,925.68,564.16 783.63,3554.5 827.42,3544.9 877.72,3526.7 911,3492 965.12,3435.5 960,3401.2 960,3323 960,3323 960,3323 960,759 960,\
+694.58 942.8,622.48 928.57,573.86"];
+	n12 -> n11	 [pos="e,855.18,803.8 776.78,3548.1 810.78,3537.2 847.96,3519.8 873,3492 925.32,3433.9 922,3401.2 922,3323 922,3323 922,3323 922,1003 922,\
+930.74 923.8,906.78 888,844 881.22,832.11 872.16,820.96 862.4,810.91"];
+	n15	 [height=1.3356,
+		label="Node15\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node14,Node12}",
+		pos="760,1004",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.7034];
+	n12 -> n15	 [pos="e,817.18,1047.8 765.58,3541.5 790.63,3530 816.98,3513.9 835,3492 884.64,3431.6 884,3401.2 884,3323 884,3323 884,3323 884,1247 884,\
+1174.7 885.8,1150.8 850,1088 843.22,1076.1 834.16,1065 824.4,1054.9"];
+	n19	 [height=1.3356,
+		label="Node19\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node18,Node12}",
+		pos="722,1248",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.7034];
+	n12 -> n19	 [pos="e,779.18,1291.8 749.91,3535.9 767.49,3524.3 785.54,3509.5 798,3492 843.23,3428.3 846,3401.1 846,3323 846,3323 846,3323 846,1491 \
+846,1418.7 847.8,1394.8 812,1332 805.22,1320.1 796.16,1309 786.4,1298.9"];
+	n23	 [height=1.3356,
+		label="Node23\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node22,Node12}",
+		pos="684,1492",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.7034];
+	n12 -> n23	 [pos="e,741.18,1535.8 732.95,3531.6 744.37,3520.1 755.95,3506.4 764,3492 801.86,3424.2 808,3400.6 808,3323 808,3323 808,3323 808,1735 \
+808,1662.7 809.8,1638.8 774,1576 767.22,1564.1 758.16,1553 748.4,1542.9"];
+	n27	 [height=1.3356,
+		label="Node27\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node26,Node12}",
+		pos="646,1736",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.7034];
+	n12 -> n27	 [pos="e,703.18,1779.8 716.31,3529.2 722.76,3517.7 729.32,3504.6 734,3492 760.73,3420 770,3399.8 770,3323 770,3323 770,3323 770,1979 770,\
+1906.7 771.8,1882.8 736,1820 729.22,1808.1 720.16,1797 710.4,1786.9"];
+	n30	 [height=1.3356,
+		label="Node30\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node29,Node12}",
+		pos="608,1980",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.7034];
+	n12 -> n30	 [pos="e,665.18,2023.8 703.39,3528.4 714.65,3481.2 732,3396.6 732,3323 732,3323 732,3323 732,2223 732,2150.7 733.8,2126.8 698,2064 691.22,\
+2052.1 682.16,2041 672.4,2030.9"];
+	n33	 [height=1.3356,
+		label="Node33\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node32,Node12}",
+		pos="570,2224",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.7034];
+	n12 -> n33	 [pos="e,627.18,2267.8 694,3528.5 694,3481.1 694,3395.9 694,3323 694,3323 694,3323 694,2467 694,2394.7 695.8,2370.8 660,2308 653.22,2296.1 \
+644.16,2285 634.4,2274.9"];
+	n36	 [height=1.3356,
+		label="Node36\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node35,Node12}",
+		pos="532,2468",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.7034];
+	n12 -> n36	 [pos="e,589.18,2511.8 684.61,3528.4 673.35,3481.2 656,3396.6 656,3323 656,3323 656,3323 656,2711 656,2638.7 657.8,2614.8 622,2552 615.22,\
+2540.1 606.16,2529 596.4,2518.9"];
+	n39	 [height=1.3356,
+		label="Node39\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node38,Node12}",
+		pos="494,2712",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.7034];
+	n12 -> n39	 [pos="e,551.18,2755.8 664.13,3530.2 655.7,3518.7 647.37,3505.4 642,3492 613.86,3421.5 618,3398.9 618,3323 618,3323 618,3323 618,2955 618,\
+2882.7 619.8,2858.8 584,2796 577.22,2784.1 568.16,2773 558.4,2762.9"];
+	n40	 [color=yellow,
+		height=1.3356,
+		label="Concatenation node (40)\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node12,Node43}",
+		pos="133,3200",
+		tooltip="[topologyTest.lua]:35_",
+		width=3.7034];
+	n12 -> n40	 [pos="e,227.18,3234.2 616.93,3544.4 587.77,3533.2 556.47,3516.4 535,3492 471.02,3419.3 542.48,3348.2 470,3284 404.05,3225.5 360.37,3269.9 \
+275,3248 262.57,3244.8 249.65,3241.1 236.89,3237.2"];
+	n42	 [height=1.3356,
+		label="Node42\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node41,Node12}",
+		pos="456,2956",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.7034];
+	n12 -> n42	 [pos="e,513.18,2999.8 643.16,3534.4 628.24,3523 613.42,3508.6 604,3492 566.62,3426 580,3398.9 580,3323 580,3323 580,3323 580,3199 580,\
+3126.7 581.8,3102.8 546,3040 539.22,3028.1 530.16,3017 520.4,3006.9"];
+	n44	 [height=1.3356,
+		label="Node44\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node43,Node12}",
+		pos="418,3200",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.7034];
+	n12 -> n44	 [pos="e,480.86,3242.5 626.68,3539.8 604.37,3528.3 581.35,3512.6 566,3492 509.37,3415.9 567.78,3364.8 518,3284 510.21,3271.4 499.81,3259.7 \
+488.67,3249.4"];
+	n45	 [height=1.3356,
+		label="Node45\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node46,Node12}",
+		pos="342,3444",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.7034];
+	n12 -> n45	 [pos="e,437.6,3477.6 623.61,3541 573.16,3523.8 504.34,3500.3 447.36,3480.9"];
+	n13	 [color=yellow,
+		height=1.3356,
+		label="Concatenation node (13)\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node17,Node18}",
+		pos="437,1248",
+		tooltip="[topologyTest.lua]:35_",
+		width=3.7034];
+	n13 -> n9	 [pos="e,467.6,1052.1 444.42,1199.8 450.6,1160.4 459.44,1104.1 466.02,1062.2"];
+	n14	 [color=blue,
+		height=1.041,
+		label="Dummy LSTM layer (14)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
+		pos="722,1126",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.3125];
+	n14 -> n9	 [pos="e,553.41,1043.1 658.39,1094.1 629.25,1079.9 594.24,1062.9 562.65,1047.6"];
+	n14 -> n15	 [pos="e,745.16,1051.9 733.5,1088.7 736.23,1080.1 739.2,1070.7 742.13,1061.4"];
+	n15 -> n10	 [pos="e,760,919.72 760,955.57 760,947.1 760,938.27 760,929.81"];
+	n16	 [height=1.3356,
+		label="Node16\ninput = {}\lselectindex = 2\lreverseMap = {}",
+		pos="667,3688",
+		tooltip="[[C]]:-1_-2",
+		width=2.1497];
+	n16 -> n12	 [pos="e,685.81,3603.4 677.52,3640.3 679.52,3631.4 681.61,3622.1 683.61,3613.2"];
+	n17	 [color=yellow,
+		height=1.3356,
+		label="Concatenation node (17)\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node21,Node22}",
+		pos="399,1492",
+		tooltip="[topologyTest.lua]:35_",
+		width=3.7034];
+	n17 -> n13	 [pos="e,429.6,1296.1 406.42,1443.8 412.6,1404.4 421.44,1348.1 428.02,1306.2"];
+	n18	 [color=blue,
+		height=1.041,
+		label="Dummy LSTM layer (18)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
+		pos="684,1370",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.3125];
+	n18 -> n13	 [pos="e,515.41,1287.1 620.39,1338.1 591.25,1323.9 556.24,1306.9 524.65,1291.6"];
+	n18 -> n19	 [pos="e,707.16,1295.9 695.5,1332.7 698.23,1324.1 701.2,1314.7 704.13,1305.4"];
+	n19 -> n14	 [pos="e,722,1163.7 722,1199.6 722,1191.1 722,1182.3 722,1173.8"];
+	n20	 [height=1.041,
+		label="Node20\nreverseMap = {}\lnSplitOutputs = 2",
+		pos="567,3810",
+		tooltip="[[C]]:-1_ split at [...e/da2412/torch/install/share/lua/5.1/nngraph/gmodule.lua]:96-mnode",
+		width=2.2307];
+	n20 -> n16	 [pos="e,631.77,3731.3 595.39,3774.9 604.67,3763.8 615.19,3751.2 625.24,3739.1"];
+	n47	 [height=1.3356,
+		label="Node47\ninput = {}\lselectindex = 1\lreverseMap = {}",
+		pos="467,3688",
+		tooltip="[[C]]:-1_-1",
+		width=2.1497];
+	n20 -> n47	 [pos="e,502.23,3731.3 538.61,3774.9 529.33,3763.8 518.81,3751.2 508.76,3739.1"];
+	n21	 [color=yellow,
+		height=1.3356,
+		label="Concatenation node (21)\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node25,Node26}",
+		pos="361,1736",
+		tooltip="[topologyTest.lua]:35_",
+		width=3.7034];
+	n21 -> n17	 [pos="e,391.6,1540.1 368.42,1687.8 374.6,1648.4 383.44,1592.1 390.02,1550.2"];
+	n22	 [color=blue,
+		height=1.041,
+		label="Dummy LSTM layer (22)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
+		pos="646,1614",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.3125];
+	n22 -> n17	 [pos="e,477.41,1531.1 582.39,1582.1 553.25,1567.9 518.24,1550.9 486.65,1535.6"];
+	n22 -> n23	 [pos="e,669.16,1539.9 657.5,1576.7 660.23,1568.1 663.2,1558.7 666.13,1549.4"];
+	n23 -> n18	 [pos="e,684,1407.7 684,1443.6 684,1435.1 684,1426.3 684,1417.8"];
+	n24	 [height=1.041,
+		label="Node24\ninput = {}\lreverseMap = {}",
+		pos="567,3922",
+		tooltip="[[C]]:-1_",
+		width=2.1497];
+	n24 -> n20	 [pos="e,567,3847.8 567,3884.4 567,3875.9 567,3866.8 567,3858"];
+	n25	 [color=yellow,
+		height=1.3356,
+		label="Concatenation node (25)\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node28,Node29}",
+		pos="323,1980",
+		tooltip="[topologyTest.lua]:35_",
+		width=3.7034];
+	n25 -> n21	 [pos="e,353.6,1784.1 330.42,1931.8 336.6,1892.4 345.44,1836.1 352.02,1794.2"];
+	n26	 [color=blue,
+		height=1.041,
+		label="Dummy LSTM layer (26)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
+		pos="608,1858",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.3125];
+	n26 -> n21	 [pos="e,439.41,1775.1 544.39,1826.1 515.25,1811.9 480.24,1794.9 448.65,1779.6"];
+	n26 -> n27	 [pos="e,631.16,1783.9 619.5,1820.7 622.23,1812.1 625.2,1802.7 628.13,1793.4"];
+	n27 -> n22	 [pos="e,646,1651.7 646,1687.6 646,1679.1 646,1670.3 646,1661.8"];
+	n28	 [color=yellow,
+		height=1.3356,
+		label="Concatenation node (28)\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node31,Node32}",
+		pos="285,2224",
+		tooltip="[topologyTest.lua]:35_",
+		width=3.7034];
+	n28 -> n25	 [pos="e,315.6,2028.1 292.42,2175.8 298.6,2136.4 307.44,2080.1 314.02,2038.2"];
+	n29	 [color=blue,
+		height=1.041,
+		label="Dummy LSTM layer (29)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
+		pos="570,2102",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.3125];
+	n29 -> n25	 [pos="e,401.41,2019.1 506.39,2070.1 477.25,2055.9 442.24,2038.9 410.65,2023.6"];
+	n29 -> n30	 [pos="e,593.16,2027.9 581.5,2064.7 584.23,2056.1 587.2,2046.7 590.13,2037.4"];
+	n30 -> n26	 [pos="e,608,1895.7 608,1931.6 608,1923.1 608,1914.3 608,1905.8"];
+	n31	 [color=yellow,
+		height=1.3356,
+		label="Concatenation node (31)\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node34,Node35}",
+		pos="247,2468",
+		tooltip="[topologyTest.lua]:35_",
+		width=3.7034];
+	n31 -> n28	 [pos="e,277.6,2272.1 254.42,2419.8 260.6,2380.4 269.44,2324.1 276.02,2282.2"];
+	n32	 [color=blue,
+		height=1.041,
+		label="Dummy LSTM layer (32)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
+		pos="532,2346",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.3125];
+	n32 -> n28	 [pos="e,363.41,2263.1 468.39,2314.1 439.25,2299.9 404.24,2282.9 372.65,2267.6"];
+	n32 -> n33	 [pos="e,555.16,2271.9 543.5,2308.7 546.23,2300.1 549.2,2290.7 552.13,2281.4"];
+	n33 -> n29	 [pos="e,570,2139.7 570,2175.6 570,2167.1 570,2158.3 570,2149.8"];
+	n34	 [color=yellow,
+		height=1.3356,
+		label="Concatenation node (34)\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node37,Node38}",
+		pos="209,2712",
+		tooltip="[topologyTest.lua]:35_",
+		width=3.7034];
+	n34 -> n31	 [pos="e,239.6,2516.1 216.42,2663.8 222.6,2624.4 231.44,2568.1 238.02,2526.2"];
+	n35	 [color=blue,
+		height=1.041,
+		label="Dummy LSTM layer (35)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
+		pos="494,2590",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.3125];
+	n35 -> n31	 [pos="e,325.41,2507.1 430.39,2558.1 401.25,2543.9 366.24,2526.9 334.65,2511.6"];
+	n35 -> n36	 [pos="e,517.16,2515.9 505.5,2552.7 508.23,2544.1 511.2,2534.7 514.13,2525.4"];
+	n36 -> n32	 [pos="e,532,2383.7 532,2419.6 532,2411.1 532,2402.3 532,2393.8"];
+	n37	 [color=yellow,
+		height=1.3356,
+		label="Concatenation node (37)\nmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node40,Node41}",
+		pos="171,2956",
+		tooltip="[topologyTest.lua]:35_",
+		width=3.7034];
+	n37 -> n34	 [pos="e,201.6,2760.1 178.42,2907.8 184.6,2868.4 193.44,2812.1 200.02,2770.2"];
+	n38	 [color=blue,
+		height=1.041,
+		label="Dummy LSTM layer (38)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
+		pos="456,2834",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.3125];
+	n38 -> n34	 [pos="e,287.41,2751.1 392.39,2802.1 363.25,2787.9 328.24,2770.9 296.65,2755.6"];
+	n38 -> n39	 [pos="e,479.16,2759.9 467.5,2796.7 470.23,2788.1 473.2,2778.7 476.13,2769.4"];
+	n39 -> n35	 [pos="e,494,2627.7 494,2663.6 494,2655.1 494,2646.3 494,2637.8"];
+	n40 -> n37	 [pos="e,163.6,3004.1 140.42,3151.8 146.6,3112.4 155.44,3056.1 162.02,3014.2"];
+	n41	 [color=blue,
+		height=1.041,
+		label="Dummy LSTM layer (41)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
+		pos="418,3078",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.3125];
+	n41 -> n37	 [pos="e,249.41,2995.1 354.39,3046.1 325.25,3031.9 290.24,3014.9 258.65,2999.6"];
+	n41 -> n42	 [pos="e,441.16,3003.9 429.5,3040.7 432.23,3032.1 435.2,3022.7 438.13,3013.4"];
+	n42 -> n38	 [pos="e,456,2871.7 456,2907.6 456,2899.1 456,2890.3 456,2881.8"];
+	n43	 [color=blue,
+		height=1.041,
+		label="Dummy LSTM layer (43)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
+		pos="342,3322",
+		tooltip="[topologyTest.lua]:31_",
+		width=3.3125];
+	n43 -> n40	 [pos="e,203,3241.2 285.99,3288.8 263.27,3275.8 236.62,3260.5 211.98,3246.3"];
+	n43 -> n44	 [pos="e,388.73,3247.2 364.8,3285 370.62,3275.8 377,3265.7 383.27,3255.8"];
+	n44 -> n41	 [pos="e,418,3115.7 418,3151.6 418,3143.1 418,3134.3 418,3125.8"];
+	n45 -> n43	 [pos="e,342,3359.7 342,3395.6 342,3387.1 342,3378.3 342,3369.8"];
+	n46	 [height=1.041,
+		label="Node46\nmodule = nn.Identity\lreverseMap = {}",
+		pos="415,3566",
+		tooltip="[topologyTest.lua]:24_",
+		width=2.6117];
+	n46 -> n45	 [pos="e,370.25,3491.4 393.3,3529.3 387.7,3520.1 381.56,3510 375.52,3500.1"];
+	n47 -> n46	 [pos="e,430.71,3603.3 447.19,3641.3 443.1,3631.9 438.8,3621.9 434.71,3612.5"];
+}
