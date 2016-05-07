@@ -10,7 +10,7 @@ require 'torch'
 require 'nn'
 require 'nngraph'
 
-
+-- Define input/hidden/output sizes
 ni =1;      -- Input layer size
 nh = 8;     -- Hidden layer size
 no = 1;     -- Output layer size
@@ -24,7 +24,13 @@ x = nn.Identity()():annotate{
 h0 = nn.Identity()()
 
 jt = x
+jt:annotate{
+	name = 'DEBUG: Begin JT'
+}
 h = h0
+h:annotate{
+	name = 'DEBUG: Begin H'
+}
 
 -- Define the layers
 for i=1, len do
