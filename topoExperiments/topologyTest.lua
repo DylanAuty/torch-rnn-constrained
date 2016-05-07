@@ -34,14 +34,28 @@ h:annotate{
 
 -- Define the layers
 for i=1, len do
-    h = nn.Linear(ni+nh, nh)(nn.JoinTable(1)({h, x})):annotate{ -- Each hidden layer is just an nn.Linear for the time being
-   	name = 'Dummy LSTM layer',
-		graphAttributes = {color = 'blue'}
+	-- For first layer
+	if i==1 then		
+		h = nn.Linear(ni+nh, nh)(x):annotate{ -- Each hidden layer is just an nn.Linear for the time being
+   		name = 'Dummy LSTM layer (First)',
+			graphAttributes = {color = 'blue'}
+		}
+		jt = nn.JoinTable(1)({x, h}):annotate{ -- Create a join table for the outgoing skip connections
+			name = 'Concatenation node (First)',
+			graphAttributes = {color = 'yellow'}
+		}
+	-- For 2nd layer onwards
+	elseif i~=1 then
+		
+		h = nn.Linear(ni+nh, nh)(nn.JoinTable(1)({h, x})):annotate{ -- Each hidden layer is just an nn.Linear for the time being
+   		name = 'Dummy LSTM layer',
+			graphAttributes = {color = 'blue'}
 		}
 		jt = nn.JoinTable(1)({jt, h}):annotate{ -- Create a join table for the outgoing skip connections
 			name = 'Concatenation node',
 			graphAttributes = {color = 'yellow'}
 		}
+	end
 end
 
 -- Output
@@ -49,7 +63,7 @@ y = nn.Linear(nh, no)(jt):annotate{	-- A final linear module for the output.
 	name = 'OUTPUT LAYER',
 	graphAttributes = {color = 'red'}
 }
-testNet = nn.gModule({h0, x},{y})	-- Links together the network
+testNet = nn.gModule({x},{y})	-- Links together the network
 
 -- Generate a graph from the testNet gModule above, and save to file
 -- Saves both a .dot and a .svg.
