@@ -31,11 +31,11 @@ digraph G {
 	n4 -> n3	 [pos="e,301.31,319.63 375.81,468.63 355.87,428.73 327.04,371.09 305.85,328.7"];
 	n5	 [color=blue,
 		fillcolor=blue,
+		fontcolor=white,
 		height=1.041,
 		label="Dummy LSTM layer (5)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
 		pos="189,394",
 		style=filled,
-		textcolor=white,
 		tooltip="[topologyTest.lua]:50_",
 		width=3.3125];
 	n5 -> n3	 [pos="e,244.2,318.57 215.46,357.32 222.58,347.73 230.43,337.13 238.11,326.79"];
@@ -48,11 +48,11 @@ digraph G {
 	n6 -> n4	 [pos="e,421.93,563.63 495.2,712.63 475.58,672.73 447.23,615.09 426.39,572.7"];
 	n7	 [color=blue,
 		fillcolor=blue,
+		fontcolor=white,
 		height=1.041,
 		label="Dummy LSTM layer (7)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
 		pos="238,638",
 		style=filled,
-		textcolor=white,
 		tooltip="[topologyTest.lua]:50_",
 		width=3.3125];
 	n7 -> n4	 [pos="e,342.59,559.05 283.28,603.25 299.1,591.46 317.19,577.98 334.29,565.23"];
@@ -72,11 +72,11 @@ digraph G {
 	n9 -> n6	 [pos="e,526.37,808.12 552.61,955.77 545.61,916.37 535.61,860.11 528.16,818.18"];
 	n10	 [color=blue,
 		fillcolor=blue,
+		fontcolor=white,
 		height=1.041,
 		label="Dummy LSTM layer (10)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
 		pos="276,882",
 		style=filled,
-		textcolor=white,
 		tooltip="[topologyTest.lua]:50_",
 		width=3.3125];
 	n10 -> n6	 [pos="e,441.81,798.78 338.64,849.94 367.32,835.72 401.75,818.65 432.74,803.28"];
@@ -162,11 +162,11 @@ digraph G {
 3004.3"];
 	n41	 [color=blue,
 		fillcolor=blue,
+		fontcolor=white,
 		height=1.041,
 		label="Dummy LSTM layer (First) (41)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
 		pos="661,3322",
 		style=filled,
-		textcolor=white,
 		tooltip="[topologyTest.lua]:40_",
 		width=3.8653];
 	n12 -> n41	 [pos="e,571.1,3350.7 377.54,3410.3 430.71,3394 503.15,3371.6 561.49,3353.7"];
@@ -186,11 +186,11 @@ digraph G {
 	n13 -> n9	 [pos="e,568.4,1052.1 591.58,1199.8 585.4,1160.4 576.56,1104.1 569.98,1062.2"];
 	n14	 [color=blue,
 		fillcolor=blue,
+		fontcolor=white,
 		height=1.041,
 		label="Dummy LSTM layer (14)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
 		pos="314,1126",
 		style=filled,
-		textcolor=white,
 		tooltip="[topologyTest.lua]:50_",
 		width=3.3125];
 	n14 -> n9	 [pos="e,482.59,1043.1 377.61,1094.1 406.75,1079.9 441.76,1062.9 473.35,1047.6"];
@@ -211,11 +211,11 @@ digraph G {
 	n17 -> n13	 [pos="e,606.4,1296.1 629.58,1443.8 623.4,1404.4 614.56,1348.1 607.98,1306.2"];
 	n18	 [color=blue,
 		fillcolor=blue,
+		fontcolor=white,
 		height=1.041,
 		label="Dummy LSTM layer (18)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
 		pos="352,1370",
 		style=filled,
-		textcolor=white,
 		tooltip="[topologyTest.lua]:50_",
 		width=3.3125];
 	n18 -> n13	 [pos="e,520.59,1287.1 415.61,1338.1 444.75,1323.9 479.76,1306.9 511.35,1291.6"];
@@ -230,11 +230,11 @@ digraph G {
 	n20 -> n17	 [pos="e,644.4,1540.1 667.58,1687.8 661.4,1648.4 652.56,1592.1 645.98,1550.2"];
 	n21	 [color=blue,
 		fillcolor=blue,
+		fontcolor=white,
 		height=1.041,
 		label="Dummy LSTM layer (21)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
 		pos="390,1614",
 		style=filled,
-		textcolor=white,
 		tooltip="[topologyTest.lua]:50_",
 		width=3.3125];
 	n21 -> n17	 [pos="e,558.59,1531.1 453.61,1582.1 482.75,1567.9 517.76,1550.9 549.35,1535.6"];
@@ -249,11 +249,11 @@ digraph G {
 	n23 -> n20	 [pos="e,682.4,1784.1 705.58,1931.8 699.4,1892.4 690.56,1836.1 683.98,1794.2"];
 	n24	 [color=blue,
 		fillcolor=blue,
+		fontcolor=white,
 		height=1.041,
 		label="Dummy LSTM layer (24)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
 		pos="428,1858",
 		style=filled,
-		textcolor=white,
 		tooltip="[topologyTest.lua]:50_",
 		width=3.3125];
 	n24 -> n20	 [pos="e,596.59,1775.1 491.61,1826.1 520.75,1811.9 555.76,1794.9 587.35,1779.6"];
@@ -268,11 +268,11 @@ digraph G {
 	n26 -> n23	 [pos="e,720.4,2028.1 743.58,2175.8 737.4,2136.4 728.56,2080.1 721.98,2038.2"];
 	n27	 [color=blue,
 		fillcolor=blue,
+		fontcolor=white,
 		height=1.041,
 		label="Dummy LSTM layer (27)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
 		pos="466,2102",
 		style=filled,
-		textcolor=white,
 		tooltip="[topologyTest.lua]:50_",
 		width=3.3125];
 	n27 -> n23	 [pos="e,634.59,2019.1 529.61,2070.1 558.75,2055.9 593.76,2038.9 625.35,2023.6"];
@@ -287,11 +287,11 @@ digraph G {
 	n29 -> n26	 [pos="e,758.4,2272.1 781.58,2419.8 775.4,2380.4 766.56,2324.1 759.98,2282.2"];
 	n30	 [color=blue,
 		fillcolor=blue,
+		fontcolor=white,
 		height=1.041,
 		label="Dummy LSTM layer (30)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
 		pos="504,2346",
 		style=filled,
-		textcolor=white,
 		tooltip="[topologyTest.lua]:50_",
 		width=3.3125];
 	n30 -> n26	 [pos="e,672.59,2263.1 567.61,2314.1 596.75,2299.9 631.76,2282.9 663.35,2267.6"];
@@ -306,11 +306,11 @@ digraph G {
 	n32 -> n29	 [pos="e,796.4,2516.1 819.58,2663.8 813.4,2624.4 804.56,2568.1 797.98,2526.2"];
 	n33	 [color=blue,
 		fillcolor=blue,
+		fontcolor=white,
 		height=1.041,
 		label="Dummy LSTM layer (33)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
 		pos="542,2590",
 		style=filled,
-		textcolor=white,
 		tooltip="[topologyTest.lua]:50_",
 		width=3.3125];
 	n33 -> n29	 [pos="e,710.59,2507.1 605.61,2558.1 634.75,2543.9 669.76,2526.9 701.35,2511.6"];
@@ -325,11 +325,11 @@ digraph G {
 	n35 -> n32	 [pos="e,834.4,2760.1 857.58,2907.8 851.4,2868.4 842.56,2812.1 835.98,2770.2"];
 	n36	 [color=blue,
 		fillcolor=blue,
+		fontcolor=white,
 		height=1.041,
 		label="Dummy LSTM layer (36)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
 		pos="580,2834",
 		style=filled,
-		textcolor=white,
 		tooltip="[topologyTest.lua]:50_",
 		width=3.3125];
 	n36 -> n32	 [pos="e,748.59,2751.1 643.61,2802.1 672.75,2787.9 707.76,2770.9 739.35,2755.6"];
@@ -344,11 +344,11 @@ digraph G {
 	n38 -> n35	 [pos="e,868.53,3004.1 871.25,3040.3 870.63,3032 869.95,3023 869.28,3014.1"];
 	n39	 [color=blue,
 		fillcolor=blue,
+		fontcolor=white,
 		height=1.041,
 		label="Dummy LSTM layer (39)\nmodule = nn.Linear(9 -> 8)\lreverseMap = {}",
 		pos="604,3078",
 		style=filled,
-		textcolor=white,
 		tooltip="[topologyTest.lua]:50_",
 		width=3.3125];
 	n39 -> n35	 [pos="e,783.75,2994.4 669.86,3046.7 701.61,3032.1 740.18,3014.4 774.62,2998.6"];
