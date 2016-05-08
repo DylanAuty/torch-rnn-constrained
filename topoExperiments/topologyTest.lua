@@ -14,7 +14,7 @@ require 'nngraph'
 ni =1;      -- Input layer size
 nh = 8;     -- Hidden layer size
 no = 1;     -- Output layer size
-len = 13;   -- Number of layers to put together
+len = 4;   -- Number of layers to put together
 
 -- INPUTS
 x = nn.Identity()():annotate{
