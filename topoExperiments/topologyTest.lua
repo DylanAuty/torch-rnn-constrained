@@ -21,17 +21,9 @@ x = nn.Identity()():annotate{
 	name = 'INPUT LAYER',
 	graphAttributes = {color = 'red'}
 }
+
 h0 = nn.Identity()()
---[[
-jt = x
-jt:annotate{
-	name = 'DEBUG: Begin JT'
-}
-]]--
 h = h0
-h:annotate{
-	name = 'DEBUG: Begin H'
-}
 
 -- Define the layers
 for i=1, len do
