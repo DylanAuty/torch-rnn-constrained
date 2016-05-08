@@ -11,7 +11,7 @@
 <polygon fill="white" stroke="none" points="-4,4 -4,-3588 1011,-3588 1011,4 -4,4"/>
 <!-- n1 -->
 <g id="node1" class="node"><title>n1</title>
-<g id="a_node1"><a xlink:title="[topologyTest.lua]:63_">
+<g id="a_node1"><a xlink:title="[topologyTest.lua]:62_">
 <ellipse fill="none" stroke="red" cx="278" cy="-150" rx="119.252" ry="37.4533"/>
 <text text-anchor="middle" x="278" y="-161.3" font-family="Times,serif" font-size="14.00">OUTPUT LAYER (1)</text>
 <text text-anchor="start" x="201.5" y="-146.3" font-family="Times,serif" font-size="14.00">module = nn.Linear(8 &#45;&gt; 1)</text>
@@ -36,7 +36,7 @@
 </g>
 <!-- n3 -->
 <g id="node3" class="node"><title>n3</title>
-<g id="a_node3"><a xlink:title="[topologyTest.lua]:55_">
+<g id="a_node3"><a xlink:title="[topologyTest.lua]:54_">
 <ellipse fill="none" stroke="yellow" cx="278" cy="-272" rx="124.176" ry="48.1667"/>
 <text text-anchor="middle" x="278" y="-290.8" font-family="Times,serif" font-size="14.00">Concatenation node (3)</text>
 <text text-anchor="start" x="198" y="-275.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -52,7 +52,7 @@
 </g>
 <!-- n4 -->
 <g id="node4" class="node"><title>n4</title>
-<g id="a_node4"><a xlink:title="[topologyTest.lua]:55_">
+<g id="a_node4"><a xlink:title="[topologyTest.lua]:54_">
 <ellipse fill="none" stroke="yellow" cx="399" cy="-516" rx="124.176" ry="48.1667"/>
 <text text-anchor="middle" x="399" y="-534.8" font-family="Times,serif" font-size="14.00">Concatenation node (4)</text>
 <text text-anchor="start" x="319" y="-519.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -68,8 +68,8 @@
 </g>
 <!-- n5 -->
 <g id="node5" class="node"><title>n5</title>
-<g id="a_node5"><a xlink:title="[topologyTest.lua]:51_">
-<ellipse fill="none" stroke="blue" cx="189" cy="-394" rx="119.252" ry="37.4533"/>
+<g id="a_node5"><a xlink:title="[topologyTest.lua]:50_">
+<ellipse fill="blue" stroke="blue" cx="189" cy="-394" rx="119.252" ry="37.4533"/>
 <text text-anchor="middle" x="189" y="-405.3" font-family="Times,serif" font-size="14.00">Dummy LSTM layer (5)</text>
 <text text-anchor="start" x="112.5" y="-390.3" font-family="Times,serif" font-size="14.00">module = nn.Linear(9 &#45;&gt; 8)</text>
 <text text-anchor="middle" x="189" y="-375.3" font-family="Times,serif" font-size="14.00">reverseMap = {}</text>
@@ -83,7 +83,7 @@
 </g>
 <!-- n6 -->
 <g id="node6" class="node"><title>n6</title>
-<g id="a_node6"><a xlink:title="[topologyTest.lua]:55_">
+<g id="a_node6"><a xlink:title="[topologyTest.lua]:54_">
 <ellipse fill="none" stroke="yellow" cx="518" cy="-760" rx="128.54" ry="48.1667"/>
 <text text-anchor="middle" x="518" y="-778.8" font-family="Times,serif" font-size="14.00">Concatenation node (6)</text>
 <text text-anchor="start" x="435" y="-763.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -99,8 +99,8 @@
 </g>
 <!-- n7 -->
 <g id="node7" class="node"><title>n7</title>
-<g id="a_node7"><a xlink:title="[topologyTest.lua]:51_">
-<ellipse fill="none" stroke="blue" cx="238" cy="-638" rx="119.252" ry="37.4533"/>
+<g id="a_node7"><a xlink:title="[topologyTest.lua]:50_">
+<ellipse fill="blue" stroke="blue" cx="238" cy="-638" rx="119.252" ry="37.4533"/>
 <text text-anchor="middle" x="238" y="-649.3" font-family="Times,serif" font-size="14.00">Dummy LSTM layer (7)</text>
 <text text-anchor="start" x="161.5" y="-634.3" font-family="Times,serif" font-size="14.00">module = nn.Linear(9 &#45;&gt; 8)</text>
 <text text-anchor="middle" x="238" y="-619.3" font-family="Times,serif" font-size="14.00">reverseMap = {}</text>
@@ -114,7 +114,7 @@
 </g>
 <!-- n8 -->
 <g id="node8" class="node"><title>n8</title>
-<g id="a_node8"><a xlink:title="[topologyTest.lua]:51_">
+<g id="a_node8"><a xlink:title="[topologyTest.lua]:50_">
 <ellipse fill="none" stroke="black" cx="128" cy="-516" rx="128.54" ry="48.1667"/>
 <text text-anchor="middle" x="128" y="-534.8" font-family="Times,serif" font-size="14.00">Node8</text>
 <text text-anchor="start" x="45" y="-519.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -135,7 +135,7 @@
 </g>
 <!-- n9 -->
 <g id="node9" class="node"><title>n9</title>
-<g id="a_node9"><a xlink:title="[topologyTest.lua]:55_">
+<g id="a_node9"><a xlink:title="[topologyTest.lua]:54_">
 <ellipse fill="none" stroke="yellow" cx="561" cy="-1004" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="561" y="-1022.8" font-family="Times,serif" font-size="14.00">Concatenation node (9)</text>
 <text text-anchor="start" x="474.5" y="-1007.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -151,8 +151,8 @@
 </g>
 <!-- n10 -->
 <g id="node10" class="node"><title>n10</title>
-<g id="a_node10"><a xlink:title="[topologyTest.lua]:51_">
-<ellipse fill="none" stroke="blue" cx="276" cy="-882" rx="119.252" ry="37.4533"/>
+<g id="a_node10"><a xlink:title="[topologyTest.lua]:50_">
+<ellipse fill="blue" stroke="blue" cx="276" cy="-882" rx="119.252" ry="37.4533"/>
 <text text-anchor="middle" x="276" y="-893.3" font-family="Times,serif" font-size="14.00">Dummy LSTM layer (10)</text>
 <text text-anchor="start" x="199.5" y="-878.3" font-family="Times,serif" font-size="14.00">module = nn.Linear(9 &#45;&gt; 8)</text>
 <text text-anchor="middle" x="276" y="-863.3" font-family="Times,serif" font-size="14.00">reverseMap = {}</text>
@@ -166,7 +166,7 @@
 </g>
 <!-- n11 -->
 <g id="node11" class="node"><title>n11</title>
-<g id="a_node11"><a xlink:title="[topologyTest.lua]:51_">
+<g id="a_node11"><a xlink:title="[topologyTest.lua]:50_">
 <ellipse fill="none" stroke="black" cx="238" cy="-760" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="238" y="-778.8" font-family="Times,serif" font-size="14.00">Node11</text>
 <text text-anchor="start" x="151.5" y="-763.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -207,7 +207,7 @@
 </g>
 <!-- n15 -->
 <g id="node15" class="node"><title>n15</title>
-<g id="a_node15"><a xlink:title="[topologyTest.lua]:51_">
+<g id="a_node15"><a xlink:title="[topologyTest.lua]:50_">
 <ellipse fill="none" stroke="black" cx="276" cy="-1004" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="276" y="-1022.8" font-family="Times,serif" font-size="14.00">Node15</text>
 <text text-anchor="start" x="189.5" y="-1007.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -223,7 +223,7 @@
 </g>
 <!-- n19 -->
 <g id="node19" class="node"><title>n19</title>
-<g id="a_node19"><a xlink:title="[topologyTest.lua]:51_">
+<g id="a_node19"><a xlink:title="[topologyTest.lua]:50_">
 <ellipse fill="none" stroke="black" cx="314" cy="-1248" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="314" y="-1266.8" font-family="Times,serif" font-size="14.00">Node19</text>
 <text text-anchor="start" x="227.5" y="-1251.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -239,7 +239,7 @@
 </g>
 <!-- n22 -->
 <g id="node22" class="node"><title>n22</title>
-<g id="a_node22"><a xlink:title="[topologyTest.lua]:51_">
+<g id="a_node22"><a xlink:title="[topologyTest.lua]:50_">
 <ellipse fill="none" stroke="black" cx="352" cy="-1492" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="352" y="-1510.8" font-family="Times,serif" font-size="14.00">Node22</text>
 <text text-anchor="start" x="265.5" y="-1495.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -255,7 +255,7 @@
 </g>
 <!-- n25 -->
 <g id="node25" class="node"><title>n25</title>
-<g id="a_node25"><a xlink:title="[topologyTest.lua]:51_">
+<g id="a_node25"><a xlink:title="[topologyTest.lua]:50_">
 <ellipse fill="none" stroke="black" cx="390" cy="-1736" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="390" y="-1754.8" font-family="Times,serif" font-size="14.00">Node25</text>
 <text text-anchor="start" x="303.5" y="-1739.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -271,7 +271,7 @@
 </g>
 <!-- n28 -->
 <g id="node28" class="node"><title>n28</title>
-<g id="a_node28"><a xlink:title="[topologyTest.lua]:51_">
+<g id="a_node28"><a xlink:title="[topologyTest.lua]:50_">
 <ellipse fill="none" stroke="black" cx="428" cy="-1980" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="428" y="-1998.8" font-family="Times,serif" font-size="14.00">Node28</text>
 <text text-anchor="start" x="341.5" y="-1983.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -287,7 +287,7 @@
 </g>
 <!-- n31 -->
 <g id="node31" class="node"><title>n31</title>
-<g id="a_node31"><a xlink:title="[topologyTest.lua]:51_">
+<g id="a_node31"><a xlink:title="[topologyTest.lua]:50_">
 <ellipse fill="none" stroke="black" cx="466" cy="-2224" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="466" y="-2242.8" font-family="Times,serif" font-size="14.00">Node31</text>
 <text text-anchor="start" x="379.5" y="-2227.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -303,7 +303,7 @@
 </g>
 <!-- n34 -->
 <g id="node34" class="node"><title>n34</title>
-<g id="a_node34"><a xlink:title="[topologyTest.lua]:51_">
+<g id="a_node34"><a xlink:title="[topologyTest.lua]:50_">
 <ellipse fill="none" stroke="black" cx="504" cy="-2468" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="504" y="-2486.8" font-family="Times,serif" font-size="14.00">Node34</text>
 <text text-anchor="start" x="417.5" y="-2471.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -319,7 +319,7 @@
 </g>
 <!-- n37 -->
 <g id="node37" class="node"><title>n37</title>
-<g id="a_node37"><a xlink:title="[topologyTest.lua]:51_">
+<g id="a_node37"><a xlink:title="[topologyTest.lua]:50_">
 <ellipse fill="none" stroke="black" cx="542" cy="-2712" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="542" y="-2730.8" font-family="Times,serif" font-size="14.00">Node37</text>
 <text text-anchor="start" x="455.5" y="-2715.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -335,7 +335,7 @@
 </g>
 <!-- n40 -->
 <g id="node40" class="node"><title>n40</title>
-<g id="a_node40"><a xlink:title="[topologyTest.lua]:51_">
+<g id="a_node40"><a xlink:title="[topologyTest.lua]:50_">
 <ellipse fill="none" stroke="black" cx="580" cy="-2956" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="580" y="-2974.8" font-family="Times,serif" font-size="14.00">Node40</text>
 <text text-anchor="start" x="493.5" y="-2959.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -352,7 +352,7 @@
 <!-- n41 -->
 <g id="node41" class="node"><title>n41</title>
 <g id="a_node41"><a xlink:title="[topologyTest.lua]:40_">
-<ellipse fill="none" stroke="blue" cx="661" cy="-3322" rx="138.951" ry="37.4533"/>
+<ellipse fill="blue" stroke="blue" cx="661" cy="-3322" rx="138.951" ry="37.4533"/>
 <text text-anchor="middle" x="661" y="-3333.3" font-family="Times,serif" font-size="14.00">Dummy LSTM layer (First) (41)</text>
 <text text-anchor="start" x="570.5" y="-3318.3" font-family="Times,serif" font-size="14.00">module = nn.Linear(9 &#45;&gt; 8)</text>
 <text text-anchor="middle" x="661" y="-3303.3" font-family="Times,serif" font-size="14.00">reverseMap = {}</text>
@@ -366,7 +366,7 @@
 </g>
 <!-- n42 -->
 <g id="node42" class="node"><title>n42</title>
-<g id="a_node42"><a xlink:title="[topologyTest.lua]:51_">
+<g id="a_node42"><a xlink:title="[topologyTest.lua]:50_">
 <ellipse fill="none" stroke="black" cx="618" cy="-3200" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="618" y="-3218.8" font-family="Times,serif" font-size="14.00">Node42</text>
 <text text-anchor="start" x="531.5" y="-3203.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -382,7 +382,7 @@
 </g>
 <!-- n13 -->
 <g id="node13" class="node"><title>n13</title>
-<g id="a_node13"><a xlink:title="[topologyTest.lua]:55_">
+<g id="a_node13"><a xlink:title="[topologyTest.lua]:54_">
 <ellipse fill="none" stroke="yellow" cx="599" cy="-1248" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="599" y="-1266.8" font-family="Times,serif" font-size="14.00">Concatenation node (13)</text>
 <text text-anchor="start" x="512.5" y="-1251.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -398,8 +398,8 @@
 </g>
 <!-- n14 -->
 <g id="node14" class="node"><title>n14</title>
-<g id="a_node14"><a xlink:title="[topologyTest.lua]:51_">
-<ellipse fill="none" stroke="blue" cx="314" cy="-1126" rx="119.252" ry="37.4533"/>
+<g id="a_node14"><a xlink:title="[topologyTest.lua]:50_">
+<ellipse fill="blue" stroke="blue" cx="314" cy="-1126" rx="119.252" ry="37.4533"/>
 <text text-anchor="middle" x="314" y="-1137.3" font-family="Times,serif" font-size="14.00">Dummy LSTM layer (14)</text>
 <text text-anchor="start" x="237.5" y="-1122.3" font-family="Times,serif" font-size="14.00">module = nn.Linear(9 &#45;&gt; 8)</text>
 <text text-anchor="middle" x="314" y="-1107.3" font-family="Times,serif" font-size="14.00">reverseMap = {}</text>
@@ -438,7 +438,7 @@
 </g>
 <!-- n17 -->
 <g id="node17" class="node"><title>n17</title>
-<g id="a_node17"><a xlink:title="[topologyTest.lua]:55_">
+<g id="a_node17"><a xlink:title="[topologyTest.lua]:54_">
 <ellipse fill="none" stroke="yellow" cx="637" cy="-1492" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="637" y="-1510.8" font-family="Times,serif" font-size="14.00">Concatenation node (17)</text>
 <text text-anchor="start" x="550.5" y="-1495.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -454,8 +454,8 @@
 </g>
 <!-- n18 -->
 <g id="node18" class="node"><title>n18</title>
-<g id="a_node18"><a xlink:title="[topologyTest.lua]:51_">
-<ellipse fill="none" stroke="blue" cx="352" cy="-1370" rx="119.252" ry="37.4533"/>
+<g id="a_node18"><a xlink:title="[topologyTest.lua]:50_">
+<ellipse fill="blue" stroke="blue" cx="352" cy="-1370" rx="119.252" ry="37.4533"/>
 <text text-anchor="middle" x="352" y="-1381.3" font-family="Times,serif" font-size="14.00">Dummy LSTM layer (18)</text>
 <text text-anchor="start" x="275.5" y="-1366.3" font-family="Times,serif" font-size="14.00">module = nn.Linear(9 &#45;&gt; 8)</text>
 <text text-anchor="middle" x="352" y="-1351.3" font-family="Times,serif" font-size="14.00">reverseMap = {}</text>
@@ -479,7 +479,7 @@
 </g>
 <!-- n20 -->
 <g id="node20" class="node"><title>n20</title>
-<g id="a_node20"><a xlink:title="[topologyTest.lua]:55_">
+<g id="a_node20"><a xlink:title="[topologyTest.lua]:54_">
 <ellipse fill="none" stroke="yellow" cx="675" cy="-1736" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="675" y="-1754.8" font-family="Times,serif" font-size="14.00">Concatenation node (20)</text>
 <text text-anchor="start" x="588.5" y="-1739.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -495,8 +495,8 @@
 </g>
 <!-- n21 -->
 <g id="node21" class="node"><title>n21</title>
-<g id="a_node21"><a xlink:title="[topologyTest.lua]:51_">
-<ellipse fill="none" stroke="blue" cx="390" cy="-1614" rx="119.252" ry="37.4533"/>
+<g id="a_node21"><a xlink:title="[topologyTest.lua]:50_">
+<ellipse fill="blue" stroke="blue" cx="390" cy="-1614" rx="119.252" ry="37.4533"/>
 <text text-anchor="middle" x="390" y="-1625.3" font-family="Times,serif" font-size="14.00">Dummy LSTM layer (21)</text>
 <text text-anchor="start" x="313.5" y="-1610.3" font-family="Times,serif" font-size="14.00">module = nn.Linear(9 &#45;&gt; 8)</text>
 <text text-anchor="middle" x="390" y="-1595.3" font-family="Times,serif" font-size="14.00">reverseMap = {}</text>
@@ -520,7 +520,7 @@
 </g>
 <!-- n23 -->
 <g id="node23" class="node"><title>n23</title>
-<g id="a_node23"><a xlink:title="[topologyTest.lua]:55_">
+<g id="a_node23"><a xlink:title="[topologyTest.lua]:54_">
 <ellipse fill="none" stroke="yellow" cx="713" cy="-1980" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="713" y="-1998.8" font-family="Times,serif" font-size="14.00">Concatenation node (23)</text>
 <text text-anchor="start" x="626.5" y="-1983.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -536,8 +536,8 @@
 </g>
 <!-- n24 -->
 <g id="node24" class="node"><title>n24</title>
-<g id="a_node24"><a xlink:title="[topologyTest.lua]:51_">
-<ellipse fill="none" stroke="blue" cx="428" cy="-1858" rx="119.252" ry="37.4533"/>
+<g id="a_node24"><a xlink:title="[topologyTest.lua]:50_">
+<ellipse fill="blue" stroke="blue" cx="428" cy="-1858" rx="119.252" ry="37.4533"/>
 <text text-anchor="middle" x="428" y="-1869.3" font-family="Times,serif" font-size="14.00">Dummy LSTM layer (24)</text>
 <text text-anchor="start" x="351.5" y="-1854.3" font-family="Times,serif" font-size="14.00">module = nn.Linear(9 &#45;&gt; 8)</text>
 <text text-anchor="middle" x="428" y="-1839.3" font-family="Times,serif" font-size="14.00">reverseMap = {}</text>
@@ -561,7 +561,7 @@
 </g>
 <!-- n26 -->
 <g id="node26" class="node"><title>n26</title>
-<g id="a_node26"><a xlink:title="[topologyTest.lua]:55_">
+<g id="a_node26"><a xlink:title="[topologyTest.lua]:54_">
 <ellipse fill="none" stroke="yellow" cx="751" cy="-2224" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="751" y="-2242.8" font-family="Times,serif" font-size="14.00">Concatenation node (26)</text>
 <text text-anchor="start" x="664.5" y="-2227.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -577,8 +577,8 @@
 </g>
 <!-- n27 -->
 <g id="node27" class="node"><title>n27</title>
-<g id="a_node27"><a xlink:title="[topologyTest.lua]:51_">
-<ellipse fill="none" stroke="blue" cx="466" cy="-2102" rx="119.252" ry="37.4533"/>
+<g id="a_node27"><a xlink:title="[topologyTest.lua]:50_">
+<ellipse fill="blue" stroke="blue" cx="466" cy="-2102" rx="119.252" ry="37.4533"/>
 <text text-anchor="middle" x="466" y="-2113.3" font-family="Times,serif" font-size="14.00">Dummy LSTM layer (27)</text>
 <text text-anchor="start" x="389.5" y="-2098.3" font-family="Times,serif" font-size="14.00">module = nn.Linear(9 &#45;&gt; 8)</text>
 <text text-anchor="middle" x="466" y="-2083.3" font-family="Times,serif" font-size="14.00">reverseMap = {}</text>
@@ -602,7 +602,7 @@
 </g>
 <!-- n29 -->
 <g id="node29" class="node"><title>n29</title>
-<g id="a_node29"><a xlink:title="[topologyTest.lua]:55_">
+<g id="a_node29"><a xlink:title="[topologyTest.lua]:54_">
 <ellipse fill="none" stroke="yellow" cx="789" cy="-2468" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="789" y="-2486.8" font-family="Times,serif" font-size="14.00">Concatenation node (29)</text>
 <text text-anchor="start" x="702.5" y="-2471.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -618,8 +618,8 @@
 </g>
 <!-- n30 -->
 <g id="node30" class="node"><title>n30</title>
-<g id="a_node30"><a xlink:title="[topologyTest.lua]:51_">
-<ellipse fill="none" stroke="blue" cx="504" cy="-2346" rx="119.252" ry="37.4533"/>
+<g id="a_node30"><a xlink:title="[topologyTest.lua]:50_">
+<ellipse fill="blue" stroke="blue" cx="504" cy="-2346" rx="119.252" ry="37.4533"/>
 <text text-anchor="middle" x="504" y="-2357.3" font-family="Times,serif" font-size="14.00">Dummy LSTM layer (30)</text>
 <text text-anchor="start" x="427.5" y="-2342.3" font-family="Times,serif" font-size="14.00">module = nn.Linear(9 &#45;&gt; 8)</text>
 <text text-anchor="middle" x="504" y="-2327.3" font-family="Times,serif" font-size="14.00">reverseMap = {}</text>
@@ -643,7 +643,7 @@
 </g>
 <!-- n32 -->
 <g id="node32" class="node"><title>n32</title>
-<g id="a_node32"><a xlink:title="[topologyTest.lua]:55_">
+<g id="a_node32"><a xlink:title="[topologyTest.lua]:54_">
 <ellipse fill="none" stroke="yellow" cx="827" cy="-2712" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="827" y="-2730.8" font-family="Times,serif" font-size="14.00">Concatenation node (32)</text>
 <text text-anchor="start" x="740.5" y="-2715.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -659,8 +659,8 @@
 </g>
 <!-- n33 -->
 <g id="node33" class="node"><title>n33</title>
-<g id="a_node33"><a xlink:title="[topologyTest.lua]:51_">
-<ellipse fill="none" stroke="blue" cx="542" cy="-2590" rx="119.252" ry="37.4533"/>
+<g id="a_node33"><a xlink:title="[topologyTest.lua]:50_">
+<ellipse fill="blue" stroke="blue" cx="542" cy="-2590" rx="119.252" ry="37.4533"/>
 <text text-anchor="middle" x="542" y="-2601.3" font-family="Times,serif" font-size="14.00">Dummy LSTM layer (33)</text>
 <text text-anchor="start" x="465.5" y="-2586.3" font-family="Times,serif" font-size="14.00">module = nn.Linear(9 &#45;&gt; 8)</text>
 <text text-anchor="middle" x="542" y="-2571.3" font-family="Times,serif" font-size="14.00">reverseMap = {}</text>
@@ -684,7 +684,7 @@
 </g>
 <!-- n35 -->
 <g id="node35" class="node"><title>n35</title>
-<g id="a_node35"><a xlink:title="[topologyTest.lua]:55_">
+<g id="a_node35"><a xlink:title="[topologyTest.lua]:54_">
 <ellipse fill="none" stroke="yellow" cx="865" cy="-2956" rx="133.465" ry="48.1667"/>
 <text text-anchor="middle" x="865" y="-2974.8" font-family="Times,serif" font-size="14.00">Concatenation node (35)</text>
 <text text-anchor="start" x="778.5" y="-2959.8" font-family="Times,serif" font-size="14.00">module = nn.JoinTable</text>
@@ -700,8 +700,8 @@
 </g>
 <!-- n36 -->
 <g id="node36" class="node"><title>n36</title>
-<g id="a_node36"><a xlink:title="[topologyTest.lua]:51_">
-<ellipse fill="none" stroke="blue" cx="580" cy="-2834" rx="119.252" ry="37.4533"/>
+<g id="a_node36"><a xlink:title="[topologyTest.lua]:50_">
+<ellipse fill="blue" stroke="blue" cx="580" cy="-2834" rx="119.252" ry="37.4533"/>
 <text text-anchor="middle" x="580" y="-2845.3" font-family="Times,serif" font-size="14.00">Dummy LSTM layer (36)</text>
 <text text-anchor="start" x="503.5" y="-2830.3" font-family="Times,serif" font-size="14.00">module = nn.Linear(9 &#45;&gt; 8)</text>
 <text text-anchor="middle" x="580" y="-2815.3" font-family="Times,serif" font-size="14.00">reverseMap = {}</text>
@@ -740,8 +740,8 @@
 </g>
 <!-- n39 -->
 <g id="node39" class="node"><title>n39</title>
-<g id="a_node39"><a xlink:title="[topologyTest.lua]:51_">
-<ellipse fill="none" stroke="blue" cx="604" cy="-3078" rx="119.252" ry="37.4533"/>
+<g id="a_node39"><a xlink:title="[topologyTest.lua]:50_">
+<ellipse fill="blue" stroke="blue" cx="604" cy="-3078" rx="119.252" ry="37.4533"/>
 <text text-anchor="middle" x="604" y="-3089.3" font-family="Times,serif" font-size="14.00">Dummy LSTM layer (39)</text>
 <text text-anchor="start" x="527.5" y="-3074.3" font-family="Times,serif" font-size="14.00">module = nn.Linear(9 &#45;&gt; 8)</text>
 <text text-anchor="middle" x="604" y="-3059.3" font-family="Times,serif" font-size="14.00">reverseMap = {}</text>

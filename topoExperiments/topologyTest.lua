@@ -39,18 +39,17 @@ for i=1, len do
 	if i==1 then		
 		h = nn.Linear(ni+nh, nh)(x):annotate{ -- Each hidden layer is just an nn.Linear for the time being
    		name = 'Dummy LSTM layer (First)',
-			graphAttributes = {color = 'blue'}
+			graphAttributes = {color = 'blue', style='filled', fillcolor='blue', textcolor='white'}
 		}
 		jt = nn.Identity(1)({h}):annotate{ -- Create a join table for the outgoing skip connections
 			name = 'Concatenation node (First)',
 			graphAttributes = {color = 'yellow'}
 		}
 	-- For 2nd layer onwards
-	elseif i~=1 then
-		
+	elseif i~=1 then	
 		h = nn.Linear(ni+nh, nh)(nn.JoinTable(1)({h, x})):annotate{ -- Each hidden layer is just an nn.Linear for the time being
    		name = 'Dummy LSTM layer',
-			graphAttributes = {color = 'blue'}
+			graphAttributes = {color = 'blue', style='filled', fillcolor='blue', textcolor='white'}
 		}
 		jt = nn.JoinTable(1)({jt, h}):annotate{ -- Create a join table for the outgoing skip connections
 			name = 'Concatenation node',
