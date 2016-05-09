@@ -1,0 +1,31 @@
+digraph G {
+labelloc="t";
+label="nngraph_1in_1out";
+node [shape = oval]; 
+n1[label="Node1\nmodule = nn.Identity\lreverseMap = {}" tooltip="[./LanguageModelSkipCon.lua]:111_"];
+n2[label="Node2\ninput = {}\lreverseMap = {}" tooltip="[[C]]:-1_"];
+n3[label="Node3\nmodule = nn.Sequential {\l  [input -> (1) -> (2) -> output]\l  (1): nn.View(50,-1)\l  (2): nn.View(1,50,-1)\l}\lreverseMap = {}" tooltip="[./LanguageModelSkipCon.lua]:111_"];
+n4[label="Node4\nmodule = nn.Tanh\lreverseMap = {}" tooltip="[./LanguageModelSkipCon.lua]:95_"];
+n5[label="Node5\ninput = {torch.CudaTensor[1x50x256]}\lmodule = nn.Linear(256 -> 128)\lreverseMap = {}" tooltip="[./LanguageModelSkipCon.lua]:94_"];
+n6[label="Node6\ninput = {torch.CudaTensor[1x50x128],torch.CudaTensor[1x50x128]}\lmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node7,Node8}" tooltip="[./LanguageModelSkipCon.lua]:85_"];
+n7[label="Node7\ninput = {torch.CudaTensor[1x50x128]}\lmodule = nn.Identity\lreverseMap = {}" tooltip="[./LanguageModelSkipCon.lua]:64_"];
+n8[label="Node8\ninput = {torch.CudaTensor[1x50x192]}\lmodule = nn.LSTM\lreverseMap = {}" tooltip="[./LanguageModelSkipCon.lua]:78_"];
+n9[label="Node9\ninput = {torch.CudaTensor[1x50x64]}\lmodule = nn.LSTM\lreverseMap = {}" tooltip="[./LanguageModelSkipCon.lua]:58_"];
+n10[label="Node10\ninput = {torch.CudaTensor[1x50x128],torch.CudaTensor[1x50x64]}\lmodule = nn.JoinTable\lreverseMap = {}\lmapindex = {Node9,Node11}" tooltip="[./LanguageModelSkipCon.lua]:78_"];
+n11[label="Node11\ninput = {torch.CudaTensor[1x50]}\lmodule = nn.LookupTable\lreverseMap = {}" tooltip="[./LanguageModelSkipCon.lua]:41_"];
+n12[label="Node12\ninput = {torch.CudaTensor[1x50]}\lreverseMap = {}" tooltip="[[C]]:-1_"];
+n1 -> n2;
+n3 -> n1;
+n4 -> n3;
+n5 -> n4;
+n6 -> n5;
+n7 -> n6;
+n8 -> n6;
+n9 -> n7;
+n10 -> n8;
+n11 -> n9;
+n9 -> n10;
+n11 -> n10;
+n12 -> n11;
+n5[style=filled, fillcolor=red];
+}
