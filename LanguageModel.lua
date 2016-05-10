@@ -37,8 +37,9 @@ function LM:__init(kwargs)
   self.bn_view_out = {}
 	
 	local LUT = nn.LookupTable(V, D)()
-  --self.net:add(nn.LookupTable(V, D))
-  for i = 1, self.num_layers do
+  self.net:add(nn.LookupTable(V, D))
+  local newC = nn.Sequential()
+	for i = 1, self.num_layers do
     local prev_dim = H
     if i == 1 then prev_dim = D end
     local rnn
@@ -49,18 +50,18 @@ function LM:__init(kwargs)
     end
     rnn.remember_states = true
     table.insert(self.rnns, rnn)
-    self.net:add(rnn)
+    newC:add(rnn)
     if self.batchnorm == 1 then
       local view_in = nn.View(1, 1, -1):setNumInputDims(3)
       table.insert(self.bn_view_in, view_in)
-      self.net:add(view_in)
-      self.net:add(nn.BatchNormalization(H))
+      newC:add(view_in)
+      newC:add(nn.BatchNormalization(H))
       local view_out = nn.View(1, -1):setNumInputDims(2)
       table.insert(self.bn_view_out, view_out)
-      self.net:add(view_out)
+      newC:add(view_out)
     end
     if self.dropout > 0 then
-      self.net:add(nn.Dropout(self.dropout))
+      newC:add(nn.Dropout(self.dropout))
     end
   end
 
@@ -74,19 +75,31 @@ function LM:__init(kwargs)
   self.view1 = nn.View(1, 1, -1):setNumInputDims(3)
   self.view2 = nn.View(1, -1):setNumInputDims(2)
 
-  self.net:add(self.view1)
-  self.net:add(nn.Linear(H, V))
-  self.net:add(self.view2)
+  newC:add(self.view1)
+  newC:add(nn.Linear(H, V))
+  newC:add(self.view2)
 	
+	-- At this point, self.net is an nn.Sequential() containing only the lookup table.
+	-- newC is an nn.Sequential() containing the rest of the network.
+	-- Create a gModule containing newC only
+	-- add this module to self.net.
+	
+	--self.net:add(newC)
+	local gInLayer = nn.Identity()()
+	local gMN = newC(gInLayer)
+
+	local newG = nn.gModule({gInLayer}, {gMN})
+	self.net:add(newG)
+	print(self.net)
+
 	--[[
 	-- DEBUGGING TEST BELOW:
 	-- Trying to wrap the given network in an nngraph module, to see if it works.
 	-- Can be invoked with no architecture argument to train.lua (it thinks this is the normal network)
 	]]--
-	--outModule = nn.Identity()(self.net())
-	self.net = self.net(LUT)
+	
 
-	self.net = nn.gModule({LUT}, {nn.Identity()(self.net)})
+	--self.net = nn.gModule({LUT}, {nn.Identity()(self.net)})
 
 end
 
