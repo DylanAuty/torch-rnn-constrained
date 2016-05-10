@@ -1,13 +1,10 @@
 require 'torch'
 require 'nn'
-require 'nngraph'
 
 require 'VanillaRNN'
 require 'LSTM'
 
 local utils = require 'util.utils'
-
-nngraph.setDebug(true)
 
 
 local LM, parent = torch.class('nn.LanguageModelSkipCon', 'nn.Module')
@@ -30,104 +27,43 @@ function LM:__init(kwargs)
   self.batchnorm = utils.get_kwarg(kwargs, 'batchnorm')
 
   local V, D, H = self.vocab_size, self.wordvec_dim, self.rnn_size
-  --self.net = nn.Sequential()
-  self.rnns = {}					-- This is used by LM:resetStates to clear all LSTM/RNN states.
-  self.bn_view_in = {}	
+	
+	--[[ Building Skip Connected network --]]
+	--[[ Structure after nn.LookupTable(V, D):
+	--	First layer, composed of 2 sub-layers:
+	--	l1 is nn.Sequential(), l1[1] is first layer of l1, l1[1][1] is first module of first layer of l1
+	--	l1[1][1] = LSTM						
+	--	l1[1][2] = nn.Identity()	(For incoming skip connections)
+	--	Connections:
+	--		l1 -> l1[1][1]					Copying the input to both cells of the first sub-layer
+	--		l1 -> l1[1][2]
+	--	------------------------
+	--	l1[2][1] = nn.Identity()	(For outgoing skip connections - will turn into a join in future layers)
+	--	l1[2][2] = nn.Join()			(Join input and previous LSTM output for incoming skip connections)
+	--	l1[2][3] = nn.Identity()	(For incoming skip connections, transferring forwards)
+	--	Connections:
+	--		l1[1][1] -> l1[2][1]		(LSTM -> Outgoing skip 'accumulator' (line of repeated table joins))
+	--		
+	--		l1[1][1] -> l1[2][2]		(LSTM -> Join with network input (for incoming skip connctions))
+	--		l1[1][2] -> l1[2][2]		(Input forwarder -> Join with LSTM (for incoming skip connctions))
+	--		
+	--		l1[1][2] -> l1[2][3]		(network input forwarder -> network input forwarder))
+	--	------------------------
+	--	Layers n != 1 are identical to layer 1, EXCEPT:
+	--	ln[1][3] = nn.Identity()	(For forwarding network input)
+	--	ln[2][3] = nn.Join()			(Outgoing skip 'accumulator' (line of repeated table joins with LSTM outputs))
+	--	Additional connections:
+	--		ln[1][1] -> ln[2][3]		(LSTM -> outgoing skip accumulator)
+	--		ln[1][3] -> ln[2][1]		(network input forwarder -> network input forwarder)
+	--]]
+
+  self.net = nn.Sequential()
+  self.rnns = {}
+  self.bn_view_in = {}
   self.bn_view_out = {}
-	
-	--[[ Defining modules to be used in the graph --]]
-	
-  --self.net:add(nn.LookupTable(V, D))	-- Originally this was the first layer of the nn.Sequential container.
-  local LUT = nn.LookupTable(V, D)()		-- This is the first thing in the graph.
-	-- Creating a skip connected LSTM with self.num_layers hidden layers
-	
-	local rnn
-	local jt
 
-	for i = 1, self.num_layers do
-		local prev_dim = D+H							-- All layers above the first layer have input size D+H
-		
-		-- Select the model type, VanillaRNN.lua or LSTM.lua
-		-- All layers will have output size H.
-		if i == 1 then	-- On first layer, connect first layer to input (rather than previous layer)
-			prev_dim = D	-- First layer input size is only D
-			if self.model_type == 'rnn' then
-				rnn = nn.VanillaRNN(prev_dim, H)(LUT)
-			elseif self.model_type == 'lstm' then
-				rnn = nn.LSTM(prev_dim, H)(LUT)
-			end
-			-- Set the layer up and insert it into a reference table of all layers
-			rnn.remember_states = true
-			table.insert(self.rnns, rnn)
-			
-			jt = nn.Identity()(rnn)
-
-			-- self.net:add(rnn)	-- This line was used when self.net was an nn.Sequential().
-			--[[BATCHNORM GOES HERE --]]
-
-			--[[DROPOUT GOES HERE --]]	
-		
-		elseif i ~= 1 then
-			--DEBUGLINE
-			prev_dim = H
-			--/DEBUGLINE
-			if self.model_type == 'rnn' then
-				rnn = nn.VanillaRNN(prev_dim, H)(nn.JoinTable(2)({rnn, LUT})[{{}, {}, 1}])
-			elseif self.model_type == 'lstm' then
-				--rnn = nn.LSTM(prev_dim, H)(nn.JoinTable(3)({rnn, LUT}))
-				rnn = nn.LSTM(prev_dim, H)(rnn)
-			end
-			-- Set the layer up and insert it into a reference table of all layers
-			rnn.remember_states = true
-			table.insert(self.rnns, rnn)
-
-			jt = nn.JoinTable(3)({jt, rnn})
-			-- self.net:add(rnn)	-- This line was used when self.net was an nn.Sequential().
-			--[[BATCHNORM GOES HERE --]]
-
-			--[[DROPOUT GOES HERE --]]	
-		end
-	end
-  
-	-- At the end of this, jt contains the outputs and all the skip connections - we need to reign in the dimensions.
-	-- Tensor will be shape (N, T, num_layers*H) due to skip connections
-	-- To deal with nn.Linear, we need to convert dimensions using views as below:
-	-- (N,T,num_layer*H) -> (NT, num_layers*H) -> {nn.Linear(num_layers * H, H)} -> (N, T, H)
-	
-	compactorContainer = nn.Sequential()
-	--[[
-	Cview1 = nn.View(1, 1, -1):setNumInputDims(3)
-	Cview2 = nn.View(1, -1):setNumInputDims(2)
-	compactorContainer:add(Cview1)
-	compactorContainer:add(nn.Linear(self.num_layers * H, H))
-	compactorContainer:add(nn.SoftMax())	-- Graves Et Al, 2013 specifies an output function - but doesn't say what it is. Softmax used instead.
-	compactorContainer:add(Cview2)
-	]]--
-
-	-- After all the RNNs run, we will have a tensor of shape (N, T, H);
-  -- we want to apply a 1D temporal convolution to predict scores for each
-  -- vocab element, giving a tensor of shape (N, T, V). Unfortunately
-  -- nn.TemporalConvolution is SUPER slow, so instead we will use a pair of
-  -- views (N, T, H) -> (NT, H) and (NT, V) -> (N, T, V) with a nn.Linear in
-  -- between. Unfortunately N and T can change on every minibatch, so we need
-  -- to set them in the forward pass.
-	convoContainer = nn.Sequential()
-	
-	self.view1 = nn.View(1, 1, -1):setNumInputDims(3)
-	self.view2 = nn.View(1, -1):setNumInputDims(2)
-	convoContainer:add(self.view1)
-	convoContainer:add(nn.Linear(self.num_layers * H, V))
-	convoContainer:add(self.view2)
-	-- Plug together: rnn -> view1 -> Linear(H, V) -> view2
-	--y = nn.Identity()(convoContainer(compactorContainer(jt)))
-	y = nn.Identity()(convoContainer(jt))
-	self.net = nn.gModule({LUT}, {y})
-
-	graph.dot(self.net.fg, 'Built1', 'debug1fg')
-	--[[
-	-- Copy of original loop below
-	--
-	for i = 1, self.num_layers do
+  self.net:add(nn.LookupTable(V, D))
+  for i = 1, self.num_layers do
     local prev_dim = H
     if i == 1 then prev_dim = D end
     local rnn
@@ -152,22 +88,25 @@ function LM:__init(kwargs)
       self.net:add(nn.Dropout(self.dropout))
     end
   end
-	--]]
-	
-	--[[
+
+  -- After all the RNNs run, we will have a tensor of shape (N, T, H);
+  -- we want to apply a 1D temporal convolution to predict scores for each
+  -- vocab element, giving a tensor of shape (N, T, V). Unfortunately
+  -- nn.TemporalConvolution is SUPER slow, so instead we will use a pair of
+  -- views (N, T, H) -> (NT, H) and (NT, V) -> (N, T, V) with a nn.Linear in
+  -- between. Unfortunately N and T can change on every minibatch, so we need
+  -- to set them in the forward pass.
   self.view1 = nn.View(1, 1, -1):setNumInputDims(3)
   self.view2 = nn.View(1, -1):setNumInputDims(2)
-	
+
   self.net:add(self.view1)
   self.net:add(nn.Linear(H, V))
   self.net:add(self.view2)
-	]]--
 end
 
 
 function LM:updateOutput(input)
-  
-	local N, T = input:size(1), input:size(2)
+  local N, T = input:size(1), input:size(2)
   self.view1:resetSize(N * T, -1)
   self.view2:resetSize(N, T, -1)
 
@@ -177,13 +116,13 @@ function LM:updateOutput(input)
   for _, view_out in ipairs(self.bn_view_out) do
     view_out:resetSize(N, T, -1)
   end
+
   return self.net:forward(input)
 end
 
 
 function LM:backward(input, gradOutput, scale)
-  print("Running backwards")
-	return self.net:backward(input, gradOutput, scale)
+  return self.net:backward(input, gradOutput, scale)
 end
 
 
@@ -193,9 +132,8 @@ end
 
 
 function LM:resetStates()
-  -- Iterates over every RNN or LSTM in the network and resets the states.
-	for i, rnn in ipairs(self.rnns) do
-    rnn:resetStates()	-- This is a method contained within the LSTM/RNN definition
+  for i, rnn in ipairs(self.rnns) do
+    rnn:resetStates()
   end
 end
 
