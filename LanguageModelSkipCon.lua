@@ -1,10 +1,13 @@
 require 'torch'
 require 'nn'
+require 'nngraph'
 
 require 'VanillaRNN'
 require 'LSTM'
 
 local utils = require 'util.utils'
+
+nngraph.setDebug(true)
 
 
 local LM, parent = torch.class('nn.LanguageModelSkipCon', 'nn.Module')
@@ -32,37 +35,98 @@ function LM:__init(kwargs)
   self.bn_view_in = {}	
   self.bn_view_out = {}
 	
-  --self.net:add(nn.LookupTable(V, D))
-  local LUT = nn.LookupTable(V, D)
+	--[[ Defining modules to be used in the graph --]]
 	
+  --self.net:add(nn.LookupTable(V, D))	-- Originally this was the first layer of the nn.Sequential container.
+  local LUT = nn.LookupTable(V, D)()		-- This is the first thing in the graph.
 	-- Creating a skip connected LSTM with self.num_layers hidden layers
+	
+	local rnn
+	local jt
+
 	for i = 1, self.num_layers do
-		local prev_dim = (D+H)					-- All layers above the first layer have input size D+H
-		if i == 1 then prev_dim = D end	-- First layer input size will be only D.
+		local prev_dim = D+H							-- All layers above the first layer have input size D+H
 		
 		-- Select the model type, VanillaRNN.lua or LSTM.lua
 		-- All layers will have output size H.
-		local rnn
-		if self.model_type == 'rnn' then
-			rnn = nn.VanillaRNN(prev_dim, H)
-		elseif self.model_type == 'lstm' then
-			rnn = nn.LSTM(prev_dim, H)
+		if i == 1 then	-- On first layer, connect first layer to input (rather than previous layer)
+			prev_dim = D	-- First layer input size is only D
+			if self.model_type == 'rnn' then
+				rnn = nn.VanillaRNN(prev_dim, H)(LUT)
+			elseif self.model_type == 'lstm' then
+				rnn = nn.LSTM(prev_dim, H)(LUT)
+			end
+			-- Set the layer up and insert it into a reference table of all layers
+			rnn.remember_states = true
+			table.insert(self.rnns, rnn)
+			
+			jt = nn.Identity()(rnn)
+
+			-- self.net:add(rnn)	-- This line was used when self.net was an nn.Sequential().
+			--[[BATCHNORM GOES HERE --]]
+
+			--[[DROPOUT GOES HERE --]]	
+		
+		elseif i ~= 1 then
+			--DEBUGLINE
+			prev_dim = H
+			--/DEBUGLINE
+			if self.model_type == 'rnn' then
+				rnn = nn.VanillaRNN(prev_dim, H)(nn.JoinTable(2)({rnn, LUT})[{{}, {}, 1}])
+			elseif self.model_type == 'lstm' then
+				--rnn = nn.LSTM(prev_dim, H)(nn.JoinTable(3)({rnn, LUT}))
+				rnn = nn.LSTM(prev_dim, H)(rnn)
+			end
+			-- Set the layer up and insert it into a reference table of all layers
+			rnn.remember_states = true
+			table.insert(self.rnns, rnn)
+
+			jt = nn.JoinTable(3)({jt, rnn})
+			-- self.net:add(rnn)	-- This line was used when self.net was an nn.Sequential().
+			--[[BATCHNORM GOES HERE --]]
+
+			--[[DROPOUT GOES HERE --]]	
 		end
-		
-		-- self.net:add(rnn)	-- This line was used when self.net was an nn.Sequential().
-		
-
-		-- Set the layer up and insert it into a reference table of all layers
-		rnn.remember_states = true
-		table.insert(self.rnns, rnn)
-		
-		--[[BATCHNORM GOES HERE --]]
-
-		--[[DROPOUT GOES HERE --]]	
-
 	end
-
+  
+	-- At the end of this, jt contains the outputs and all the skip connections - we need to reign in the dimensions.
+	-- Tensor will be shape (N, T, num_layers*H) due to skip connections
+	-- To deal with nn.Linear, we need to convert dimensions using views as below:
+	-- (N,T,num_layer*H) -> (NT, num_layers*H) -> {nn.Linear(num_layers * H, H)} -> (N, T, H)
+	
+	compactorContainer = nn.Sequential()
 	--[[
+	Cview1 = nn.View(1, 1, -1):setNumInputDims(3)
+	Cview2 = nn.View(1, -1):setNumInputDims(2)
+	compactorContainer:add(Cview1)
+	compactorContainer:add(nn.Linear(self.num_layers * H, H))
+	compactorContainer:add(nn.SoftMax())	-- Graves Et Al, 2013 specifies an output function - but doesn't say what it is. Softmax used instead.
+	compactorContainer:add(Cview2)
+	]]--
+
+	-- After all the RNNs run, we will have a tensor of shape (N, T, H);
+  -- we want to apply a 1D temporal convolution to predict scores for each
+  -- vocab element, giving a tensor of shape (N, T, V). Unfortunately
+  -- nn.TemporalConvolution is SUPER slow, so instead we will use a pair of
+  -- views (N, T, H) -> (NT, H) and (NT, V) -> (N, T, V) with a nn.Linear in
+  -- between. Unfortunately N and T can change on every minibatch, so we need
+  -- to set them in the forward pass.
+	convoContainer = nn.Sequential()
+	
+	self.view1 = nn.View(1, 1, -1):setNumInputDims(3)
+	self.view2 = nn.View(1, -1):setNumInputDims(2)
+	convoContainer:add(self.view1)
+	convoContainer:add(nn.Linear(self.num_layers * H, V))
+	convoContainer:add(self.view2)
+	-- Plug together: rnn -> view1 -> Linear(H, V) -> view2
+	--y = nn.Identity()(convoContainer(compactorContainer(jt)))
+	y = nn.Identity()(convoContainer(jt))
+	self.net = nn.gModule({LUT}, {y})
+
+	graph.dot(self.net.fg, 'Built1', 'debug1fg')
+	--[[
+	-- Copy of original loop below
+	--
 	for i = 1, self.num_layers do
     local prev_dim = H
     if i == 1 then prev_dim = D end
@@ -89,25 +153,21 @@ function LM:__init(kwargs)
     end
   end
 	--]]
-
-  -- After all the RNNs run, we will have a tensor of shape (N, T, H);
-  -- we want to apply a 1D temporal convolution to predict scores for each
-  -- vocab element, giving a tensor of shape (N, T, V). Unfortunately
-  -- nn.TemporalConvolution is SUPER slow, so instead we will use a pair of
-  -- views (N, T, H) -> (NT, H) and (NT, V) -> (N, T, V) with a nn.Linear in
-  -- between. Unfortunately N and T can change on every minibatch, so we need
-  -- to set them in the forward pass.
+	
+	--[[
   self.view1 = nn.View(1, 1, -1):setNumInputDims(3)
   self.view2 = nn.View(1, -1):setNumInputDims(2)
 	
   self.net:add(self.view1)
   self.net:add(nn.Linear(H, V))
   self.net:add(self.view2)
+	]]--
 end
 
 
 function LM:updateOutput(input)
-  local N, T = input:size(1), input:size(2)
+  
+	local N, T = input:size(1), input:size(2)
   self.view1:resetSize(N * T, -1)
   self.view2:resetSize(N, T, -1)
 
@@ -117,13 +177,13 @@ function LM:updateOutput(input)
   for _, view_out in ipairs(self.bn_view_out) do
     view_out:resetSize(N, T, -1)
   end
-
   return self.net:forward(input)
 end
 
 
 function LM:backward(input, gradOutput, scale)
-  return self.net:backward(input, gradOutput, scale)
+  print("Running backwards")
+	return self.net:backward(input, gradOutput, scale)
 end
 
 

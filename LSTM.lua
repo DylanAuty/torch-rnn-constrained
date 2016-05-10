@@ -64,9 +64,9 @@ end
 
 
 local function check_dims(x, dims)
-  assert(x:dim() == #dims)
+	assert(x:dim() == #dims)
   for i, d in ipairs(dims) do
-    assert(x:size(i) == d)
+		assert(x:size(i) == d)
   end
 end
 
@@ -91,7 +91,7 @@ function layer:_get_sizes(input, gradOutput)
   local N, T = x:size(1), x:size(2)
   local H, D = self.hidden_dim, self.input_dim
   check_dims(x, {N, T, D})
-  if h0 then
+	if h0 then
     check_dims(h0, {N, H})
   end
   if c0 then
@@ -116,9 +116,9 @@ Output:
 
 
 function layer:updateOutput(input)
-  local c0, h0, x = self:_unpack_input(input)
+  print("running LSTM UPDATEOUTPUT")
+	local c0, h0, x = self:_unpack_input(input)
   local N, T, D, H = self:_get_sizes(input)
-
   self._return_grad_c0 = (c0 ~= nil)
   self._return_grad_h0 = (h0 ~= nil)
   if not c0 then
@@ -175,7 +175,8 @@ end
 
 
 function layer:backward(input, gradOutput, scale)
-  scale = scale or 1.0
+	print("LSTM BACKWARDS")
+	scale = scale or 1.0
   local c0, h0, x = self:_unpack_input(input)
   if not c0 then c0 = self.c0 end
   if not h0 then h0 = self.h0 end

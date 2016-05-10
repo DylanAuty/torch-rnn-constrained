@@ -99,7 +99,6 @@ else
 	model = nn.LanguageModel(opt_clone):type(dtype)
 end
 
-print(model.net)
 local params, grad_params = model:getParameters()
 local crit = nn.CrossEntropyCriterion():type(dtype)
 
@@ -123,7 +122,7 @@ end
 local function f(w)
   assert(w == params)
   grad_params:zero()
-
+	
   -- Get a minibatch and run the model forward, maybe timing it
   local timer
   local x, y = loader:nextBatch('train')
@@ -132,7 +131,7 @@ local function f(w)
     if cutorch then cutorch.synchronize() end
     timer = torch.Timer()
   end
-  local scores = model:forward(x)
+	local scores = model:forward(x)
 
   -- Use the Criterion to compute loss; we need to reshape the scores to be
   -- two-dimensional before doing so. Annoying.
