@@ -259,13 +259,12 @@ function layer:backward(input, gradOutput, scale)
   else
     self.gradInput = self.grad_x
   end
-
   return self.gradInput
 end
 
 
 function layer:clearState()
-  self.cell:set()
+	self.cell:set()
   self.gates:set()
   self.buffer1:set()
   self.buffer2:set()
@@ -280,11 +279,11 @@ end
 
 
 function layer:updateGradInput(input, gradOutput)
-  self:backward(input, gradOutput, 0)
+	self:backward(input, gradOutput, 0)
 end
 
 
 function layer:accGradParameters(input, gradOutput, scale)
-  self:backward(input, gradOutput, scale)
+	self:backward(input, gradOutput, scale)
 end
 
