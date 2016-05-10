@@ -1,6 +1,9 @@
 require 'torch'
 require 'nn'
 
+-- DEBUG
+require 'nngraph'
+
 require 'VanillaRNN'
 require 'LSTM'
 
@@ -73,6 +76,18 @@ function LM:__init(kwargs)
   self.net:add(self.view1)
   self.net:add(nn.Linear(H, V))
   self.net:add(self.view2)
+	
+	--[[
+	-- DEBUGGING TEST BELOW:
+	-- Trying to wrap the given network in an nngraph module, to see if it works.
+	-- Can be invoked with no architecture argument to train.lua (it thinks this is the normal network)
+	]]--
+	--outModule = nn.Identity()(self.net())
+	local inputNode = nn.Identity()()
+	self.net = self.net(inputNode)
+
+	self.net = nn.gModule({inputNode}, {self.net})
+
 end
 
 
