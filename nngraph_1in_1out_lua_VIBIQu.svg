@@ -9,7 +9,7 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 1483)">
 <title>G</title>
 <polygon fill="white" stroke="none" points="-4,4 -4,-1483 963,-1483 963,4 -4,4"/>
-<text text-anchor="middle" x="479.5" y="-1463.8" font-family="Times,serif" font-size="14.00">nngraph_1in_1out</text>
+<text text-anchor="middle" x="479.5" y="-1463.8" font-family="Times,serif" font-size="14.00">nngraph_1in_1out_lua_VIBIQu</text>
 <!-- n1 -->
 <g id="node1" class="node"><title>n1</title>
 <g id="a_node1"><a xlink:title="[./LanguageModelSkipCon.lua]:123_">

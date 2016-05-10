@@ -1,6 +1,6 @@
 digraph G {
 labelloc="t";
-label="nngraph_1in_1out";
+label="nngraph_1in_1out_lua_VIBIQu";
 node [shape = oval]; 
 n1[label="Node1\ninput = {torch.CudaTensor[2x50x65]}\lmodule = nn.Identity\lreverseMap = {}\lgradOutput = {torch.CudaTensor[2x50x65]}" tooltip="[./LanguageModelSkipCon.lua]:123_"];
 n2[label="Node2\ninput = {torch.CudaTensor[2x50x65]}\lreverseMap = {}\lgradOutput = {torch.CudaTensor[2x50x65]}" tooltip="[[C]]:-1_"];
