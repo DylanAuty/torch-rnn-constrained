@@ -2,12 +2,12 @@ digraph G {
 labelloc="t";
 label="nngraph_1in_1out";
 node [shape = oval]; 
-n1[label="Node1\ninput = {torch.CudaTensor[2x50]}\lmodule = nn.Sequential {\l  [input -> (1) -> (2) -> (3) -> (4) -> (5) -> (6) -> output]\l  (1): nn.LookupTable\l  (2): nn.LSTM\l  (3): nn.LSTM\l  (4): nn.View(100,-1)\l  (5): nn.Linear(128 -> 65)\l  (6): nn.View(2,50,-1)\l}\lreverseMap = {}\lgradOutput = {torch.CudaTensor[2x50x65]}" tooltip="[./LanguageModel.lua]:87_"];
+n1[label="Node1\ninput = {torch.CudaTensor[2x50x65]}\lmodule = nn.Identity\lreverseMap = {}\lgradOutput = {torch.CudaTensor[2x50x65]}" tooltip="[./LanguageModel.lua]:88_"];
 n2[label="Node2\ninput = {torch.CudaTensor[2x50x65]}\lreverseMap = {}\lgradOutput = {torch.CudaTensor[2x50x65]}" tooltip="[[C]]:-1_"];
-n3[label="Node3\ninput = {torch.CudaTensor[2x50]}\lmodule = nn.Identity\lreverseMap = {}" tooltip="[./LanguageModel.lua]:86_"];
+n3[label="Node3\ninput = {torch.CudaTensor[2x50]}\lmodule = nn.Sequential {\l  [input -> (1) -> (2) -> (3) -> (4) -> (5) -> (6) -> output]\l  (1): nn.LookupTable\l  (2): nn.LSTM\l  (3): nn.LSTM\l  (4): nn.View(100,-1)\l  (5): nn.Linear(128 -> 65)\l  (6): nn.View(2,50,-1)\l}\lreverseMap = {}\lgradOutput = {torch.CudaTensor[2x50x65]}" tooltip="[./LanguageModel.lua]:86_"];
 n4[label="Node4\ninput = {torch.CudaTensor[2x50]}\lreverseMap = {}" tooltip="[[C]]:-1_"];
 n1 -> n2;
 n3 -> n1;
 n4 -> n3;
-n1[style=filled, fillcolor=red];
+n3[style=filled, fillcolor=red];
 }

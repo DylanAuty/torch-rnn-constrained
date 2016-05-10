@@ -83,10 +83,9 @@ function LM:__init(kwargs)
 	-- Can be invoked with no architecture argument to train.lua (it thinks this is the normal network)
 	]]--
 	--outModule = nn.Identity()(self.net())
-	local inputNode = nn.Identity()()
-	self.net = self.net(inputNode)
+	self.net = self.net()
 
-	self.net = nn.gModule({inputNode}, {self.net})
+	self.net = nn.gModule({self.net}, {nn.Identity()(self.net)})
 
 end
 
