@@ -9,12 +9,13 @@ require 'nn'
 
 local DP, parent = torch.class('nn.dimPrint', 'nn.Module')
 
-function DP:__init()
+function DP:__init(msg)
 	parent.__init(self)
-
+	self.msg = msg
 end
 
 function DP:updateOutput(input)
+	print(self.msg)
 	print("TYPE: ", type(input))
 	print("SIZE: ", #input)
 	if(type(input) == 'table') then
