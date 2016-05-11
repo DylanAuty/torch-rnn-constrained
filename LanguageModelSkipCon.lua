@@ -92,7 +92,7 @@ function LM:__init(kwargs)
 				-- Output from t11: table of 2 elements:
 				-- 	{LSTM output, network input}
 			t12:add(nn.SelectTable(1))		-- Grab LSTM output only from first sublayer.
-			t12:add(nn.JoinTable(2))			-- For incoming skip connection to next LSTM layer.
+			t12:add(nn.JoinTable(3))			-- For incoming skip connection to next LSTM layer.
 			t12:add(nn.SelectTable(2))		-- Forward input for use in future incoming skip connections.
 				-- Output from t12: table of 3 elements:
 				-- 	{LSTM output, LSTM output + network input, network input}
@@ -149,7 +149,7 @@ function LM:__init(kwargs)
   end
 
 	self.net:add(nn.SelectTable(2))		-- This contains the outgoing skip connection accumulator (a large table)
-	
+
   -- After all the RNNs run, we will have a tensor of shape (N, T, H);
   -- we want to apply a 1D temporal convolution to predict scores for each
   -- vocab element, giving a tensor of shape (N, T, V). Unfortunately
@@ -171,6 +171,18 @@ function LM:__init(kwargs)
   self.net:add(self.view1)
   self.net:add(nn.Linear(self.num_layers * H, V))
   self.net:add(self.view2)
+	
+	print(self.net)
+	--[[DEBUGGING--]]
+	print("BEGIN DEBUG CODE")
+
+	testIn = torch.ones(2, V)
+	self.net:forward(testIn)
+
+
+	print(#self.net.modules[4].output)
+	print("END DEBUG CODE")
+
 end
 
 
