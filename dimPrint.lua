@@ -15,6 +15,7 @@ function DP:__init()
 end
 
 function DP:updateOutput(input)
-	print("SIZE: ")
-	print(input:size())
+	print("TYPE: ", type(input))
+	print("SIZE: ", #input)
+	print(input)
 end
