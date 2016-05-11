@@ -3,6 +3,7 @@ require 'nn'
 
 require 'VanillaRNN'
 require 'LSTM'
+require 'dimPrint'		-- Self-written debugging module whose purpose is to print the dimensions of tensors passing through.
 
 local utils = require 'util.utils'
 
@@ -63,7 +64,8 @@ function LM:__init(kwargs)
   self.bn_view_out = {}
 
   self.net:add(nn.LookupTable(V, D))
-  for i = 1, self.num_layers do
+ 	
+	for i = 1, self.num_layers do
     -- Selecting input dimensions for LSTM cells
 		local prev_dim = D+H								-- All LSTMs in layers 2 onwards have input dimension D+H
     if i == 1 then prev_dim = D end			-- First layer LSTM has input dimension D only
@@ -97,8 +99,10 @@ function LM:__init(kwargs)
 				-- Output from t12: table of 3 elements:
 				-- 	{LSTM output, LSTM output + network input, network input}
 			t1:add(t11)
+			--t1:add(nn.dimPrint("output of t11"))
 			t1:add(t12)		-- Construct the complete first layer.
-
+			--t1:add(nn.dimPrint("output of t12"))
+			self.net:add(nn.dimPrint("NETWORK INPUT"))
 			self.net:add(t1)	-- Add the completed layer to the overall network container.
 
 		elseif i ~= 1 then	-- Set up any layers after the first layer			
@@ -113,17 +117,17 @@ function LM:__init(kwargs)
 				-- 	{outgoing skipcon forwarder, LSTM output, input forwarder}
 			local t12s = nn.Sequential()		-- Container for handling outgoing skip connection 
 			t12s:add(nn.NarrowTable(1, 2))	-- Select only the first two outputs from t11
-			t12s:add(nn.JoinTable(2))				-- Add to the outgoing skip connection 'accumulator'
-			
+			t12s:add(nn.JoinTable(3))				-- Add to the outgoing skip connection 'accumulator'
+
 			local t12sj = nn.Sequential()		-- Container for handling the incoming skip connection
 			t12sj:add(nn.NarrowTable(2, 2))	-- Select only the LSTM output and the forwarded network input.
-			t12sj:add(nn.JoinTable(2))			-- Join network input and LSTM input 
+			t12sj:add(nn.JoinTable(3))			-- Join network input and LSTM input 
 
 			t12:add(t12s)										-- Handles outgoing skip connection to accumulator
 			t12:add(t12sj)									-- For incoming skip connection to next LSTM layer.
 			t12:add(nn.SelectTable(3))			-- Forward input for use in future incoming skip connections.
 				-- Output from t12: table of 3 elements:
-				-- {LSTM output, LSTM output + network input, network input}
+				-- {Output from outgoing skipcon accumulator, LSTM output + network input, network input}
 			t1:add(t11)
 			t1:add(t12)		-- Construct the complete layer.
 
@@ -147,8 +151,8 @@ function LM:__init(kwargs)
     end
 		--]]
   end
-
-	self.net:add(nn.SelectTable(2))		-- This contains the outgoing skip connection accumulator (a large table)
+	
+	self.net:add(nn.SelectTable(1))		-- This contains the outgoing skip connection accumulator (a large table)
 
   -- After all the RNNs run, we will have a tensor of shape (N, T, H);
   -- we want to apply a 1D temporal convolution to predict scores for each
@@ -174,14 +178,14 @@ function LM:__init(kwargs)
 	
 	print(self.net)
 	--[[DEBUGGING--]]
-	print("BEGIN DEBUG CODE")
+	--print("BEGIN DEBUG CODE")
 
-	testIn = torch.ones(2, V)
-	self.net:forward(testIn)
+	--testIn = torch.ones(2, V)
+	--self.net:forward(testIn)
 
 
-	print(#self.net.modules[4].output)
-	print("END DEBUG CODE")
+	--print(#self.net.modules[4].output)
+	--print("END DEBUG CODE")
 
 end
 
