@@ -64,17 +64,73 @@ function LM:__init(kwargs)
 
   self.net:add(nn.LookupTable(V, D))
   for i = 1, self.num_layers do
-    local prev_dim = H
-    if i == 1 then prev_dim = D end
-    local rnn
+    -- Selecting input dimensions for LSTM cells
+		local prev_dim = D+H								-- All LSTMs in layers 2 onwards have input dimension D+H
+    if i == 1 then prev_dim = D end			-- First layer LSTM has input dimension D only
+   	
+		-- Selecting cell type to use
+		local rnn
     if self.model_type == 'rnn' then
       rnn = nn.VanillaRNN(prev_dim, H)
     elseif self.model_type == 'lstm' then
       rnn = nn.LSTM(prev_dim, H)
     end
     rnn.remember_states = true
-    table.insert(self.rnns, rnn)
-    self.net:add(rnn)
+    table.insert(self.rnns, rnn)				-- This table is used to find all the rnn cells and reset them later.
+    
+		-- Construct and link the layers
+
+		--self.net:add(rnn)
+		
+		if i == 1 then	-- Set up first layer
+			local t1 = nn.Sequential()			-- Contains both sub-layers
+			local t11 = nn.ConcatTable()		-- First sub-layer
+			local t12 = nn.ConcatTable()		-- Second sub-layer
+
+			t11:add(rnn)
+			t11:add(nn.Identity())		-- output 1 of this layer is LSTM output, output 2 is input.
+				-- Output from t11: table of 2 elements:
+				-- 	{LSTM output, network input}
+			t12:add(nn.SelectTable(1))		-- Grab LSTM output only from first sublayer.
+			t12:add(nn.JoinTable(2))			-- For incoming skip connection to next LSTM layer.
+			t12:add(nn.SelectTable(2))		-- Forward input for use in future incoming skip connections.
+				-- Output from t12: table of 3 elements:
+				-- 	{LSTM output, LSTM output + network input, network input}
+			t1:add(t11)
+			t1:add(t12)		-- Construct the complete first layer.
+
+			self.net:add(t1)	-- Add the completed layer to the overall network container.
+
+		elseif i ~= 1 then	-- Set up any layers after the first layer			
+			local t1 = nn.Sequential()			-- Container for both sub-layers
+			local t11 = nn.ParallelTable()	-- First sub-layer
+			local t12 = nn.ConcatTable()		-- Second sub-layer
+			
+			t11:add(nn.Identity())					--Outgoing skip connection 'accumulator' forwarder
+			t11:add(rnn)
+			t11:add(nn.Identity())					-- network input forwarder, for incoming skip connections
+				-- Output from t11: table of 3 elements:
+				-- 	{outgoing skipcon forwarder, LSTM output, input forwarder}
+			local t12s = nn.Sequential()		-- Container for handling outgoing skip connection 
+			t12s:add(nn.NarrowTable(1, 2))	-- Select only the first two outputs from t11
+			t12s:add(nn.JoinTable(2))				-- Add to the outgoing skip connection 'accumulator'
+			
+			local t12sj = nn.Sequential()		-- Container for handling the incoming skip connection
+			t12sj:add(nn.NarrowTable(2, 2))	-- Select only the LSTM output and the forwarded network input.
+			t12sj:add(nn.JoinTable(2))			-- Join network input and LSTM input 
+
+			t12:add(t12s)										-- Handles outgoing skip connection to accumulator
+			t12:add(t12sj)									-- For incoming skip connection to next LSTM layer.
+			t12:add(nn.SelectTable(3))			-- Forward input for use in future incoming skip connections.
+				-- Output from t12: table of 3 elements:
+				-- {LSTM output, LSTM output + network input, network input}
+			t1:add(t11)
+			t1:add(t12)		-- Construct the complete layer.
+
+			self.net:add(t1)	-- Add the completed layer to the overall network container.
+		end
+		--[[
+		-- Batch normalisation
     if self.batchnorm == 1 then
       local view_in = nn.View(1, 1, -1):setNumInputDims(3)
       table.insert(self.bn_view_in, view_in)
@@ -84,11 +140,16 @@ function LM:__init(kwargs)
       table.insert(self.bn_view_out, view_out)
       self.net:add(view_out)
     end
+		
+		-- Dropout
     if self.dropout > 0 then
       self.net:add(nn.Dropout(self.dropout))
     end
+		--]]
   end
 
+	self.net:add(nn.SelectTable(2))		-- This contains the outgoing skip connection accumulator (a large table)
+	
   -- After all the RNNs run, we will have a tensor of shape (N, T, H);
   -- we want to apply a 1D temporal convolution to predict scores for each
   -- vocab element, giving a tensor of shape (N, T, V). Unfortunately
@@ -96,11 +157,19 @@ function LM:__init(kwargs)
   -- views (N, T, H) -> (NT, H) and (NT, V) -> (N, T, V) with a nn.Linear in
   -- between. Unfortunately N and T can change on every minibatch, so we need
   -- to set them in the forward pass.
+	--
+	-- MODIFICATION:
+	-- Introducing skip connections means that after running, the tensor is of shape (N, T, self.num_layers * H)
+	-- The same approach is used as below, but will be modified so that the layers are:
+	-- view (N, T, self.num_layers * H) -> (NT, self.num_layers * H)
+	-- nn.Linear(self.num_layers * H, V)
+	-- view (NT, V) -> (N, T, V)
+	--
   self.view1 = nn.View(1, 1, -1):setNumInputDims(3)
   self.view2 = nn.View(1, -1):setNumInputDims(2)
 
   self.net:add(self.view1)
-  self.net:add(nn.Linear(H, V))
+  self.net:add(nn.Linear(self.num_layers * H, V))
   self.net:add(self.view2)
 end
 
