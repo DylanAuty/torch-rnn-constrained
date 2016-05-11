@@ -17,5 +17,7 @@ end
 function DP:updateOutput(input)
 	print("TYPE: ", type(input))
 	print("SIZE: ", #input)
-	print(input)
+	if(type(input) == 'table') then
+		print(input)
+	end
 end
