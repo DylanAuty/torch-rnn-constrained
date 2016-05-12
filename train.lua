@@ -132,7 +132,7 @@ local function f(w)
     timer = torch.Timer()
   end
 	local scores = model:forward(x)
-
+	
   -- Use the Criterion to compute loss; we need to reshape the scores to be
   -- two-dimensional before doing so. Annoying.
   local scores_view = scores:view(N * T, -1)
@@ -142,7 +142,7 @@ local function f(w)
   -- Run the Criterion and model backward to compute gradients, maybe timing it
   local grad_scores = crit:backward(scores_view, y_view):view(N, T, -1)
   model:backward(x, grad_scores)
-  if timer then
+	if timer then
     if cutorch then cutorch.synchronize() end
     local time = timer:time().real
     print('Forward / Backward pass took ', time)
