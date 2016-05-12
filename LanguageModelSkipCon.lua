@@ -94,7 +94,8 @@ function LM:__init(kwargs)
 				-- Output from t11: table of 2 elements:
 				-- 	{LSTM output, network input}
 			t12:add(nn.SelectTable(1))		-- Grab LSTM output only from first sublayer.
-			t12:add(nn.JoinTable(3))			-- For incoming skip connection to next LSTM layer.
+			t12:add(nn.JoinTable(3, 3))			-- For incoming skip connection to next LSTM layer.
+			--t12:add(nn.dimPrint("t12 JoinTable Output"))
 			t12:add(nn.SelectTable(2))		-- Forward input for use in future incoming skip connections.
 				-- Output from t12: table of 3 elements:
 				-- 	{LSTM output, LSTM output + network input, network input}
@@ -102,7 +103,6 @@ function LM:__init(kwargs)
 			--t1:add(nn.dimPrint("output of t11"))
 			t1:add(t12)		-- Construct the complete first layer.
 			--t1:add(nn.dimPrint("output of t12"))
-			self.net:add(nn.dimPrint("NETWORK INPUT"))
 			self.net:add(t1)	-- Add the completed layer to the overall network container.
 
 		elseif i ~= 1 then	-- Set up any layers after the first layer			
@@ -175,7 +175,7 @@ function LM:__init(kwargs)
   self.net:add(self.view1)
   self.net:add(nn.Linear(self.num_layers * H, V))
   self.net:add(self.view2)
-	
+
 	print(self.net)
 	--[[DEBUGGING--]]
 	--print("BEGIN DEBUG CODE")
@@ -207,7 +207,8 @@ end
 
 
 function LM:backward(input, gradOutput, scale)
-  return self.net:backward(input, gradOutput, scale)
+	print("gradOutput size: ", #gradOutput)
+	return self.net:backward(input, gradOutput, scale)
 end
 
 
