@@ -92,15 +92,16 @@ local model = {}
 	-- Select the architecture to use
 if opt.arch == 'reg' then
 	model = nn.LanguageModel(opt_clone):type(dtype)
+	print("Network Architecture: Standard (no skip connections, unconstrained)")
 elseif opt.arch == 'skipcon' then
 	model = nn.LanguageModelSkipCon(opt_clone):type(dtype)
-	print('Architecture: Skip connections')
+	print("Network Architecture: Skip connections, unconstrained")
 else
 	model = nn.LanguageModel(opt_clone):type(dtype)
 end
 
 local params, grad_params = model:getParameters()
-local crit = nn.CrossEntropyCriterion():type(dtype)
+local crit = nn.CrossEntropyCriterion():type(dtype)		-- Select the training criterion to use.
 
 -- Set up some variables we will use below
 local N, T = opt.batch_size, opt.seq_length
@@ -126,22 +127,21 @@ local function f(w)
   -- Get a minibatch and run the model forward, maybe timing it
   local timer
   local x, y = loader:nextBatch('train')
-  x, y = x:type(dtype), y:type(dtype)
-  if opt.speed_benchmark == 1 then
+	x, y = x:type(dtype), y:type(dtype)
+	if opt.speed_benchmark == 1 then
     if cutorch then cutorch.synchronize() end
     timer = torch.Timer()
   end
 	local scores = model:forward(x)
-	
-  -- Use the Criterion to compute loss; we need to reshape the scores to be
+	-- Use the Criterion to compute loss; we need to reshape the scores to be
   -- two-dimensional before doing so. Annoying.
   local scores_view = scores:view(N * T, -1)
-  local y_view = y:view(N * T)
+	local y_view = y:view(N * T)
   local loss = crit:forward(scores_view, y_view)
 
   -- Run the Criterion and model backward to compute gradients, maybe timing it
   local grad_scores = crit:backward(scores_view, y_view):view(N, T, -1)
-  model:backward(x, grad_scores)
+	model:backward(x, grad_scores)
 	if timer then
     if cutorch then cutorch.synchronize() end
     local time = timer:time().real
