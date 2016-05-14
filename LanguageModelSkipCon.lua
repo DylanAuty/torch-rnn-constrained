@@ -94,8 +94,12 @@ function LM:__init(kwargs)
 				-- Output from t11: table of 2 elements:
 				-- 	{LSTM output, network input}
 			t12:add(nn.SelectTable(1))		-- Grab LSTM output only from first sublayer.
-			t12:add(nn.JoinTable(3, 3))			-- For incoming skip connection to next LSTM layer.
-			--t12:add(nn.dimPrint("t12 JoinTable Output"))
+			local dC = nn.Sequential()	-- FOR DEBUGGING ONLY
+			--dC:add(nn.dimPrint("Before L1 JoinTable"))
+			dC:add(nn.JoinTable(3, 3))
+			dC:add(nn.dimPrint("After L1 JoinTable"))
+			t12:add(dC)	-- Adding in the debugging module
+			--t12:add(nn.JoinTable(3, 3))			-- For incoming skip connection to next LSTM layer.
 			t12:add(nn.SelectTable(2))		-- Forward input for use in future incoming skip connections.
 				-- Output from t12: table of 3 elements:
 				-- 	{LSTM output, LSTM output + network input, network input}
@@ -104,15 +108,36 @@ function LM:__init(kwargs)
 			t1:add(t12)		-- Construct the complete first layer.
 			--t1:add(nn.dimPrint("output of t12"))
 			self.net:add(t1)	-- Add the completed layer to the overall network container.
+			self.net:add(nn.dimPrint("After Layer 1"))
 
 		elseif i ~= 1 then	-- Set up any layers after the first layer			
 			local t1 = nn.Sequential()			-- Container for both sub-layers
-			local t11 = nn.ParallelTable()	-- First sub-layer
+			--local t11 = nn.ParallelTable()	-- First sub-layer
+			local t11 = nn.ConcatTable()	-- DEBUG TEST - replace Parallel with Concat and add SelectTables to do the same as a ParallelTable.
 			local t12 = nn.ConcatTable()		-- Second sub-layer
 			
+			-- DEFINING SOME SEQUENTIALS FOR A DEBUGGING TEST
+			local seq1 = nn.Sequential()
+			local seq2 = nn.Sequential()
+			local seq3 = nn.Sequential()
+			
+			seq1:add(nn.SelectTable(1))
+			seq2:add(nn.SelectTable(2))
+			seq3:add(nn.SelectTable(3))	-- This bit replicates the nn.ParallelTable functionality
+			
+			seq1:add(nn.Identity())
+			seq2:add(rnn)
+			seq3:add(nn.Identity())			-- This is the meat of the layer
+
+			t11:add(seq1)
+			t11:add(seq2)
+			t11:add(seq3)								-- I *THINK* this will work.
+
+			--[[
 			t11:add(nn.Identity())					--Outgoing skip connection 'accumulator' forwarder
 			t11:add(rnn)
 			t11:add(nn.Identity())					-- network input forwarder, for incoming skip connections
+			]]--
 				-- Output from t11: table of 3 elements:
 				-- 	{outgoing skipcon forwarder, LSTM output, input forwarder}
 			local t12s = nn.Sequential()		-- Container for handling outgoing skip connection 
@@ -207,7 +232,6 @@ end
 
 
 function LM:backward(input, gradOutput, scale)
-	print("gradOutput size: ", #gradOutput)
 	return self.net:backward(input, gradOutput, scale)
 end
 
