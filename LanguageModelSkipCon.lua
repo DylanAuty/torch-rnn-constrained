@@ -94,12 +94,12 @@ function LM:__init(kwargs)
 				-- Output from t11: table of 2 elements:
 				-- 	{LSTM output, network input}
 			t12:add(nn.SelectTable(1))		-- Grab LSTM output only from first sublayer.
-			local dC = nn.Sequential()	-- FOR DEBUGGING ONLY
+			--local dC = nn.Sequential()	-- FOR DEBUGGING ONLY
 			--dC:add(nn.dimPrint("Before L1 JoinTable"))
-			dC:add(nn.JoinTable(3, 3))
-			dC:add(nn.dimPrint("After L1 JoinTable"))
-			t12:add(dC)	-- Adding in the debugging module
-			--t12:add(nn.JoinTable(3, 3))			-- For incoming skip connection to next LSTM layer.
+			--dC:add(nn.JoinTable(3, 3))
+			--dC:add(nn.dimPrint("After L1 JoinTable"))
+			--t12:add(dC)	-- Adding in the debugging module
+			t12:add(nn.JoinTable(3, 3))			-- For incoming skip connection to next LSTM layer.
 			t12:add(nn.SelectTable(2))		-- Forward input for use in future incoming skip connections.
 				-- Output from t12: table of 3 elements:
 				-- 	{LSTM output, LSTM output + network input, network input}
@@ -108,7 +108,7 @@ function LM:__init(kwargs)
 			t1:add(t12)		-- Construct the complete first layer.
 			--t1:add(nn.dimPrint("output of t12"))
 			self.net:add(t1)	-- Add the completed layer to the overall network container.
-			self.net:add(nn.dimPrint("After Layer 1"))
+			--self.net:add(nn.dimPrint("After Layer 1"))
 
 		elseif i ~= 1 then	-- Set up any layers after the first layer			
 			local t1 = nn.Sequential()			-- Container for both sub-layers
