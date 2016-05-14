@@ -116,7 +116,6 @@ Output:
 
 
 function layer:updateOutput(input)
-  print("running LSTM UPDATEOUTPUT")
 	local c0, h0, x = self:_unpack_input(input)
   local N, T, D, H = self:_get_sizes(input)
   self._return_grad_c0 = (c0 ~= nil)
@@ -175,7 +174,6 @@ end
 
 
 function layer:backward(input, gradOutput, scale)
-	print("LSTM BACKWARDS")
 	scale = scale or 1.0
   local c0, h0, x = self:_unpack_input(input)
   if not c0 then c0 = self.c0 end
