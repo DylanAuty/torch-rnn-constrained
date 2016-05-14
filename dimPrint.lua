@@ -22,9 +22,41 @@ function DP:updateOutput(input)
 	if(type(input) == 'table') then
 		print(input)
 	end
-	return input
+	self.output = input
+	return self.output
 end
 
+function DP:updateGradInput(input, gradOutput)
+	self.gradInput = gradOutput
+print("BACKWARDS: ", self.msg)
+	print("TYPE: ", type(self.gradInput))
+	print("SIZE: ")
+	print(#self.gradInput)
+	if(type(self.gradInput) == 'table') then
+		print(self.gradInput)
+	end
+	return self.gradInput
+end
+
+function DP:clearState()		-- This function lifted from nn.Identity()
+   -- don't call set because it might reset referenced tensors
+   local function clear(f)
+      if self[f] then
+         if torch.isTensor(self[f]) then
+            self[f] = self[f].new()
+         elseif type(self[f]) == 'table' then
+            self[f] = {}
+         else
+            self[f] = nil 
+         end
+      end 
+   end 
+   clear('output')
+   clear('gradInput')
+   return self
+end
+
+--[[
 function DP:backward(input)
 	print("BACKWARDS: ", self.msg)
 	print("TYPE: ", type(input))
@@ -35,4 +67,4 @@ function DP:backward(input)
 	end
 	return input
 end
-
+]]--
