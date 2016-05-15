@@ -149,5 +149,5 @@ recurrent neural network by simply stacking multiple instance in an `nn.Sequenti
 model = nn.LanguageModelSkipCon(kwargs)
 ```
 
-[LanguagemodelSkipCon](../LanguageModelSkipcon) is an adaptation of the above `LanguageModel` model, which adds in skip connections. These connections are detailed in ["Generating Sequences with Recurrent Neural Networks" (Graves Et. Al. 2013)](http://arxiv.org/abs/1308.0850), in Figure 1. The nework remains unconstrained at this point. `kwargs` is identical to that of `LanguageModel`.
+[LanguagemodelSkipCon](../LanguageModelSkipCon) is an adaptation of the above `LanguageModel` model, which adds in skip connections. These connections are detailed in ["Generating Sequences with Recurrent Neural Networks" (Graves Et. Al. 2013)](http://arxiv.org/abs/1308.0850), in Figure 1. The nework remains unconstrained at this point. `kwargs` is identical to that of `LanguageModel`.
 
