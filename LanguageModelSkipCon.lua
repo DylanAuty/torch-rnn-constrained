@@ -67,56 +67,64 @@ function LM:__init(kwargs)
  	
 	for i = 1, self.num_layers do
     -- Selecting input dimensions for LSTM cells
-		local prev_dim = D+H								-- All LSTMs in layers 2 onwards have input dimension D+H
+		local prev_dim = D+H								-- All LSTMs in layers 2 onwards have input dimension D+H (H because of skip connections)
     if i == 1 then prev_dim = D end			-- First layer LSTM has input dimension D only
    	
 		-- Selecting cell type to use
 		local rnn
-    if self.model_type == 'rnn' then
+    local rnnContainer = nn.Sequential()
+		if self.model_type == 'rnn' then
       rnn = nn.VanillaRNN(prev_dim, H)
     elseif self.model_type == 'lstm' then
       rnn = nn.LSTM(prev_dim, H)
     end
     rnn.remember_states = true
     table.insert(self.rnns, rnn)				-- This table is used to find all the rnn cells and reset them later.
-    
-		-- Construct and link the layers
+ 		rnnContainer:add(rnn)
+		
+		-- Batch normalisation
+    if self.batchnorm == 1 then
+      local view_in = nn.View(1, 1, -1):setNumInputDims(3)
+      table.insert(self.bn_view_in, view_in)
+      rnnContainer:add(view_in)
+      rnnContainer:add(nn.BatchNormalization(H))
+      local view_out = nn.View(1, -1):setNumInputDims(2)
+      table.insert(self.bn_view_out, view_out)
+      rnnContainer:add(view_out)
+    end
+		
+		-- Dropout
+    if self.dropout > 0 then
+      rnnContainer:add(nn.Dropout(self.dropout))
+    end
 
-		--self.net:add(rnn)
+
+		-- Construct and link the layers
 		
 		if i == 1 then	-- Set up first layer
 			local t1 = nn.Sequential()			-- Contains both sub-layers
 			local t11 = nn.ConcatTable()		-- First sub-layer
 			local t12 = nn.ConcatTable()		-- Second sub-layer
 
-			t11:add(rnn)
+			t11:add(rnnContainer)
 			t11:add(nn.Identity())		-- output 1 of this layer is LSTM output, output 2 is input.
 				-- Output from t11: table of 2 elements:
 				-- 	{LSTM output, network input}
 			t12:add(nn.SelectTable(1))		-- Grab LSTM output only from first sublayer.
-			--local dC = nn.Sequential()	-- FOR DEBUGGING ONLY
-			--dC:add(nn.dimPrint("Before L1 JoinTable"))
-			--dC:add(nn.JoinTable(3, 3))
-			--dC:add(nn.dimPrint("After L1 JoinTable"))
-			--t12:add(dC)	-- Adding in the debugging module
 			t12:add(nn.JoinTable(3, 3))			-- For incoming skip connection to next LSTM layer.
 			t12:add(nn.SelectTable(2))		-- Forward input for use in future incoming skip connections.
 				-- Output from t12: table of 3 elements:
 				-- 	{LSTM output, LSTM output + network input, network input}
 			t1:add(t11)
-			--t1:add(nn.dimPrint("output of t11"))
 			t1:add(t12)		-- Construct the complete first layer.
-			--t1:add(nn.dimPrint("output of t12"))
 			self.net:add(t1)	-- Add the completed layer to the overall network container.
-			--self.net:add(nn.dimPrint("After Layer 1"))
 
-		elseif i ~= 1 then	-- Set up any layers after the first layer			
+		elseif i ~= 1 then	-- Set up any layers after the first layer
 			local t1 = nn.Sequential()			-- Container for both sub-layers
-			--local t11 = nn.ParallelTable()	-- First sub-layer
-			local t11 = nn.ConcatTable()	-- DEBUG TEST - replace Parallel with Concat and add SelectTables to do the same as a ParallelTable.
+			local t11 = nn.ConcatTable()		-- First sub-layer
 			local t12 = nn.ConcatTable()		-- Second sub-layer
 			
-			-- DEFINING SOME SEQUENTIALS FOR A DEBUGGING TEST
+			-- Define sequentials to contain a SelectTable and a module.
 			local seq1 = nn.Sequential()
 			local seq2 = nn.Sequential()
 			local seq3 = nn.Sequential()
@@ -126,18 +134,12 @@ function LM:__init(kwargs)
 			seq3:add(nn.SelectTable(3))	-- This bit replicates the nn.ParallelTable functionality
 			
 			seq1:add(nn.Identity())
-			seq2:add(rnn)
-			seq3:add(nn.Identity())			-- This is the meat of the layer
+			seq2:add(rnnContainer)			-- LSTM/RNN and Batchnorm and dropout if enabled
+			seq3:add(nn.Identity())
 
 			t11:add(seq1)
 			t11:add(seq2)
-			t11:add(seq3)								-- I *THINK* this will work.
-
-			--[[
-			t11:add(nn.Identity())					--Outgoing skip connection 'accumulator' forwarder
-			t11:add(rnn)
-			t11:add(nn.Identity())					-- network input forwarder, for incoming skip connections
-			]]--
+			t11:add(seq3)								
 				-- Output from t11: table of 3 elements:
 				-- 	{outgoing skipcon forwarder, LSTM output, input forwarder}
 			local t12s = nn.Sequential()		-- Container for handling outgoing skip connection 
@@ -200,17 +202,6 @@ function LM:__init(kwargs)
   self.net:add(self.view1)
   self.net:add(nn.Linear(self.num_layers * H, V))
   self.net:add(self.view2)
-
-	print(self.net)
-	--[[DEBUGGING--]]
-	--print("BEGIN DEBUG CODE")
-
-	--testIn = torch.ones(2, V)
-	--self.net:forward(testIn)
-
-
-	--print(#self.net.modules[4].output)
-	--print("END DEBUG CODE")
 
 end
 
