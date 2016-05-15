@@ -3,6 +3,7 @@ require 'nn'
 require 'optim'
 
 require 'LanguageModel'
+require 'LanguageModelSkipCon'
 require 'util.DataLoader'
 
 local utils = require 'util.utils'
@@ -15,6 +16,11 @@ cmd:option('-input_h5', 'data/tiny-shakespeare.h5')
 cmd:option('-input_json', 'data/tiny-shakespeare.json')
 cmd:option('-batch_size', 50)
 cmd:option('-seq_length', 50)
+
+-- Architecture options
+-- This section will allow the user to switch between different network architectures
+-- Skip connections, methods of constraint etc.
+cmd:option('-arch', 'reg')
 
 -- Model options
 cmd:option('-init_from', '')
@@ -83,6 +89,7 @@ end
 -- Initialize the model and criterion
 local opt_clone = torch.deserialize(torch.serialize(opt))
 opt_clone.idx_to_token = idx_to_token
+
 local model = nil
 local start_i = 0
 if opt.init_from ~= '' then
@@ -93,10 +100,20 @@ if opt.init_from ~= '' then
     start_i = checkpoint.i
   end
 else
-  model = nn.LanguageModel(opt_clone):type(dtype)
+	-- Select architecture
+	if opt.arch == 'reg' then
+		model = nn.LanguageModel(opt_clone):type(dtype)
+		print("Network Architecture: Standard (no skip connections, unconstrained)")
+	elseif opt.arch == 'skipcon' then
+		model = nn.LanguageModelSkipCon(opt_clone):type(dtype)
+		print("Network Architecture: Skip connections, unconstrained")
+	else
+		model = nn.LanguageModel(opt_clone):type(dtype)
+	end
 end
+
 local params, grad_params = model:getParameters()
-local crit = nn.CrossEntropyCriterion():type(dtype)
+local crit = nn.CrossEntropyCriterion():type(dtype)		-- Select the training criterion to use.
 
 -- Set up some variables we will use below
 local N, T = opt.batch_size, opt.seq_length
@@ -118,27 +135,26 @@ end
 local function f(w)
   assert(w == params)
   grad_params:zero()
-
+	
   -- Get a minibatch and run the model forward, maybe timing it
   local timer
   local x, y = loader:nextBatch('train')
-  x, y = x:type(dtype), y:type(dtype)
-  if opt.speed_benchmark == 1 then
+	x, y = x:type(dtype), y:type(dtype)
+	if opt.speed_benchmark == 1 then
     if cutorch then cutorch.synchronize() end
     timer = torch.Timer()
   end
-  local scores = model:forward(x)
-
-  -- Use the Criterion to compute loss; we need to reshape the scores to be
+	local scores = model:forward(x)
+	-- Use the Criterion to compute loss; we need to reshape the scores to be
   -- two-dimensional before doing so. Annoying.
   local scores_view = scores:view(N * T, -1)
-  local y_view = y:view(N * T)
+	local y_view = y:view(N * T)
   local loss = crit:forward(scores_view, y_view)
 
   -- Run the Criterion and model backward to compute gradients, maybe timing it
   local grad_scores = crit:backward(scores_view, y_view):view(N, T, -1)
-  model:backward(x, grad_scores)
-  if timer then
+	model:backward(x, grad_scores)
+	if timer then
     if cutorch then cutorch.synchronize() end
     local time = timer:time().real
     print('Forward / Backward pass took ', time)

@@ -64,9 +64,9 @@ end
 
 
 local function check_dims(x, dims)
-  assert(x:dim() == #dims)
+	assert(x:dim() == #dims)
   for i, d in ipairs(dims) do
-    assert(x:size(i) == d)
+		assert(x:size(i) == d)
   end
 end
 
@@ -91,7 +91,7 @@ function layer:_get_sizes(input, gradOutput)
   local N, T = x:size(1), x:size(2)
   local H, D = self.hidden_dim, self.input_dim
   check_dims(x, {N, T, D})
-  if h0 then
+	if h0 then
     check_dims(h0, {N, H})
   end
   if c0 then
@@ -119,7 +119,6 @@ function layer:updateOutput(input)
   self.recompute_backward = true
   local c0, h0, x = self:_unpack_input(input)
   local N, T, D, H = self:_get_sizes(input)
-
   self._return_grad_c0 = (c0 ~= nil)
   self._return_grad_h0 = (h0 ~= nil)
   if not c0 then
@@ -261,13 +260,12 @@ function layer:backward(input, gradOutput, scale)
   else
     self.gradInput = self.grad_x
   end
-
   return self.gradInput
 end
 
 
 function layer:clearState()
-  self.cell:set()
+	self.cell:set()
   self.gates:set()
   self.buffer1:set()
   self.buffer2:set()
