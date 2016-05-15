@@ -191,7 +191,7 @@ function LM:__init(kwargs)
 	--
 	-- MODIFICATION:
 	-- Introducing skip connections means that after running, the tensor is of shape (N, T, self.num_layers * H)
-	-- The same approach is used as below, but will be modified so that the layers are:
+	-- The same approach is used as in the original language model, but will be modified so that the layers are:
 	-- view (N, T, self.num_layers * H) -> (NT, self.num_layers * H)
 	-- nn.Linear(self.num_layers * H, V)
 	-- view (NT, V) -> (N, T, V)
