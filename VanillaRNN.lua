@@ -102,9 +102,10 @@ Input: Table of
 - x:  Sequence of inputs, of shape (N, T, D)
 
 Output:
-- h: Sequence of hidden states, of shape (T, N, H)
+- h: Sequence of hidden states, of shape (N, T, H)
 --]]
 function layer:updateOutput(input)
+  self.recompute_backward = true
   local h0, x = self:_unpack_input(input)
   local N, T, D, H = self:_get_sizes(input)
   self._return_grad_h0 = (h0 ~= nil)
@@ -144,7 +145,9 @@ end
 -- therefore we'll just implement backward and update gradInput and
 -- gradients with respect to parameters at the same time.
 function layer:backward(input, gradOutput, scale)
+  self.recompute_backward = false
   scale = scale or 1.0
+  assert(scale == 1.0, 'scale must be 1')
   local N, T, D, H = self:_get_sizes(input, gradOutput)
   local h0, x = self:_unpack_input(input)
   if not h0 then h0 = self.h0 end
@@ -173,7 +176,7 @@ function layer:backward(input, gradOutput, scale)
     grad_Wx:addmm(scale, x[{{}, t}]:t(), grad_a)
     grad_Wh:addmm(scale, prev_h:t(), grad_a)
     grad_next_h:mm(grad_a, Wh:t())
-    self.buffer2:resize(H):sum(grad_a, 1)
+    self.buffer2:resize(1, H):sum(grad_a, 1)
     grad_b:add(scale, self.buffer2)
   end
   grad_h0:copy(grad_next_h)
@@ -189,12 +192,17 @@ end
 
 
 function layer:updateGradInput(input, gradOutput)
-  return self:updateGradInput(input, gradOutput, 0)
+  if self.recompute_backward then
+    self:backward(input, gradOutput, 1.0)
+  end
+  return self.gradInput
 end
 
 
 function layer:accGradParameters(input, gradOutput, scale)
-  self:backward(input, gradOutput, scale)
+  if self.recompute_backward then
+    self:backward(input, gradOutput, scale)
+  end
 end
 
 
@@ -205,3 +213,11 @@ function layer:clearState()
   self.grad_x:set()
   self.output:set()
 end
+
+
+function layer:__tostring__()
+  local name = torch.type(self)
+  local din, dout = self.input_dim, self.hidden_dim
+  return string.format('%s(%d -> %d)', name, din, dout)
+end
+
