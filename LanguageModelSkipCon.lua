@@ -280,7 +280,12 @@ function LM:sample(kwargs)
   local verbose = utils.get_kwarg(kwargs, 'verbose', 0)
   local sample = utils.get_kwarg(kwargs, 'sample', 1)
   local temperature = utils.get_kwarg(kwargs, 'temperature', 1)
-
+	local nullStop = utils.get_kwarg(kwargs, 'nullstop', 0)	-- Argument to stop sampling/truncate output after a null character is generated.
+		
+	if nullStop > 0 then	-- Change the sample limit if the nullStop argument is set to 1.
+		T = 7000	-- Hardcoding this to be truncated later, should be adequate... HEY I'M SURE IT'S PROBABLY FINE RIGHT
+	end
+	
   local sampled = torch.LongTensor(1, T)
   self:resetStates()
 
@@ -303,19 +308,42 @@ function LM:sample(kwargs)
     first_t = 1
   end
   
-  for t = first_t, T do
-    if sample == 0 then
-      local _, next_char = scores:max(3)
-      next_char = next_char[{{}, {}, 1}]
-    else
-       local probs = torch.div(scores, temperature):double():exp():squeeze()
-       probs:div(torch.sum(probs))
-       next_char = torch.multinomial(probs, 1):view(1, 1)
-    end
-    sampled[{{}, {t, t}}]:copy(next_char)
-    scores = self:forward(next_char)
-  end
+	-- Trying to remove a little overhead by repeating the loop twice - once for nullStop, once for no nullStop.
+	if nullStop > 0 then
+  	for t = first_t, T do
+  	  if sample == 0 then
+  	    local _, next_char = scores:max(3)
+  	    next_char = next_char[{{}, {}, 1}]
+  	  else
+  	     local probs = torch.div(scores, temperature):double():exp():squeeze()
+  	     probs:div(torch.sum(probs))
+  	     next_char = torch.multinomial(probs, 1):view(1, 1)
+  	  end
+  	  
+			sampled[{{}, {t, t}}]:copy(next_char)
+  	  scores = self:forward(next_char)
+  		if self.decode_string(next_char[1]) == "\0" then	-- TODO: Find the code of the null character to avoid having to do this every time.
+				sampled:resize(1, t)	-- Resize output vector to the final size
+				break	-- If a null character is received then stop sampling.
+			end
+		end
 
+	else	-- Same thing, without the comparisons and truncation.
+		for t = first_t, T do
+  	  if sample == 0 then
+  	    local _, next_char = scores:max(3)
+  	    next_char = next_char[{{}, {}, 1}]
+  	  else
+  	     local probs = torch.div(scores, temperature):double():exp():squeeze()
+  	     probs:div(torch.sum(probs))
+  	     next_char = torch.multinomial(probs, 1):view(1, 1)
+  	  end
+  	  
+			sampled[{{}, {t, t}}]:copy(next_char)
+  	  scores = self:forward(next_char)
+		end
+	end
+	
   self:resetStates()
   return self:decode_string(sampled[1])
 end
