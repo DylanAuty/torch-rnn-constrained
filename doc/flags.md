@@ -58,3 +58,4 @@ The sampling script `sample.lua` accepts the following command-line flags:
 - `-gpu`: The ID of the GPU to use (zero-indexed). Default is 0. Set this to -1 to run in CPU-only mode.
 - `-gpu_backend`: The GPU backend to use; either `cuda` or `opencl`. Default is `cuda`.
 - `-verbose`: By default just the sampled text is printed to the console. Set this to 1 to also print some diagnostic information.
+- `-nullstop`: Defaults to 0, if 1 then model will stop sampling when a null character is encountered.
