@@ -2,7 +2,7 @@ require 'torch'
 require 'nn'
 
 require 'LanguageModel'
-
+require 'LanguageModelSkipCon'
 
 local cmd = torch.CmdLine()
 cmd:option('-checkpoint', 'cv/checkpoint_4000.t7')
