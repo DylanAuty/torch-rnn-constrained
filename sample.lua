@@ -13,6 +13,7 @@ cmd:option('-temperature', 1)
 cmd:option('-gpu', 0)
 cmd:option('-gpu_backend', 'cuda')
 cmd:option('-verbose', 0)
+cmd:option('-nullstop', 0)		-- Added argument to tell model to stop sampling/truncate output after a null character is generated.
 local opt = cmd:parse(arg)
 
 
