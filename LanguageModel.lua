@@ -163,7 +163,11 @@ function LM:sample(kwargs)
   local sample = utils.get_kwarg(kwargs, 'sample', 1)
   local temperature = utils.get_kwarg(kwargs, 'temperature', 1)
 	local nullStop = utils.get_kwarg(kwargs, 'nullstop', 0)
-	
+		
+	if nullStop > 0 then
+		T = 20000	-- Hardcoding a large limit which **SHOULD** never be reached when null terminating with the weatherGov application.
+	end
+
   local sampled = torch.LongTensor(1, T)
   self:resetStates()
 

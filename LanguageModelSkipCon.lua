@@ -283,7 +283,7 @@ function LM:sample(kwargs)
 	local nullStop = utils.get_kwarg(kwargs, 'nullstop', 0)	-- Argument to stop sampling/truncate output after a null character is generated.
 		
 	if nullStop > 0 then	-- Change the sample limit if the nullStop argument is set to 1.
-		T = 7000	-- Hardcoding this to be truncated later, should be adequate... HEY I'M SURE IT'S PROBABLY FINE RIGHT
+		T = 20000	-- Hardcoding this to be truncated later, should be adequate... HEY I'M SURE IT'S PROBABLY FINE RIGHT
 	end
 	
   local sampled = torch.LongTensor(1, T)
