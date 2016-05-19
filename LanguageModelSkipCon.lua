@@ -252,7 +252,7 @@ end
 
 
 function LM:decode_string(encoded)
-  assert(torch.isTensor(encoded) and encoded:dim() == 1)
+	assert(torch.isTensor(encoded) and encoded:dim() == 1)
   local s = ''
   for i = 1, encoded:size(1) do
     local idx = encoded[i]
@@ -312,17 +312,16 @@ function LM:sample(kwargs)
 	if nullStop > 0 then
   	for t = first_t, T do
   	  if sample == 0 then
-  	    local _, next_char = scores:max(3)
+				local _, next_char = scores:max(3)
   	    next_char = next_char[{{}, {}, 1}]
   	  else
   	     local probs = torch.div(scores, temperature):double():exp():squeeze()
   	     probs:div(torch.sum(probs))
-  	     next_char = torch.multinomial(probs, 1):view(1, 1)
+				 next_char = torch.multinomial(probs, 1):view(1, 1)
   	  end
-  	  
 			sampled[{{}, {t, t}}]:copy(next_char)
   	  scores = self:forward(next_char)
-  		if self.decode_string(next_char[1]) == "\0" then	-- TODO: Find the code of the null character to avoid having to do this every time.
+  		if self:decode_string(next_char[1]) == "\0" then	-- TODO: Find the code of the null character to avoid having to do this every time.
 				sampled:resize(1, t)	-- Resize output vector to the final size
 				break	-- If a null character is received then stop sampling.
 			end
