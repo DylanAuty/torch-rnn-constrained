@@ -160,23 +160,6 @@ function LM:__init(kwargs)
 
 			self.net:add(t1)	-- Add the completed layer to the overall network container.
 		end
-		--[[
-		-- Batch normalisation
-    if self.batchnorm == 1 then
-      local view_in = nn.View(1, 1, -1):setNumInputDims(3)
-      table.insert(self.bn_view_in, view_in)
-      self.net:add(view_in)
-      self.net:add(nn.BatchNormalization(H))
-      local view_out = nn.View(1, -1):setNumInputDims(2)
-      table.insert(self.bn_view_out, view_out)
-      self.net:add(view_out)
-    end
-		
-		-- Dropout
-    if self.dropout > 0 then
-      self.net:add(nn.Dropout(self.dropout))
-    end
-		--]]
   end
 	
 	self.net:add(nn.SelectTable(1))		-- This contains the outgoing skip connection accumulator (a large table)
