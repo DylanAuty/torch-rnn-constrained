@@ -3,7 +3,9 @@
 The base dataset used was the WeatherGov dataset. It was processed into a single, monolithic text file.
 
 The data was paired in the following way:
-```[Raw Data]
+
+```
+[Raw Data]
 
 [Corresponding forecast]
 \0
@@ -12,6 +14,7 @@ The data was paired in the following way:
 [Corresponding forecast]
 \0
 ```
+
 Note that square brackets denote placeholders here, not literal square brackets. `\0` denotes the null character.
 
 This was split at the character level in the proportions 80/10/10, for training, testing and validation sets respectively.
