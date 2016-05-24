@@ -40,7 +40,7 @@ def main(argv):
     outputFile1 = ''
     outputFile2 = ''
     try:
-        opts, args = getopt.getopt(argv,"hi:o:")
+        opts, args = getopt.getopt(argv,":hi:o:")
     except:
         usage()
         sys.exit(2)     # Should not get here, should be done in usage()
