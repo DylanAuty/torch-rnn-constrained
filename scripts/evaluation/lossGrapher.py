@@ -71,12 +71,12 @@ def main(argv):
     for item in TPdata:
         d[item[0]].append(item)
     for key, value in d.items():
-        aveTrainLoss = sum(value[2])/float(len(value))
+        aveTrainLoss = sum([x[2] for x in value])/float(len(value))
         TPave.append([key, aveTrainLoss])
     
-    TPave = np.asarray(TPave)
+    TPave = [list(elem) for elem in TPave]
+    #print([i[1] for i in TPave])
 
-    # Graphs:
     # Epoch vs. validation loss
     fig1 = plt.figure()
     plt.plot(CLdata['Epoch'], CLdata['Validation_Loss'], color='b', label='Training Progress, Epoch/Validation Loss')
@@ -103,8 +103,11 @@ def main(argv):
     
     # Epoch vs. ave. training loss
     fig4 = plt.figure()
-    plt.plot(TPave[:,0], TPave[:,1], color='b', label='Training Progress, Epoch/Average Training Loss')
-    plt.xlabel("Iteration")
+        # Sorting the ave list, which for some reason isn't sorted.
+    TPsorted = sorted(TPave)
+
+    plt.plot([i[0] for i in TPsorted], [i[1] for i in TPsorted], color='b', label='Training Progress, Epoch/Average Training Loss')
+    plt.xlabel("Epoch")
     plt.ylabel("Average Training Loss")
     plt.savefig(TPout3)
     plt.close(fig4)
