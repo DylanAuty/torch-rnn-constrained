@@ -9,7 +9,6 @@ import getopt
 import numpy as np
 import h5py
 import json
-import codecs
 
 def usage():
     sys.exit("Usage: python2 extractFromTest.py [-i /full/path/to/dataset.h5] [-j /full/path/dataset.json]")
