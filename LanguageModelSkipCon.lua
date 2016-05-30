@@ -291,6 +291,9 @@ function LM:sample(kwargs)
     first_t = 1
   end
   
+	local n1Flag = 0	-- Having to use flags to detect the string "\n\n." which should mean the end of a forecast.
+	local n2Flag = 0
+
 	-- Trying to remove a little overhead by repeating the loop twice - once for nullStop, once for no nullStop.
 	if nullStop > 0 then
   	for t = first_t, T do
@@ -302,14 +305,30 @@ function LM:sample(kwargs)
   	     probs:div(torch.sum(probs))
 				 next_char = torch.multinomial(probs, 1):view(1, 1)
   	  end
+
 			sampled[{{}, {t, t}}]:copy(next_char)
   	  scores = self:forward(next_char)
-  		if self:decode_string(next_char[1]) == "\0" then	-- TODO: Find the code of the null character to avoid having to do this every time.
-				sampled:resize(1, t)	-- Resize output vector to the final size
-				break	-- If a null character is received then stop sampling.
+			
+			if (n1Flag == 0 and n2Flag == 0) then	-- No newlines detected yet.
+				if (self:decode_string(next_char[1]) == "\n") then
+					n1Flag = 1
+				end
+			elseif (n1Flag == 1 and n2Flag == 0) then	-- First newline detected already
+  			if (self:decode_string(next_char[1]) == "\n") then
+					n2Flag = 1	-- Say that we've detected the second newline
+				else
+					n1Flag = 0	-- Reset since the latest character is just a normal newline.
+				end
+			elseif (n1Flag == 1 and n2Flag == 1) then -- 2 newlines detected in a row.
+				if (self:decode_string(next_char[1]) == ".") then	-- This is the last of the "\n\n."
+					sampled:resize(1, t-1)	-- Resize output vector to the final size
+					break	-- If a null character is received then stop sampling. Don't write the character to the output here.
+				else
+					n1Flag = 0
+					n2Flag = 0
+				end
 			end
 		end
-
 	else	-- Same thing, without the comparisons and truncation.
 		for t = first_t, T do
   	  if sample == 0 then
