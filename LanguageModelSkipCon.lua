@@ -224,8 +224,8 @@ end
 
 function LM:encode_string(s)
   local encoded = torch.LongTensor(#s)
-  for i = 1, #s do
-    local token = s:sub(i, i)
+	for i = 1, #s do
+		local token = s:sub(i, i)
     local idx = self.token_to_idx[token]
     assert(idx ~= nil, 'Got invalid idx')
     encoded[i] = idx
@@ -271,6 +271,7 @@ function LM:sample(kwargs)
 	
   local sampled = torch.LongTensor(1, T)
   self:resetStates()
+	
 
   local scores, first_t
   if #start_text > 0 then
