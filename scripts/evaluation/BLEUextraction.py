@@ -44,12 +44,14 @@ if __name__ == '__main__':
     print("Writing output to " + args.output_file)
 
     # Build the command line base strin components.
-    comm = 'th sample.lua -checkpoint ' + args.input_checkpoint + ' -nullstop 1 -start_text '
+    comm = 'th sample.lua -gpu -1 -checkpoint ' + args.input_checkpoint + ' -nullstop 1 -start_text '
     #comm = 'th sample.lua -checkpoint ' + args.input_checkpoint + ' -nullstop 1 -start_text '
     
     # Iterate over every item in data, seed data[i]['data'] to the network
     # A note on timing: One iteration of this loop seems to take ~3.9s
     # With 2945 examples, this should take ~3h20m or so.
+    # CPU MODE: Single iteration takes ~6.2s => ~5h6m for 2945 examples assuming it doesn't leak memory...
+    
     print("Begin BLEU calculation...")
     with open(args.output_file, "a") as outFile:
         for i, ex in data.iteritems():
