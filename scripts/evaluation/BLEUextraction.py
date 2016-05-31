@@ -52,29 +52,53 @@ if __name__ == '__main__':
     # With 2945 examples, this should take ~3h20m or so.
     # CPU MODE: Single iteration takes ~6.2s => ~5h6m for 2945 examples assuming it doesn't leak memory...
     
+    ignored = 0     # Counter for examples ignored due to errors.
+    iterationNum = 0   # Iteration counter.
+    DataLength = len(data)
+
     print("Begin BLEU calculation...")
     with open(args.output_file, "a") as outFile:
         for i, ex in data.iteritems():
+            print("Iteration: " + `iterationNum`)
+            iterationNum += 1
             # Generate the command to run a sample through
             commArgs = shlex.split(comm)
             dataString = ex['data']
             commArgs.append(dataString)
-            
-            # Sample the model using the seed text.
-            retString = subprocess.check_output(commArgs)
-            # Process the returned string
-            #retString = p.stdout.read()
-            retStringSplit = retString.split(dataString, 1) # Split on newline to remove the input argument...
-            genString = retStringSplit[1]   # genString now contains the sampled forecast
-            genString = genString.strip()
+            if len(dataString) == 0:
+                print("Data error in iteration " + `i` + ", ignoring...")
+                ignored += 1
+                break   # Assuming that this means that there's a bad example
 
-            # Now compute BLEU score
-            genStringToken = word_tokenize(genString)
-            refStringToken = word_tokenize(ex['forecast'])
-            bleuScore = bleu_score.sentence_bleu([refStringToken], genStringToken)
+            # Sample the model using the seed text.
+            try:
+                retString = subprocess.check_output(commArgs)
+            except:
+                print("Sample Error in iteration " + `i` + ", ignoring...")
+                ignored += 1
+                break   # This means a problem with the sampling.
+            else:
+                # Process the returned string
+                #retString = p.stdout.read()
+                retStringSplit = retString.split(dataString, 1) # Split on newline to remove the input argument...
+                if len(retStringSplit) < 2:
+                    ignored += 1
+                    print("Output error: No output seems to be present. Ignoring...")
+                    break
+                genString = retStringSplit[1]   # genString now contains the sampled forecast
+                genString = genString.strip()
+
+                # Now compute BLEU score
+                if len(genString) == 0:
+                    print("Output error: Returned output is size 0. Ignoring...")
+                    ignored += 1
+                    break
+                genStringToken = word_tokenize(genString)
+                refStringToken = word_tokenize(ex['forecast'])
+                bleuScore = bleu_score.sentence_bleu([refStringToken], genStringToken)
             
-            # Appending to the end of a file
-            outFile.write(`bleuScore` + "\n")
+                # Appending to the end of a file
+                outFile.write(`bleuScore` + "\n")
 
     print("Done.")
-
+    print("Ignored Examples: " + `ignored`)
