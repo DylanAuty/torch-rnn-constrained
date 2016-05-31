@@ -68,7 +68,7 @@ if __name__ == '__main__':
             if len(dataString) == 0:
                 print("Data error in iteration " + `i` + ", ignoring...")
                 ignored += 1
-                break   # Assuming that this means that there's a bad example
+                continue   # Assuming that this means that there's a bad example
 
             # Sample the model using the seed text.
             try:
@@ -84,7 +84,7 @@ if __name__ == '__main__':
                 if len(retStringSplit) < 2:
                     ignored += 1
                     print("Output error: No output seems to be present. Ignoring...")
-                    break
+                    continue
                 genString = retStringSplit[1]   # genString now contains the sampled forecast
                 genString = genString.strip()
 
@@ -92,7 +92,7 @@ if __name__ == '__main__':
                 if len(genString) == 0:
                     print("Output error: Returned output is size 0. Ignoring...")
                     ignored += 1
-                    break
+                    continue
                 genStringToken = word_tokenize(genString)
                 refStringToken = word_tokenize(ex['forecast'])
                 bleuScore = bleu_score.sentence_bleu([refStringToken], genStringToken)
