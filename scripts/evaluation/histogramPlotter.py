@@ -34,7 +34,6 @@ if __name__ == '__main__':
     n, bins, patches = plt.hist(data, 50, normed=1, facecolor='blue', alpha=0.75)
     plt.xlabel("BLEU Score")
     plt.ylabel("Probability")
-    plt.title("Histogram of BLEU score, 3 Hidden Layer, 256 Hidden Neuron per Layer, Skip Connections")
     plt.savefig(args.output_file)
     plt.close(fig1)
 
