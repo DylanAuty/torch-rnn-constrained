@@ -41,12 +41,17 @@ if __name__ == '__main__':
     # First read in the data and stick it in a dict for easy access.
     data = json.loads(open(args.input_data).read())
     
+    print("Writing output to " + args.output_file)
+
     # Build the command line base strin components.
     comm = 'th sample.lua -checkpoint ' + args.input_checkpoint + ' -nullstop 1 -start_text '
-
+    #comm = 'th sample.lua -checkpoint ' + args.input_checkpoint + ' -nullstop 1 -start_text '
+    
     # Iterate over every item in data, seed data[i]['data'] to the network
+    # A note on timing: One iteration of this loop seems to take ~3.9s
+    # With 2945 examples, this should take ~3h20m or so.
     print("Begin BLEU calculation...")
-    with open(args.output_file, "a") as f:
+    with open(args.output_file, "a") as outFile:
         for i, ex in data.iteritems():
             # Generate the command to run a sample through
             commArgs = shlex.split(comm)
@@ -54,13 +59,10 @@ if __name__ == '__main__':
             commArgs.append(dataString)
             
             # Sample the model using the seed text.
-            p = subprocess.Popen(commArgs, stdout=subprocess.PIPE)
-            
+            retString = subprocess.check_output(commArgs)
             # Process the returned string
-            retString = p.stdout.read()
+            #retString = p.stdout.read()
             retStringSplit = retString.split(dataString, 1) # Split on newline to remove the input argument...
-            print(retStringSplit[1])
-            sys.exit()
             genString = retStringSplit[1]   # genString now contains the sampled forecast
             genString = genString.strip()
 
@@ -70,7 +72,7 @@ if __name__ == '__main__':
             bleuScore = bleu_score.sentence_bleu([refStringToken], genStringToken)
             
             # Appending to the end of a file
-            outFile.write(`bleuScore`)
-    
+            outFile.write(`bleuScore` + "\n")
+
     print("Done.")
 
