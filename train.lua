@@ -4,6 +4,7 @@ require 'optim'
 
 require 'LanguageModel'
 require 'LanguageModelSkipCon'
+require 'LanguageModelSkip_win1'
 require 'util.DataLoader'
 
 local utils = require 'util.utils'
@@ -107,6 +108,9 @@ else
 	elseif opt.arch == 'skipcon' then
 		model = nn.LanguageModelSkipCon(opt_clone):type(dtype)
 		print("Network Architecture: Skip connections, unconstrained")
+	elseif opt.arch = 'skip_win1' then
+		model = nn.LanguageModelSkip_win1(opt_clone):type(dtype)
+		print("Network Architecture: Skip connections, window method 1")
 	else
 		model = nn.LanguageModel(opt_clone):type(dtype)
 	end

@@ -26,7 +26,7 @@ The training script `train.lua` accepts the following command-line flags:
 - `-rnn_size`: The number of hidden units in the RNN; default is 128. Larger values (256 or 512) are commonly used to learn more powerful models and for bigger datasets, but this will significantly slow down computation.
 - `-dropout`: Amount of dropout regularization to apply after each RNN layer; must be in the range `0 <= dropout < 1`. Setting `dropout` to 0 disables dropout, and higher numbers give a stronger regularizing effect.
 - `-num_layers`: The number of layers present in the RNN; default is 2.
-- `-arch`: The network architecture to use. Defaults to `reg`, which is a fully connected feed-forward network with no constraint methods applied. Other option is `skipcon`, which adds skip connections to the network - network remains unconstrained.
+- `-arch`: The network architecture to use. Defaults to `reg`, which is a fully connected feed-forward network with no constraint methods applied. Other options are `skipcon`, which adds skip connections to the network - network remains unconstrained - and `skipcon_win1` which adds a method similar to the windowing method of Graves et. al (2013) to the skip connected network.
 
 **Optimization options**:
 - `-max_epochs`: How many training epochs to use for optimization. Default is 50.
@@ -58,4 +58,4 @@ The sampling script `sample.lua` accepts the following command-line flags:
 - `-gpu`: The ID of the GPU to use (zero-indexed). Default is 0. Set this to -1 to run in CPU-only mode.
 - `-gpu_backend`: The GPU backend to use; either `cuda` or `opencl`. Default is `cuda`.
 - `-verbose`: By default just the sampled text is printed to the console. Set this to 1 to also print some diagnostic information.
-- `-nullstop`: Defaults to 0, if 1 then model will stop sampling when a null character is encountered.
+- `-nullstop`: Defaults to 0, if 1 then model will stop sampling when a double newline and period is encountered (signalling the beginning of the next batch of data).
