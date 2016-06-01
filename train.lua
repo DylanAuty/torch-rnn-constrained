@@ -108,11 +108,12 @@ else
 	elseif opt.arch == 'skipcon' then
 		model = nn.LanguageModelSkipCon(opt_clone):type(dtype)
 		print("Network Architecture: Skip connections, unconstrained")
-	elseif opt.arch = 'skip_win1' then
+	elseif opt.arch == 'skip_win1' then
 		model = nn.LanguageModelSkip_win1(opt_clone):type(dtype)
 		print("Network Architecture: Skip connections, window method 1")
 	else
 		model = nn.LanguageModel(opt_clone):type(dtype)
+		print("Architecture option not recognised: using standard")
 	end
 end
 
