@@ -1,7 +1,9 @@
 # extractFromTest.py
 # Script to extract individual examples from the test dataset created by preprocess.py.
-# Script expects 1 argument:
+# Script expects 2 arguments:
 #	1) -i /path/to/dataset.h5
+#       2) -j /path/to/dataset.json
+#       3) -o /path/to/outfile.json
 # Dylan Auty, 25/05/2016
 
 import sys
@@ -11,7 +13,7 @@ import h5py
 import json
 
 def usage():
-    sys.exit("Usage: python2 extractFromTest.py [-i /full/path/to/dataset.h5] [-j /full/path/dataset.json]")
+    sys.exit("Usage: python2 extractFromTest.py [-i /full/path/to/dataset.h5] [-j /full/path/dataset.json] [-o /path/to/outfile.json]")
     return
 
 def main(argv):
@@ -38,7 +40,7 @@ def main(argv):
     token_to_idx = fjson["token_to_idx"]
     idx_to_token = fjson["idx_to_token"]
     
-    testSet = f.get('test')
+    testSet = f.get('train')
     testSet = np.array(testSet)
     tString = ''
     outData = []
