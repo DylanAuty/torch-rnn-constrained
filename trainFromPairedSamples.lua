@@ -100,10 +100,11 @@ end
 
 
 -- Initialize the DataLoader and vocabulary
-local loader = DataLoader(opt)
-local vocab = utils.read_json(opt.input_json)
+-- This may well need changing.
+local loader = DataLoader(opt)								-- From utils.DataLoader.
+local vocab = utils.read_json(opt.input_json)	-- Can stay unchanged - to get encoder/decoder keys.
 local idx_to_token = {}
-for k, v in pairs(vocab.idx_to_token) do
+for k, v in pairs(vocab.idx_to_token) do			-- Get the decoder key into memory.
   idx_to_token[tonumber(k)] = v
 end
 
@@ -207,6 +208,7 @@ end
 -- Train the model!
 local optim_config = {learningRate = opt.learning_rate}
 local num_train = loader.split_sizes['train']
+-- num_train is number of chars in train set, divided by (batch_size (N) * seq_length (T))
 local num_iterations = opt.max_epochs * num_train
 model:training()
 for i = start_i + 1, num_iterations do
