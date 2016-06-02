@@ -117,7 +117,7 @@ function DataLoader:__init(kwargs)
     	-- Chop out the extra bits at the end to make it evenly divide
 			-- If it fits perfectly... append 
 			-- vx is of dimension (V, N, T)
-			-- 	Need to make it (V, N + C, T + C) where C is constraint size
+			-- 	Need to make it (V, N + C, T) where C is constraint size
 			local vx = v[{{1, num - extra}}]:view(N, -1, T):transpose(1, 2):clone()	
 			local vy = v[{{2, num - extra + 1}}]:view(N, -1, T):transpose(1, 2):clone()
 			
@@ -159,9 +159,10 @@ end
 function DataLoader:nextBatch(split)
 	-- Also y will be the same (the input but shifted by one)
   local idx = self.split_idxs[split]
-  assert(idx, 'invalid split ' .. split)
-  local x = self.x_splits[split][idx]
-  local y = self.y_splits[split][idx]
+	assert(idx, 'invalid split ' .. split)
+  local x = self.x_splits[split][idx][{{},{1, self.batch_size}, {}}]
+	local c = self.x_splits[split][idx][{{},{{self.batch_size + 1, {}}}, {}}]
+	local y = self.y_splits[split][idx]
   if idx == self.split_sizes[split] then
     self.split_idxs[split] = 1
   else
