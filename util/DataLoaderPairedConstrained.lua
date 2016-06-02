@@ -161,7 +161,7 @@ function DataLoader:nextBatch(split)
   local idx = self.split_idxs[split]
 	assert(idx, 'invalid split ' .. split)
   local x = self.x_splits[split][idx][{{},{1, self.batch_size}, {}}]
-	local c = self.x_splits[split][idx][{{},{{self.batch_size + 1, {}}}, {}}]
+	local c = self.x_splits[split][idx][{{},{{self.batch_size, {}}}, {}}]
 	local y = self.y_splits[split][idx]
   if idx == self.split_sizes[split] then
     self.split_idxs[split] = 1
