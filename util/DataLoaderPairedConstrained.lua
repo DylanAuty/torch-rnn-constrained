@@ -106,8 +106,11 @@ function DataLoader:__init(kwargs)
 			-- num is number of chars in the split
 			-- N is batch length
 			-- T is sequence length
-
+			if extra == 0 then
+				v = torch.cat(v, torch.ByteTensor(1))
+			end
     	-- Chop out the extra bits at the end to make it evenly divide
+			-- If it fits perfectly... append 
 			-- vx is of dimension (V, N, T)
 			-- 	Need to make it (V + C, N, T) where C is constraint size
 			local vx = v[{{1, num - extra}}]:view(N, -1, T):transpose(1, 2):clone()	
@@ -115,7 +118,8 @@ function DataLoader:__init(kwargs)
 			
 			-- Now extract and append the constraint vector in the right place...
 			vc = set.data[datasetNum]
-			
+			print(#vx)
+			print(#vc)
 
     	-- x and y are the input and reference output respectively
 			-- x will have the constraint set concatenated onto it. Always the same for every x batch.
