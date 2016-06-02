@@ -98,12 +98,12 @@ function DataLoader:__init(kwargs)
 	-- All constraint stuff should be sorted out in here.
 	for split, set in pairs(splits) do -- For every top level dataset split (train/test/val)
     -- Split is one of 3 sets of datasets
-		-- v is the array of characters within the given split
 		local firstFlag = 0
 
 		for datasetNum, v in pairs(set.forecasts) do
+			-- v is an array of encoded characters.
 			local num = v:nElement()
-    	local extra = num % (N * T)
+			local extra = num % (N * T)
 			-- num is number of chars in the split
 			-- N is batch length
 			-- T is sequence length
@@ -120,7 +120,7 @@ function DataLoader:__init(kwargs)
 			-- 	Need to make it (V, N + C, T) where C is constraint size
 			local vx = v[{{1, num - extra}}]:view(N, -1, T):transpose(1, 2):clone()	
 			local vy = v[{{2, num - extra + 1}}]:view(N, -1, T):transpose(1, 2):clone()
-			
+
 			-- Now extract and append the constraint vector in the right place...
 			-- Needs to be appended to N in every place
 			-- Appending along the minibatch direction because it will be sliced off on arrival
@@ -129,14 +129,14 @@ function DataLoader:__init(kwargs)
 			
 			vc = set.data[datasetNum]
 			temp = torch.ByteTensor(vc:nElement(), vx:size(1), T)
-			for x=1,N do
+			for x=1,vx:size(1) do
 				for y=1,T do
 					temp[{{}, x, y}] = vc
 				end
 			end
 			temp = temp:view(vx:size(1), -1, T)
 			vx = torch.cat(vx, temp, 2) 			-- Now, the constraint is on the end of every minibatch. It can be chopped off on receipt.
-			
+
 			-- x and y are the input and reference output respectively
 			-- y is the same as x, just transposed by 1
 			-- Note that the outputs are indexed by split alone.
@@ -160,14 +160,18 @@ function DataLoader:nextBatch(split)
 	-- Also y will be the same (the input but shifted by one)
   local idx = self.split_idxs[split]
 	assert(idx, 'invalid split ' .. split)
-  local x = self.x_splits[split][idx][{{},{1, self.batch_size}, {}}]
-	local c = self.x_splits[split][idx][{{},{{self.batch_size, {}}}, {}}]
+  
+	local x = self.x_splits[split][idx][{{1, self.batch_size}, {}}]
+	local tempVar = #self.x_splits[split][idx]
+	local tempVar2 = self.batch_size + 1
+	local c = self.x_splits[split][idx][{{tempVar2, tempVar[1]}}]
 	local y = self.y_splits[split][idx]
+	print(self.x_splits[split])
   if idx == self.split_sizes[split] then
     self.split_idxs[split] = 1
   else
     self.split_idxs[split] = idx + 1
   end
-  return x, y
+  return x, y, c
 end
 
