@@ -99,6 +99,7 @@ function DataLoader:__init(kwargs)
 	for split, set in pairs(splits) do -- For every top level dataset split (train/test/val)
     -- Split is one of 3 sets of datasets
 		-- v is the array of characters within the given split
+		local firstFlag = 0
 
 		for datasetNum, v in pairs(set.forecasts) do
 			local num = v:nElement()
@@ -106,30 +107,49 @@ function DataLoader:__init(kwargs)
 			-- num is number of chars in the split
 			-- N is batch length
 			-- T is sequence length
-			if extra == 0 then
-				v = torch.cat(v, torch.ByteTensor(1))
+
+			if extra == 0 then	-- If the batch size fits exactly, then we append one so that we can construct y properly.
+				t1 = torch.ByteTensor(1)
+				t1[1] = 0
+				v = torch.cat(v, t1)
 			end
+
     	-- Chop out the extra bits at the end to make it evenly divide
 			-- If it fits perfectly... append 
 			-- vx is of dimension (V, N, T)
-			-- 	Need to make it (V + C, N, T) where C is constraint size
+			-- 	Need to make it (V, N + C, T + C) where C is constraint size
 			local vx = v[{{1, num - extra}}]:view(N, -1, T):transpose(1, 2):clone()	
 			local vy = v[{{2, num - extra + 1}}]:view(N, -1, T):transpose(1, 2):clone()
 			
 			-- Now extract and append the constraint vector in the right place...
+			-- Needs to be appended to N in every place
+			-- Appending along the minibatch direction because it will be sliced off on arrival
+			-- 	Every minibatch must come from the same example
+			--	Every constraint appended to that minibatch should correspond to the same example.
+			
 			vc = set.data[datasetNum]
-			print(#vx)
-			print(#vc)
-
-    	-- x and y are the input and reference output respectively
-			-- x will have the constraint set concatenated onto it. Always the same for every x batch.
-			-- The constraint set will be chopped off when the network receives it (I hope)
+			temp = torch.ByteTensor(vc:nElement(), vx:size(1), T)
+			for x=1,N do
+				for y=1,T do
+					temp[{{}, x, y}] = vc
+				end
+			end
+			temp = temp:view(vx:size(1), -1, T)
+			vx = torch.cat(vx, temp, 2) 			-- Now, the constraint is on the end of every minibatch. It can be chopped off on receipt.
+			
+			-- x and y are the input and reference output respectively
 			-- y is the same as x, just transposed by 1
 			-- Note that the outputs are indexed by split alone.
-			self.x_splits[split] = vx
-    	self.y_splits[split] = vy
-    	self.split_sizes[split] = vx:size(1)
-  	end
+			if firstFlag == 0 then
+				self.x_splits[split] = vx
+				self.y_splits[split] = vy
+				self.split_sizes[split] = vx:size(1)
+			else
+				self.x_splits[split] = torch.cat(vx, self.x_splits[split], 1)
+    		self.y_splits[split] = torch.cat(vy, self.y_splits[split], 1)	-- Add to the vector of example slices
+    		self.split_sizes[split] = self.split_sizes[split] + vx:size(1)
+  		end
+		end
 	end
 
   self.split_idxs = {train=1, val=1, test=1}
@@ -137,7 +157,6 @@ end
 
 
 function DataLoader:nextBatch(split)
-	-- To be changed to: construct a batch, concatenate the constraint vector to the end, return that back.
 	-- Also y will be the same (the input but shifted by one)
   local idx = self.split_idxs[split]
   assert(idx, 'invalid split ' .. split)
