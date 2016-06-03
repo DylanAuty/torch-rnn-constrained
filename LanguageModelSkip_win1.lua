@@ -124,17 +124,14 @@ function LM:__init(kwargs)
 		if i == 1 then -- Set up the first layer
 			local l1 = nn.ConcatTable()
 			l1:add(rnnContainer)				-- Add windowed LSTM, which takes a table {encoded x, encoded c} as input.
-			local l12 = nn.Sequential()	-- This will be a nn.Identity() to forward the input
-
-			l12:add(nn.SelectTable(2))
-			l12:add(nn.Identity())			-- Forwarding the input for skip connection purposes.
-
-			l1:add(l12)
+			l1:add(nn.SelectTable(1))		-- Add selector to ensure that input gets forwarded for skips.
+			self.net:add(l1)
 
 		elseif i ~= 1 then --Set up the second layer - this network should only really have 2.
-			print("L2 PLACEHOLDER")
-			collectgarbage()
-			os.exit()
+			local l2 = nn.Sequential()
+			l2:add(nn.JoinTable(3, 3))
+			l2:add(rnnContainer)
+			self.net:add(l2)
 		end
 
 		--[[
@@ -200,8 +197,6 @@ function LM:__init(kwargs)
 		--]]
   end
 	
-	self.net:add(nn.SelectTable(1))		-- This contains the outgoing skip connection accumulator (a large table)
-
   -- After all the RNNs run, we will have a tensor of shape (N, T, H);
   -- we want to apply a 1D temporal convolution to predict scores for each
   -- vocab element, giving a tensor of shape (N, T, V). Unfortunately
@@ -221,7 +216,7 @@ function LM:__init(kwargs)
   self.view2 = nn.View(1, -1):setNumInputDims(2)
 
   self.net:add(self.view1)
-  self.net:add(nn.Linear(self.num_layers * H, V))
+  self.net:add(nn.Linear(H, V))
   self.net:add(self.view2)
 
 end
