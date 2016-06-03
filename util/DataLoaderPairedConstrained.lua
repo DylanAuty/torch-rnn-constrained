@@ -166,7 +166,6 @@ function DataLoader:nextBatch(split)
 	local tempVar2 = self.batch_size + 1
 	local c = self.x_splits[split][idx][{{tempVar2, tempVar[1]}}]
 	local y = self.y_splits[split][idx]
-	print(self.x_splits[split])
   if idx == self.split_sizes[split] then
     self.split_idxs[split] = 1
   else
