@@ -157,7 +157,7 @@ end
 
 
 function DataLoader:nextBatch(split)
-	-- Also y will be the same (the input but shifted by one)
+	-- y will be the same as the input but shifted by one
   local idx = self.split_idxs[split]
 	assert(idx, 'invalid split ' .. split)
   
