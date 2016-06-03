@@ -137,6 +137,7 @@ function DataLoader:__init(kwargs)
 			
 			vc = set.data[datasetNum]
 			temp = torch.ByteTensor(vc:nElement(), vx:size(1), T)
+			-- Append vc column by column
 			for x=1,vx:size(1) do
 				for y=1,T do
 					temp[{{}, x, y}] = vc
@@ -169,16 +170,19 @@ function DataLoader:nextBatch(split)
   local idx = self.split_idxs[split]
 	assert(idx, 'invalid split ' .. split)
   
-	local x = self.x_splits[split][idx][{{1, self.batch_size}, {}}]
-	local tempVar = #self.x_splits[split][idx]
-	local tempVar2 = self.batch_size + 1
-	local c = self.x_splits[split][idx][{{tempVar2, tempVar[1]}}]
+	--local x = self.x_splits[split][idx][{{1, self.batch_size}, {}}]
+	-- Modifying x so that it's the whole of x + C concatenated together along dim 1.
+	local x = self.x_splits[split][idx] 
+	--local tempVar = #self.x_splits[split][idx]
+	--local tempVar2 = self.batch_size + 1
+	--local c = self.x_splits[split][idx][{{tempVar2, tempVar[1]}}]
 	local y = self.y_splits[split][idx]
   if idx == self.split_sizes[split] then
     self.split_idxs[split] = 1
   else
     self.split_idxs[split] = idx + 1
   end
-  return x, y, c
+  --return x, y, c
+	return x, y
 end
 
