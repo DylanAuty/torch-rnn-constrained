@@ -45,10 +45,13 @@ function DataLoader:__init(kwargs)
 	--	os.exit()
 	--end	
 	
+	print("Loading data from HDF5 to Memory...")
+	--[[
 	trainData = f:read('/train/data'):all()
 	trainForecasts = f:read('/train/forecast'):all()
 	testData = f:read('/test/data'):all()
 	trainForecasts = f:read('/test/forecast'):all()
+	--]]
 	valData = f:read('/val/data'):all()
 	valForecasts = f:read('/val/forecast'):all()
 
@@ -56,17 +59,21 @@ function DataLoader:__init(kwargs)
 	-- Now it contains 3 groups of 2 groups each of many datasets.
 	
 	-- The splits
+	--[[
 	splits.train = {}
 	splits.train.data = {}
 	splits.train.forecasts = {}
 	splits.test = {}
 	splits.test.data = {}
 	splits.test.forecasts = {}
+	--]]
 	splits.val = {}
 	splits.val.data = {}
 	splits.val.forecasts = {}
 	
+	print("Sorting the data into sets...")
 	-- Fill the sets
+	--[[
 	for key, item in pairs(trainData) do
 		splits.train.data[key] = item
 		splits.train.forecasts[key] = trainForecasts[key]
@@ -75,6 +82,7 @@ function DataLoader:__init(kwargs)
 		splits.test.data[key] = item
 		splits.test.forecasts[key] = testForecasts[key]
 	end
+	--]]
 	for key, item in pairs(valData) do
 		splits.val.data[key] = item
 		splits.val.forecasts[key] = valForecasts[key]
@@ -99,7 +107,7 @@ function DataLoader:__init(kwargs)
 	for split, set in pairs(splits) do -- For every top level dataset split (train/test/val)
     -- Split is one of 3 sets of datasets
 		local firstFlag = 0
-
+		print("Reshaping data")
 		for datasetNum, v in pairs(set.forecasts) do
 			-- v is an array of encoded characters.
 			local num = v:nElement()

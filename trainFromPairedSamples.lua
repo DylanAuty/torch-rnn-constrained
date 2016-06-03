@@ -23,7 +23,7 @@ require 'optim'
 require 'LanguageModel'
 require 'LanguageModelSkipCon'
 require 'LanguageModelSkip_win1'
-require 'util.DataLoader'
+require 'util.DataLoaderPairedConstrained'
 
 local utils = require 'util.utils'
 local unpack = unpack or table.unpack
@@ -101,7 +101,7 @@ end
 
 -- Initialize the DataLoader and vocabulary
 -- This may well need changing.
-local loader = DataLoader(opt)								-- From utils.DataLoader.
+local loader = DataLoaderPairedConstrained(opt)								-- From utils.DataLoaderPairedConstrained.
 local vocab = utils.read_json(opt.input_json)	-- Can stay unchanged - to get encoder/decoder keys.
 local idx_to_token = {}
 for k, v in pairs(vocab.idx_to_token) do			-- Get the decoder key into memory.
@@ -164,13 +164,20 @@ local function f(w)
 	
   -- Get a minibatch and run the model forward, maybe timing it
   local timer
-  local x, y = loader:nextBatch('train')
-	x, y = x:type(dtype), y:type(dtype)
+  
+	--[[GETTING DATA FROM THE VAL SET FOR SPEED OF DEBUGGING
+	--]]
+	
+	--local x, y, c = loader:nextBatch('train')
+	local x, y, c = loader:nextBatch('val')
+	-- The modified loader returns x, y, c - input, output, constraint vector respectively.
+
+	x, y, c = x:type(dtype), y:type(dtype), c:type(dtype)
 	if opt.speed_benchmark == 1 then
     if cutorch then cutorch.synchronize() end
     timer = torch.Timer()
   end
-	local scores = model:forward(x)
+	local scores = model:forward({x, c})
 	-- Use the Criterion to compute loss; we need to reshape the scores to be
   -- two-dimensional before doing so. Annoying.
   local scores_view = scores:view(N * T, -1)
@@ -207,7 +214,7 @@ end
 
 -- Train the model!
 local optim_config = {learningRate = opt.learning_rate}
-local num_train = loader.split_sizes['train']
+local num_train = loader.split_sizes['val']
 -- num_train is number of chars in train set, divided by (batch_size (N) * seq_length (T))
 local num_iterations = opt.max_epochs * num_train
 model:training()
