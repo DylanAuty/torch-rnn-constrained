@@ -3,6 +3,7 @@ require 'nn'
 
 require 'VanillaRNN'
 require 'LSTM'
+require 'windowedLSTM'
 require 'dimPrint'		-- Self-written debugging module whose purpose is to print the dimensions of tensors passing through.
 
 local utils = require 'util.utils'
@@ -29,33 +30,26 @@ function LM:__init(kwargs)
 
   local V, D, H = self.vocab_size, self.wordvec_dim, self.rnn_size
 	
-	--[[ Building Skip Connected network --]]
-	--[[ Structure after nn.LookupTable(V, D):
-	--	First layer, composed of 2 sub-layers:
-	--	l1 is nn.Sequential(), l1[1] is first layer of l1, l1[1][1] is first module of first layer of l1
-	--	l1[1][1] = LSTM						
-	--	l1[1][2] = nn.Identity()	(For incoming skip connections)
-	--	Connections:
-	--		l1 -> l1[1][1]					Copying the input to both cells of the first sub-layer
-	--		l1 -> l1[1][2]
-	--	------------------------
-	--	l1[2][1] = nn.Identity()	(For outgoing skip connections - will turn into a join in future layers)
-	--	l1[2][2] = nn.Join()			(Join input and previous LSTM output for incoming skip connections)
-	--	l1[2][3] = nn.Identity()	(For incoming skip connections, transferring forwards)
-	--	Connections:
-	--		l1[1][1] -> l1[2][1]		(LSTM -> Outgoing skip 'accumulator' (line of repeated table joins))
-	--		
-	--		l1[1][1] -> l1[2][2]		(LSTM -> Join with network input (for incoming skip connctions))
-	--		l1[1][2] -> l1[2][2]		(Input forwarder -> Join with LSTM (for incoming skip connctions))
-	--		
-	--		l1[1][2] -> l1[2][3]		(network input forwarder -> network input forwarder))
-	--	------------------------
-	--	Layers n != 1 are identical to layer 1, EXCEPT:
-	--	ln[1][3] = nn.Identity()	(For forwarding network input)
-	--	ln[2][3] = nn.Join()			(Outgoing skip 'accumulator' (line of repeated table joins with LSTM outputs))
-	--	Additional connections:
-	--		ln[1][1] -> ln[2][3]		(LSTM -> outgoing skip accumulator)
-	--		ln[1][3] -> ln[2][1]		(network input forwarder -> network input forwarder)
+	--[[ Adding the Window of Graves Et. Al --]]
+	-- The window:
+	-- 	window at time t (w_t) is sum over u of phi(t, u)*c_u
+	-- 	i.e. The sum over all character (one hot vectors) multiplied by phi(t, u)
+	-- 		c_u		: character u of constraint vector c
+	-- 		t			: timestep
+	-- 	phi(t, u):
+	-- 		Sum of K of these:
+	-- 				alpha_k_t * exp(-beta_k_t * (k_k_t - u)^2)
+	--		K is the number of possible text classes
+	--			(i.e. number of items in a single characters's one hot vector)
+	--		t is the timestep (up to T)
+	--	The parameters:
+	--		Each parameter is a vector of size K
+	--		=> all three make a vector of size 3K
+	--		(alpha_t$, beta_t$, k_t$) = Linear(h_1 -> 3K)
+	--			alpha_t = exp(alpha_t$)
+	--			beta_t = exp(beta_t$)
+	--			k_t = k_(t-1) + exp(k_t$)
+	--
 	--]]
 
   self.net = nn.Sequential()
@@ -64,7 +58,10 @@ function LM:__init(kwargs)
   self.bn_view_out = {}
 
   self.net:add(nn.LookupTable(V, D))
- 	
+ 	-- V is the vocabulary size (number of symbols)
+	-- D is the size of the one-hot vectors
+	-- This lookup table converts a symbol to a vector of size D.
+	
 	for i = 1, self.num_layers do
     -- Selecting input dimensions for LSTM cells
 		local prev_dim = D+H								-- All LSTMs in layers 2 onwards have input dimension D+H (H because of skip connections)
