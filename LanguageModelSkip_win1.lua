@@ -21,10 +21,12 @@ function LM:__init(kwargs)
     self.vocab_size = self.vocab_size + 1
   end
 
-  self.model_type = utils.get_kwarg(kwargs, 'model_type')
+  print("Using a fixed architecture - 2 hidden LSTM layers + windowing.")
+  -- Model type and number of layers are forced to lstm and 2 respectively.
+	self.model_type = 'lstm'
   self.wordvec_dim = utils.get_kwarg(kwargs, 'wordvec_size')
   self.rnn_size = utils.get_kwarg(kwargs, 'rnn_size')
-  self.num_layers = utils.get_kwarg(kwargs, 'num_layers')
+	self.num_layers = 2
   self.dropout = utils.get_kwarg(kwargs, 'dropout')
   self.batchnorm = utils.get_kwarg(kwargs, 'batchnorm')
 
@@ -57,28 +59,50 @@ function LM:__init(kwargs)
   self.bn_view_in = {}
   self.bn_view_out = {}
 
-  self.net:add(nn.LookupTable(V, D))
+  local LUT = nn.LookupTable(V, D)
+	--self.net:add(nn.LookupTable(V, D))
  	-- V is the vocabulary size (number of symbols)
-	-- D is the size of the one-hot vectors
-	-- This lookup table converts a symbol to a vector of size D.
-	
+	-- D is the size of each individual one-hot vector
+	-- This lookup table converts a symbol (one of V possible symbols) to a vector of size D.
+	-- Note that as long as the vocab size is the same, this just doesn't care about batch size.
+
+	-- Construct a layer to decode both inputs in the input table.
+	-- Input to the whole network will be a table {input x, constraint c}
+	local t1 = nn.ConcatTable()
+	local t11 = nn.Sequential()
+	local t12 = nn.Sequential()
+
+	t11:add(nn.SelectTable(1))	-- Selecting the input x
+	t11:add(LUT)
+	t12:add(nn.SelectTable(2))	-- Selecting the constraint vector c
+	t12:add(LUT)	-- Both inputs go through a copy of the same nn.LookupTable (I think)
+			
+	t1:add(t11)		-- Add the sublayers to the concatTable
+	t1:add(t12)
+
+	self.net:add(t1)	-- Add the concatTable to the network.
+
 	for i = 1, self.num_layers do
     -- Selecting input dimensions for LSTM cells
-		local prev_dim = D+H								-- All LSTMs in layers 2 onwards have input dimension D+H (H because of skip connections)
-    if i == 1 then prev_dim = D end			-- First layer LSTM has input dimension D only
-   	
+		local prev_dim = D+H								
+    local out_dim = H
+		if i == 1 then prev_dim = D end			-- First layer LSTM has input dimension D only
+   	if i == 1 then out_dim = D+H end
 		-- Selecting cell type to use
 		local rnn
     local rnnContainer = nn.Sequential()
-		if self.model_type == 'rnn' then
-      rnn = nn.VanillaRNN(prev_dim, H)
-    elseif self.model_type == 'lstm' then
-      rnn = nn.LSTM(prev_dim, H)
-    end
-    rnn.remember_states = true
+		
+		-- Choose which LSTM type to use - windowed or unwindowed - depending on the layer number
+		if i == 1 then
+			rnn = nn.windowedLSTM(prev_dim, out_dim)			-- Constructor takes input and output sizes.
+				-- nn.windowedLSTM has a control vector of size D concatenated to the normal LSTM output H.
+		elseif i~= 1 then
+			rnn = nn.LSTM(prev_dim, out_dim)			-- Constructor takes input and output sizes.
+		end
+		rnn.remember_states = true
     table.insert(self.rnns, rnn)				-- This table is used to find all the rnn cells and reset them later.
  		rnnContainer:add(rnn)
-		
+
 		-- Batch normalisation
     if self.batchnorm == 1 then
       local view_in = nn.View(1, 1, -1):setNumInputDims(3)
@@ -95,9 +119,25 @@ function LM:__init(kwargs)
       rnnContainer:add(nn.Dropout(self.dropout))
     end
 
-
 		-- Construct and link the layers
-		
+		-- Note that after encoding, the table is {encoded data, encoded constraint}	
+		if i == 1 then -- Set up the first layer
+			local l1 = nn.ConcatTable()
+			l1:add(rnnContainer)				-- Add windowed LSTM, which takes a table {encoded x, encoded c} as input.
+			local l12 = nn.Sequential()	-- This will be a nn.Identity() to forward the input
+
+			l12:add(nn.SelectTable(2))
+			l12:add(nn.Identity())			-- Forwarding the input for skip connection purposes.
+
+			l1:add(l12)
+
+		elseif i ~= 1 then --Set up the second layer - this network should only really have 2.
+			print("L2 PLACEHOLDER")
+			collectgarbage()
+			os.exit()
+		end
+
+		--[[
 		if i == 1 then	-- Set up first layer
 			local t1 = nn.Sequential()			-- Contains both sub-layers
 			local t11 = nn.ConcatTable()		-- First sub-layer
@@ -157,6 +197,7 @@ function LM:__init(kwargs)
 
 			self.net:add(t1)	-- Add the completed layer to the overall network container.
 		end
+		--]]
   end
 	
 	self.net:add(nn.SelectTable(1))		-- This contains the outgoing skip connection accumulator (a large table)
