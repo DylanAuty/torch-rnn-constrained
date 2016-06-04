@@ -30,8 +30,10 @@ function LM:__init(kwargs)
   self.dropout = utils.get_kwarg(kwargs, 'dropout')
   self.batchnorm = utils.get_kwarg(kwargs, 'batchnorm')
 	self.batch_size = utils.get_kwarg(kwargs, 'batch_size')
+	self.con_length = utils.get_kwarg(kwargs, 'con_length')	-- Argument to take the size of the constraint window, default 3100.
 
   local V, D, H = self.vocab_size, self.wordvec_dim, self.rnn_size
+	local U = self.con_length	-- Setting the constraint vector size in the command line.
 	local N = self.batch_size
 	--[[ Adding the Window of Graves Et. Al --]]
 	-- The window:
@@ -111,13 +113,12 @@ function LM:__init(kwargs)
 	local d1 = nn.ConcatTable()
 	local d11 = nn.Narrow(1, 1, N)	-- Narrow along dimension 1 from index 1 to N
 	local d12Con = nn.Sequential()
-	self.d12 = nn.Narrow(1, N+1, N+2)	-- Defining as a self so that the second dimension can be fixed
-				-- Every iteration, it should be remade to nn.Narrow(1, N+1, U) where U is the size of the constraint vector
+	local d12 = nn.Narrow(1, N+1, U)	
 	d12Con:add(d12)
 	d12Con:add(nn.Unsqueeze(1))
 	d12Con:add(nn.Replicate(N, 1))	-- Expand constraint into 4th dimension - (U, T, D) -> (N, U, T, D)
 	d1:add(d11)
-	d1:add(d12Con)
+d1:add(d12Con)
 	self.decodeNet:add(d1)
 		-- Output at this point is {decoded input(N, T, D), decoded C (N, U, T, D)}
 	
@@ -129,7 +130,7 @@ function LM:__init(kwargs)
 
   self.paramNet:add(self.view1)
   self.paramNet:add(nn.Linear(H, 3 * D))
-  self.paramNet:add(self.view2)
+  self.paramNet:add(self.view2)		-- (N, T, 3D)
 	
 	local pC = nn.ConcatTable()
 	local pC1 = nn.Sequential()
@@ -143,15 +144,68 @@ function LM:__init(kwargs)
 	pC3:add(nn.Narrow(3, (2*D)+1, 3*D))
 	pC3:add(nn.Exp())
 	
-	pC:add(pC1)
-	pC:add(pC2)
-	pC:add(pC3)
-
+	pC:add(pC1)	-- alpha : (N, T, D)
+	pC:add(pC2)	-- beta : (N, T, D)
+	pC:add(pC3)	-- exp_k_bar : (N, T, D)
+			-- Note after processing, k will be (N, T, D)
 	self.paramNet:add(pC)
 	--paramNet outputs a TABLE
 	--{a, b, exp_k_bar}
 
 	--[[ Construct parameter -> phi network --]]
+	--Input is a table of 3 things: {a, b, k}
+	--These will have been set manually in the break.
+	self.phiNet = nn.Sequential()
+	local phiCol1 = nn.Sequential()		-- Input is self.a, dim (N, T, D)
+	local phiCol2 = nn.Sequential()		-- Input is self.b, dim (N, T, D)
+	local phiCol3 = nn.Sequential()		-- Input is self.k, dim (N, T, D)
+	phiCol1:add(nn.SelectTable(1))
+	phiCol2:add(nn.SelectTable(2))
+	phiCol3:add(nn.SelectTable(3))
+	self.phiCol1Rep = nn.Replicate(U, 4)	
+	self.phiCol2Rep = nn.Replicate(U, 4)	
+	self.phiCol3Rep = nn.Replicate(U, 4)	
+	phiCol1:add(self.phiCol1Rep)
+	phiCol2:add(self.phiCol2Rep)
+	phiCol3:add(self.phiCol3Rep)
+	
+	phiCol2:add(nn.MulConstant(-1, true)) -- beta has a factor of -1 in the phi equation.
+	
+	local phiCol3Concat = nn.Concat(4)
+	for i=0,U do		-- This should implement the subtraction of u from k in the phi equation.
+		local tSeq = nn.Sequential()
+		tSeq:add(nn.Select(4, i))
+		tSeq:add(nn.AddConstant(-i, true))
+		tSeq:add(nn.Unsqueeze(4))
+		phiCol3Concat:add(tSeq)
+	end
+	
+	phiCol3:add(phiCol3Concat)
+	phiCol3:add(nn.Square())
+
+	local phiUpperConcatWrapper = nn.ConcatTable()
+	phiUpperConcatWrapper:add(phiCol1)
+	phiUpperConcatWrapper:add(phiCol2)
+	phiUpperConcatWrapper:add(phiCol3)	-- phiConcatWrapper goes down to just above the nn.CMulTable()
+	
+	local phiLowerConcatWrapper = nn.ConcatTable()
+	local phiLowCol1 = nn.Sequential()
+	local phiLowCol2 = nn.Sequential()
+	phiLowCol1:add(nn.SelectTable(1))
+	phiLowCol1:add(nn.Identity())
+	phiLowCol2:add(nn.NarrowTable(2, 2))
+	phiLowCol2:add(nn.CMulTable())
+	phiLowCol2:add(nn.Exp())
+	
+	phiLowerConcatWrapper:add(phiLowCol1)
+	phiLowerConcatWrapper:add(phiLowCol2)
+
+	phiNet:add(phiUpperConcatWrapper)
+	phiNet:add(phiLowerConcatWrapper)	-- outputs a table of 2 elements
+	phiNet:add(nn.CMulTable())
+	phiNet:add(nn.Sum(3, 4))	-- Sum over D.
+
+	
 
 	--[[ CONSTRUCT self.net1 --]]
 	for i = 1, self.num_layers do
@@ -242,9 +296,6 @@ function LM:updateOutput(input)
 	-- Set paramView up the same way
 	self.paramView1:resetSize(N * T, -1)
 	self.paramView2:resetSize(N, T, -1)
-
-	-- Set the input splitter up according to the size of the input.
-	self.d12 = nn.Narrow(1, self.vocab_size + 1, input:size(1))	-- To select the constraint from the input.
 
 	-- Set up the batch normalisation views according to the current N and T.
   for _, view_in in ipairs(self.bn_view_in) do
