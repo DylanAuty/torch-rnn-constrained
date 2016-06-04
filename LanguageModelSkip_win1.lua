@@ -55,9 +55,28 @@ function LM:__init(kwargs)
 	--]]
 	--
 	--[[ IMPLEMENTATION NOTES --]]
-	-- INPUT: single vector containing {x, c} concatenated together.
+	-- INPUT: single vector containing x, and c concatenated together.
 	-- decodeNet: Split input apart, run through the lookup table.
-	-- 
+	--
+	-- WINDOW CELL:
+	-- 	2 sub-networks:
+	--		net1 : PARAMETER HANDLING
+	--				dimensions: {(N, T, H), (N, T, D, U}) -> {{(N, T, D), (N, T, D), (N, T, D)}, (N, T, D, U)}
+	--				input: output from first LSTM hidden layer, C.
+	--				outputs: {{alpha, beta, exp_k_bar}, C} (C is forwarded).
+	--					NB: alpha and beta go in self.a and self.b
+	--							self.k = self.k + exp_k_bar (needs to be done elementwise)
+	--		
+	--		net2 : PHI GENERATION
+	--				dimensions: {{(N, T, D), (N, T, D), (N, T, D)}, (N, T, D, U)} -> {(N, T, U), (N, T, D, U)}
+	--				input: table of (table of parameters alpha, beta, k.), and C
+	--				output: table of Phi (for all T and all U, in one tensor), C (C is forwarded)
+	--
+	--		net3 : PHI APPLICATION
+	--				dimensions: {(N, T, U), (N, T, D, U)} -> (N, T, D)
+	--				inputs: table of {Phi, C}
+	--				outputs: window vector (to be fed into a hidden layer somewhere).
+	
 
 	self.decodeNet = nn.Sequential() 	-- Network containing the decoder, returns table of {x, c} decoded.
   self.net1 = nn.Sequential()
