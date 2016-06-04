@@ -124,12 +124,12 @@ function DataLoader:__init(kwargs)
 
     	-- Chop out the extra bits at the end to make it evenly divide
 			-- If it fits perfectly... append 
-			-- vx is of dimension (V, N, T)
-			-- 	Need to make it (V, N + C, T) where C is constraint size
+			-- vx is of dimension (E, N, T), E is the index of the training example
+			-- 	Need to make it (E, N + C, T) where C is constraint size
 			local vx = v[{{1, num - extra}}]:view(N, -1, T):transpose(1, 2):clone()	
 			local vy = v[{{2, num - extra + 1}}]:view(N, -1, T):transpose(1, 2):clone()
 
-			-- Now vx has dim (V, N, T)
+			-- Now vx has dim (E, N, T)
 
 			-- Now extract and append the constraint vector in the right place...
 			-- Needs to be appended to N in every place
@@ -137,22 +137,25 @@ function DataLoader:__init(kwargs)
 			-- 	Every minibatch must come from the same example
 			--	Every constraint appended to that minibatch should correspond to the same example.
 			
-			vc = set.data[datasetNum]
-			temp = torch.ByteTensor(vc:nElement(), vx:size(1), T)
+			vc = set.data[datasetNum] -- vc is a vector of size (C)
+			temp = torch.ByteTensor(vc:nElement(), vx:size(1), T) -- Currently (C, E, T), will change later to (E, C, T)
 			-- Append vc to temp column by column
-			-- temp dimensions at this point are (C, N, T)
 			-- This currently takes five billion years
 			-- Would make more sense to repeat vc in the relevant dimensions, then append in one go.
-			for x=1,vx:size(1) do	-- vx:size(1) = V.
+			for x=1,vx:size(1) do	-- vx:size(1) = E.
 				for y=1,T do	
 					temp[{{}, x, y}] = vc
 				end
 			end
-			-- After this loop, temp has dimensions (C, N, T)
-			-- Append to vx (dim (V, N, T)) along 2nd dimension.
-			-- We want an output of size (V, N + C, T)
+			temp = temp:transpose(1, 2)		-- (C, E, T) -> (E, C, T)
+			-- After this loop, temp has dimensions (C, E, T)
+			-- Append to vx (dim (E, N, T)) along 2nd dimension.
+			-- We want an output of size (E, N + C, T)
+			-- 				That way, out[1] has dim (N+C, T)
+			-- 					=> for time t, it's a vector of (N+C)
 			-- 		Think of V as indexing whole examples
 			-- 		Each example consists of N + C characters.
+
 			vx = torch.cat(vx, temp, 2) 			-- Now, the constraint is on the end of every minibatch. It can be chopped off on receipt.
 			-- x and y are the input and reference output respectively
 			-- y is the same as x, just transposed by 1
@@ -179,19 +182,15 @@ function DataLoader:nextBatch(split)
   local idx = self.split_idxs[split]
 	assert(idx, 'invalid split ' .. split)
   
-	--local x = self.x_splits[split][idx][{{1, self.batch_size}, {}}]
-	-- Modifying x so that it's the whole of x + C concatenated together along dim 1.
-	local x = self.x_splits[split][idx] 
-	--local tempVar = #self.x_splits[split][idx]
-	--local tempVar2 = self.batch_size + 1
-	--local c = self.x_splits[split][idx][{{tempVar2, tempVar[1]}}]
-	local y = self.y_splits[split][idx]
+	local x = self.x_splits[split][idx]	 		-- x of size (N+C, T)
+	local y = self.y_splits[split][idx]			-- y of size (N, T)
+			-- Intention is that receiving network unpacks x to retrieve C,
+			-- but will know 100% that the C it gets is supposed to be with the minibatch of size N.
   if idx == self.split_sizes[split] then
     self.split_idxs[split] = 1
   else
     self.split_idxs[split] = idx + 1
   end
-  --return x, y, c
 	return x, y
 end
 
