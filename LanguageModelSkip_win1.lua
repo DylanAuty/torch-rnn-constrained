@@ -3,7 +3,6 @@ require 'nn'
 
 require 'VanillaRNN'
 require 'LSTM'
-require 'windowedLSTM'
 require 'dimPrint'		-- Self-written debugging module whose purpose is to print the dimensions of tensors passing through.
 
 local utils = require 'util.utils'
@@ -37,8 +36,8 @@ function LM:__init(kwargs)
 	local N = self.batch_size
 	
 	--[[Defining the temporary/storage variables--]]
-	self.prev_w = torch.Tensor(N, T, D):fill(0)	-- At the start this is filled with 0...
-	self.curr_w = torch.tensor(N, T, D):fill(0)
+	self.prev_w = {}	--torch.Tensor(N, T, D):fill(0)	-- At the start this is filled with 0...
+	self.curr_w = {}	--torch.tensor(N, T, D):fill(0)
 	self.dec_in = {}
 	self.dec_con = {}
 	self.LSTM1_out = {}
@@ -121,7 +120,7 @@ function LM:__init(kwargs)
 	local d1 = nn.ConcatTable()
 	local d11 = nn.Narrow(1, 1, N)	-- Narrow along dimension 1 from index 1 to N
 	local d12Con = nn.Sequential()
-	local d12 = nn.Narrow(1, N+1, N+U)	-- Narrow along dimension 1 from index N+1 to N+U
+	local d12 = nn.Narrow(1, (N+1), (N+U))	-- Narrow along dimension 1 from index N+1 to N+U
 	d12Con:add(d12)
 	d12Con:add(nn.Unsqueeze(1))
 	d12Con:add(nn.Replicate(N, 1))	-- Expand constraint into 4th dimension - (U, T, D) -> (N, U, T, D)
@@ -138,9 +137,9 @@ function LM:__init(kwargs)
   self.paramView1 = nn.View(1, 1, -1):setNumInputDims(3)
   self.paramView2 = nn.View(1, -1):setNumInputDims(2)			-- These are set every run in nn.updateOutputs.
 
-  self.paramNet:add(self.view1)
+  self.paramNet:add(self.paramView1)
   self.paramNet:add(nn.Linear(H, 3 * D))
-  self.paramNet:add(self.view2)		-- (N, T, 3D)
+  self.paramNet:add(self.paramView2)		-- (N, T, 3D)
 	
 	local pC = nn.ConcatTable()
 	local pC1 = nn.Sequential()
@@ -176,9 +175,9 @@ function LM:__init(kwargs)
 	local phiCol1Rep = nn.Replicate(U, 4)	
 	local phiCol2Rep = nn.Replicate(U, 4)	
 	local phiCol3Rep = nn.Replicate(U, 4)	
-	phiCol1:add(self.phiCol1Rep)
-	phiCol2:add(self.phiCol2Rep)
-	phiCol3:add(self.phiCol3Rep)
+	phiCol1:add(phiCol1Rep)
+	phiCol2:add(phiCol2Rep)
+	phiCol3:add(phiCol3Rep)
 	
 	phiCol2:add(nn.MulConstant(-1, true)) -- beta has a factor of -1 in the phi equation.
 	
@@ -211,18 +210,18 @@ function LM:__init(kwargs)
 	phiLowerConcatWrapper:add(phiLowCol1)
 	phiLowerConcatWrapper:add(phiLowCol2)
 
-	phiNet:add(phiUpperConcatWrapper)
-	phiNet:add(phiLowerConcatWrapper)	-- outputs a table of 2 elements
-	phiNet:add(nn.CMulTable())
-	phiNet:add(nn.Sum(3, 4))	-- Sum over D.
+	self.phiNet:add(phiUpperConcatWrapper)
+	self.phiNet:add(phiLowerConcatWrapper)	-- outputs a table of 2 elements
+	self.phiNet:add(nn.CMulTable())
+	self.phiNet:add(nn.Sum(3, 4))	-- Sum over D.
 
-	phiNet:add(nn.Unsqueeze(3, 4))
-	phiNet:add(nn.Replicate(D, 3))
+	self.phiNet:add(nn.Unsqueeze(3, 4))
+	self.phiNet:add(nn.Replicate(D, 3))
 
 	--[[Build last layer out of phi, needs a C input for the actual mixture. --]]
 	self.phiOut = nn.Sequential()	-- Should be fed a table: {C, phi_altered}, dimensions {(N, T, D, U), (N, T, D, U)}
-	phiOut:add(nn.CMulTable())
-	phiOut:add(nn.Sum(4))
+	self.phiOut:add(nn.CMulTable())
+	self.phiOut:add(nn.Sum(4))
 		-- Output should be of shape (N, T, D))
 	
 	--[[ Build any possibly high level structure --]]
@@ -247,10 +246,10 @@ function LM:__init(kwargs)
 	-- Make 2 modules to hold the LSTMs and their input concatenators
 	self.LSTM1Seq = nn.Sequential()
 	self.LSTM2Seq = nn.Sequential()
-	LSTM1Seq:add(nn.JoinTable(3))
-	LSTM1Seq:add(LSTM1)
-	LSTM2Seq:add(nn.JoinTable(3))
-	LSTM2Seq:add(LSTM2)
+	self.LSTM1Seq:add(nn.JoinTable(3))
+	self.LSTM1Seq:add(LSTM1)
+	self.LSTM2Seq:add(nn.JoinTable(3))
+	self.LSTM2Seq:add(LSTM2)
 	
 	--[[ CONSTRUCT self.net1 --]]
 	--[[
@@ -327,6 +326,7 @@ end
 
 function LM:updateOutput(input)
   local N, T = self.batch_size, input:size(2)
+	local D = self.wordvec_dim
 	local U = input:size(1) - N
   -- Set the view sizes according to the batch size and number of timesteps to unroll
 	self.view1:resetSize(N * T, -1)
@@ -335,8 +335,12 @@ function LM:updateOutput(input)
 	-- Set paramView up the same way
 	self.paramView1:resetSize(N * T, -1)
 	self.paramView2:resetSize(N, T, -1)
-
 	
+	if #self.curr_w == 0 then
+		self.curr_w = torch.Tensor(N, T, D):fill(0)
+		self.prev_w = torch.Tensor(N, T, D):fill(0)
+	end
+
 	--[[
 	-- Set up the batch normalisation views according to the current N and T.
   for _, view_in in ipairs(self.bn_view_in) do
@@ -374,7 +378,7 @@ function LM:updateOutput(input)
 	self.phiNetOut = self.phiNet:forward({self.a, self.b, self.k})
 	self.prev_w = self.curr_w
 	self.curr_w =  self.phiOut:forward({self.phiNetOut, self.dec_con})
-	self.LSTM2SeqOut = self.LSTM2Seq:forward({self.LSTM1_out, self.curr_w, self.dec_in}))
+	self.LSTM2SeqOut = self.LSTM2Seq:forward({self.LSTM1_out, self.curr_w, self.dec_in})
 	return self.net:forward(self.LSTM2SeqOut)
 end
 
