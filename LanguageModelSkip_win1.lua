@@ -31,7 +31,7 @@ function LM:__init(kwargs)
   self.batchnorm = utils.get_kwarg(kwargs, 'batchnorm')
 
   local V, D, H = self.vocab_size, self.wordvec_dim, self.rnn_size
-	
+
 	--[[ Adding the Window of Graves Et. Al --]]
 	-- The window:
 	-- 	window at time t (w_t) is sum over u of phi(t, u)*c_u
@@ -53,9 +53,16 @@ function LM:__init(kwargs)
 	--			k_t = k_(t-1) + exp(k_t$)
 	--
 	--]]
+	--
+	--[[ IMPLEMENTATION NOTES --]]
+	-- INPUT: single vector containing {x, c} concatenated together.
+	-- decodeNet: Split input apart, run through the lookup table.
+	-- 
 
-  self.net = nn.Sequential()
-  self.rnns = {}
+	self.decodeNet = nn.Sequential() 	-- Network containing the decoder, returns table of {x, c} decoded.
+  self.net1 = nn.Sequential()
+  self.net2 = nn.Sequential()
+	self.rnns = {}
   self.bn_view_in = {}
   self.bn_view_out = {}
 
@@ -67,21 +74,27 @@ function LM:__init(kwargs)
 	-- Note that as long as the vocab size is the same, this just doesn't care about batch size.
 
 	-- Construct a layer to decode both inputs in the input table.
-	-- Input to the whole network will be a table {input x, constraint c}
+	-- Input to the whole network will be a CONCATENATED TENSOR: input x (dim V) + constraint c (dim V_C)
 	local t1 = nn.ConcatTable()
 	local t11 = nn.Sequential()
 	local t12 = nn.Sequential()
-
-	t11:add(nn.SelectTable(1))	-- Selecting the input x
+	
+	--[[ CONSTRUCT self.decodeNet --]]
+	self.InSplitC = nn.Narrow(3, V+1, V+2)	-- THIS WILL BE RESET EVERY ITERATION in updateOutputs
+	--t11:add(nn.SelectTable(1))	-- Selecting the input x
+	t11:add(nn.Narrow(3, 1, V))		-- Select x from the input - dimensions 1 to V
 	t11:add(LUT)
-	t12:add(nn.SelectTable(2))	-- Selecting the constraint vector c
+	--t12:add(nn.SelectTable(2))	-- Selecting the constraint vector c
+	t12:add(self.InSplitC)
 	t12:add(LUT)	-- Both inputs go through a copy of the same nn.LookupTable (I think)
 			
 	t1:add(t11)		-- Add the sublayers to the concatTable
 	t1:add(t12)
 
-	self.net:add(t1)	-- Add the concatTable to the network.
+	self.decodeNet:add(t1)	-- Add the concatTable to the network.
 
+
+	--[[ CONSTRUCT self.net1 --]]
 	for i = 1, self.num_layers do
     -- Selecting input dimensions for LSTM cells
 		local prev_dim = D+H								
@@ -93,6 +106,7 @@ function LM:__init(kwargs)
     local rnnContainer = nn.Sequential()
 		
 		-- Choose which LSTM type to use - windowed or unwindowed - depending on the layer number
+		-- The windowed layer gets put into self.net1
 		if i == 1 then
 			rnn = nn.windowedLSTM(prev_dim, out_dim)			-- Constructor takes input and output sizes.
 				-- nn.windowedLSTM has a control vector of size D concatenated to the normal LSTM output H.
@@ -133,68 +147,6 @@ function LM:__init(kwargs)
 			l2:add(rnnContainer)
 			self.net:add(l2)
 		end
-
-		--[[
-		if i == 1 then	-- Set up first layer
-			local t1 = nn.Sequential()			-- Contains both sub-layers
-			local t11 = nn.ConcatTable()		-- First sub-layer
-			local t12 = nn.ConcatTable()		-- Second sub-layer
-
-			t11:add(rnnContainer)
-			t11:add(nn.Identity())		-- output 1 of this layer is LSTM output, output 2 is input.
-				-- Output from t11: table of 2 elements:
-				-- 	{LSTM output, network input}
-			t12:add(nn.SelectTable(1))		-- Grab LSTM output only from first sublayer.
-			t12:add(nn.JoinTable(3, 3))			-- For incoming skip connection to next LSTM layer.
-			t12:add(nn.SelectTable(2))		-- Forward input for use in future incoming skip connections.
-				-- Output from t12: table of 3 elements:
-				-- 	{LSTM output, LSTM output + network input, network input}
-			t1:add(t11)
-			t1:add(t12)		-- Construct the complete first layer.
-			self.net:add(t1)	-- Add the completed layer to the overall network container.
-
-		elseif i ~= 1 then	-- Set up any layers after the first layer
-			local t1 = nn.Sequential()			-- Container for both sub-layers
-			local t11 = nn.ConcatTable()		-- First sub-layer
-			local t12 = nn.ConcatTable()		-- Second sub-layer
-			
-			-- Define sequentials to contain a SelectTable and a module.
-			local seq1 = nn.Sequential()
-			local seq2 = nn.Sequential()
-			local seq3 = nn.Sequential()
-			
-			seq1:add(nn.SelectTable(1))
-			seq2:add(nn.SelectTable(2))
-			seq3:add(nn.SelectTable(3))	-- This bit replicates the nn.ParallelTable functionality
-			
-			seq1:add(nn.Identity())
-			seq2:add(rnnContainer)			-- LSTM/RNN and Batchnorm and dropout if enabled
-			seq3:add(nn.Identity())
-
-			t11:add(seq1)
-			t11:add(seq2)
-			t11:add(seq3)								
-				-- Output from t11: table of 3 elements:
-				-- 	{outgoing skipcon forwarder, LSTM output, input forwarder}
-			local t12s = nn.Sequential()		-- Container for handling outgoing skip connection 
-			t12s:add(nn.NarrowTable(1, 2))	-- Select only the first two outputs from t11
-			t12s:add(nn.JoinTable(3))				-- Add to the outgoing skip connection 'accumulator'
-
-			local t12sj = nn.Sequential()		-- Container for handling the incoming skip connection
-			t12sj:add(nn.NarrowTable(2, 2))	-- Select only the LSTM output and the forwarded network input.
-			t12sj:add(nn.JoinTable(3))			-- Join network input and LSTM input 
-
-			t12:add(t12s)										-- Handles outgoing skip connection to accumulator
-			t12:add(t12sj)									-- For incoming skip connection to next LSTM layer.
-			t12:add(nn.SelectTable(3))			-- Forward input for use in future incoming skip connections.
-				-- Output from t12: table of 3 elements:
-				-- {Output from outgoing skipcon accumulator, LSTM output + network input, network input}
-			t1:add(t11)
-			t1:add(t12)		-- Construct the complete layer.
-
-			self.net:add(t1)	-- Add the completed layer to the overall network container.
-		end
-		--]]
   end
 	
   -- After all the RNNs run, we will have a tensor of shape (N, T, H);
@@ -221,12 +173,19 @@ function LM:__init(kwargs)
 
 end
 
-
 function LM:updateOutput(input)
-  local N, T = input:size(1), input:size(2)
+  -- Set the view sizes according to the batch size and number of timesteps to unroll
+	local N, T = input:size(1), input:size(2)
   self.view1:resetSize(N * T, -1)
   self.view2:resetSize(N, T, -1)
 
+	-- Set the input splitter up according to the size of the input.
+	local LC = input:size()
+	print(LC)
+	print(self.vocab_size)
+	self.InSplitC = nn.Narrow(3, self.vocab_size + 1, LC)	
+
+	-- Set up the batch normalisation views according to the current N and T.
   for _, view_in in ipairs(self.bn_view_in) do
     view_in:resetSize(N * T, -1)
   end
@@ -237,8 +196,19 @@ function LM:updateOutput(input)
   return self.net:forward(input)
 end
 
-
 function LM:backward(input, gradOutput, scale)
+	--TODO: Modify to link the sub-networks together
+	--Note that :
+	--	1) net:forwards(input) must have already been called
+	--	2) net:backward(input, gradOutput, scale) must be called WITH THE SAME INPUT AS FORWARDS.
+	--	3) The 'gradOutput' input must be equal to the (internal) state 'gradInput' from the next network
+	--			in order (i.e. the most recently backward's'ded. That's a word. Sure.
+	--EACH BACKWARDS MODIFIES NET INTERNAL gradInput
+	--gradInput must be passed as the gradOutput of the network that is next to be backpropagated through
+	--e.g. if whole network is net 1 then net 2:
+	--net2:backward(input, gradOutput, scale)
+	--	-- Assume that the intermediary value (forward output of net1) is self.n12Temp
+	--net1:backward(n12Temp, net2.gradInput, scale)
 	return self.net:backward(input, gradOutput, scale)
 end
 
