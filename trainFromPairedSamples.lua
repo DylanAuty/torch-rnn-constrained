@@ -53,7 +53,7 @@ cmd:option('-num_layers', 2)
 cmd:option('-dropout', 0)
 cmd:option('-batchnorm', 0)
 
-cmd:option('-con_length', 3000)	-- Added option for maximum size of the constraint window.
+cmd:option('-con_length', 3100)	-- Added option for maximum size of the constraint window.
 
 -- Optimization options
 cmd:option('-max_epochs', 50)
