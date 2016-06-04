@@ -129,6 +129,8 @@ function DataLoader:__init(kwargs)
 			local vx = v[{{1, num - extra}}]:view(N, -1, T):transpose(1, 2):clone()	
 			local vy = v[{{2, num - extra + 1}}]:view(N, -1, T):transpose(1, 2):clone()
 
+			-- Now vx has dim (V, N, T)
+
 			-- Now extract and append the constraint vector in the right place...
 			-- Needs to be appended to N in every place
 			-- Appending along the minibatch direction because it will be sliced off on arrival
@@ -137,18 +139,25 @@ function DataLoader:__init(kwargs)
 			
 			vc = set.data[datasetNum]
 			temp = torch.ByteTensor(vc:nElement(), vx:size(1), T)
-			-- Append vc column by column
-			for x=1,vx:size(1) do
-				for y=1,T do
+			-- Append vc to temp column by column
+			-- temp dimensions at this point are (C, N, T)
+			-- This currently takes five billion years
+			-- Would make more sense to repeat vc in the relevant dimensions, then append in one go.
+			for x=1,vx:size(1) do	-- vx:size(1) = V.
+				for y=1,T do	
 					temp[{{}, x, y}] = vc
 				end
 			end
-			temp = temp:view(vx:size(1), -1, T)
+			-- After this loop, temp has dimensions (C, N, T)
+			-- Append to vx (dim (V, N, T)) along 2nd dimension.
+			-- We want an output of size (V, N + C, T)
+			-- 		Think of V as indexing whole examples
+			-- 		Each example consists of N + C characters.
 			vx = torch.cat(vx, temp, 2) 			-- Now, the constraint is on the end of every minibatch. It can be chopped off on receipt.
-
 			-- x and y are the input and reference output respectively
 			-- y is the same as x, just transposed by 1
 			-- Note that the outputs are indexed by split alone.
+			-- x_splits and y_splits are empty tables, NOT TENSORS.
 			if firstFlag == 0 then
 				self.x_splits[split] = vx
 				self.y_splits[split] = vy
