@@ -84,11 +84,13 @@ function LM:__init(kwargs)
 
 	--[[ Declaration of sub-networks --]]
 	self.decodeNet = nn.Sequential() 	-- Network containing the decoder, returns table of {x, c} decoded.
-  self.HL1 = nn.Sequential()				-- Contains the first hidden layer
+
+	--[[
+	--self.HL1 = nn.Sequential()				-- Contains the first hidden layer
 	self.window = nn.Sequential()			-- Contains net1 and net2 of the window layer.
 	self.net1 = nn.Sequential()				-- Contains subnet 1 of the window layer (parameter handling)
   self.net2 = nn.Sequential()				-- Phi generation and application 
-	
+	--]]
 	--[[ Holders for quick reference of the hidden cells and the batch normalisation views --]]
 	self.rnns = {}
   self.bn_view_in = {}
@@ -103,7 +105,7 @@ function LM:__init(kwargs)
 	--	If input is size (N, T) then it should output (N, T, D)
 	--	To extract C (which is appended to N) - slice over dimension 1.
   
-	-- Construct a layer to decode both inputs in the input table.
+	--[[ Construct a layer to decode both inputs in the input table. --]]
 	self.decodeNet:add(nn.LookupTable(V, D))	-- Decodes all input, needs slicing along dimension 1.
 		-- Output shape (N+U, T, D)
 	local d1 = nn.ConcatTable()
@@ -113,11 +115,43 @@ function LM:__init(kwargs)
 				-- Every iteration, it should be remade to nn.Narrow(1, N+1, U) where U is the size of the constraint vector
 	d12Con:add(d12)
 	d12Con:add(nn.Unsqueeze(1))
-	d12Con:add(nn.Replicate(N, 1)	-- Expand constraint into 4th dimension - (U, T, D) -> (N, U, T, D)
+	d12Con:add(nn.Replicate(N, 1))	-- Expand constraint into 4th dimension - (U, T, D) -> (N, U, T, D)
 	d1:add(d11)
 	d1:add(d12Con)
 	self.decodeNet:add(d1)
-		-- Output at this point {decoded input(N, T, D), decoded C (N, U, T, D)}
+		-- Output at this point is {decoded input(N, T, D), decoded C (N, U, T, D)}
+	
+	--[[ Construct Parameter finding network --]]
+  self.paramNet = nn.Sequential()		-- Network to calculate the parameters of the window.
+	
+  self.paramView1 = nn.View(1, 1, -1):setNumInputDims(3)
+  self.paramView2 = nn.View(1, -1):setNumInputDims(2)			-- These are set every run in nn.updateOutputs.
+
+  self.paramNet:add(self.view1)
+  self.paramNet:add(nn.Linear(H, 3 * D))
+  self.paramNet:add(self.view2)
+	
+	local pC = nn.ConcatTable()
+	local pC1 = nn.Sequential()
+	local pC2 = nn.Sequential()
+	local pC3 = nn.Sequential()
+
+	pC1:add(nn.Narrow(3, 1, D))
+	pC1:add(nn.Exp())
+	pC2:add(nn.Narrow(3, D+1, 2*D))
+	pC2:add(nn.Exp())
+	pC3:add(nn.Narrow(3, (2*D)+1, 3*D))
+	pC3:add(nn.Exp())
+	
+	pC:add(pC1)
+	pC:add(pC2)
+	pC:add(pC3)
+
+	self.paramNet:add(pC)
+	--paramNet outputs a TABLE
+	--{a, b, exp_k_bar}
+
+	--[[ Construct parameter -> phi network --]]
 
 	--[[ CONSTRUCT self.net1 --]]
 	for i = 1, self.num_layers do
@@ -204,6 +238,10 @@ function LM:updateOutput(input)
   -- Set the view sizes according to the batch size and number of timesteps to unroll
 	self.view1:resetSize(N * T, -1)
   self.view2:resetSize(N, T, -1)
+	
+	-- Set paramView up the same way
+	self.paramView1:resetSize(N * T, -1)
+	self.paramView2:resetSize(N, T, -1)
 
 	-- Set the input splitter up according to the size of the input.
 	self.d12 = nn.Narrow(1, self.vocab_size + 1, input:size(1))	-- To select the constraint from the input.
