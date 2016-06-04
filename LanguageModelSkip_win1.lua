@@ -35,6 +35,21 @@ function LM:__init(kwargs)
   local V, D, H = self.vocab_size, self.wordvec_dim, self.rnn_size
 	local U = self.con_length	-- Setting the constraint vector size in the command line.
 	local N = self.batch_size
+	
+	--[[Defining the temporary/storage variables--]]
+	self.prev_w = torch.Tensor(N, T, D):fill(0)	-- At the start this is filled with 0...
+	self.curr_w = torch.tensor(N, T, D):fill(0)
+	self.dec_in = {}
+	self.dec_con = {}
+	self.LSTM1_out = {}
+	self.a = {}
+	self.b = {}
+	self.k = {}
+	self.exp_k_bar = {}
+	self.net = nn.Sequential()	-- This is used for the jointable and views at the end.
+	self.phiNetOut = {}
+	self.LSTM2SeqOut = {}
+
 	--[[ Adding the Window of Graves Et. Al --]]
 	-- The window:
 	-- 	window at time t (w_t) is sum over u of phi(t, u)*c_u
@@ -58,7 +73,7 @@ function LM:__init(kwargs)
 	--]]
 	--
 	--[[ IMPLEMENTATION NOTES --]]
-	-- INPUT: single matrix containing x, and c concatenated together, dim (N + U, V)
+	-- INPUT: single matrix containing x, and c concatenated together, dim (N + U, T, V)
 	-- decodeNet: Split input apart, run through the lookup table.
 	-- 		After lookupTable, need to stretch the constraint vectors so there are enough of them.
 	-- 		(N+U, T, V) -> {(N, T, D), (N, U, T, D)}, for input and constraint vector respectively
@@ -84,15 +99,8 @@ function LM:__init(kwargs)
 	--				outputs: window vector (to be fed into a hidden layer somewhere).
 	
 
-	--[[ Declaration of sub-networks --]]
 	self.decodeNet = nn.Sequential() 	-- Network containing the decoder, returns table of {x, c} decoded.
 
-	--[[
-	--self.HL1 = nn.Sequential()				-- Contains the first hidden layer
-	self.window = nn.Sequential()			-- Contains net1 and net2 of the window layer.
-	self.net1 = nn.Sequential()				-- Contains subnet 1 of the window layer (parameter handling)
-  self.net2 = nn.Sequential()				-- Phi generation and application 
-	--]]
 	--[[ Holders for quick reference of the hidden cells and the batch normalisation views --]]
 	self.rnns = {}
   self.bn_view_in = {}
@@ -113,14 +121,16 @@ function LM:__init(kwargs)
 	local d1 = nn.ConcatTable()
 	local d11 = nn.Narrow(1, 1, N)	-- Narrow along dimension 1 from index 1 to N
 	local d12Con = nn.Sequential()
-	local d12 = nn.Narrow(1, N+1, U)	
+	local d12 = nn.Narrow(1, N+1, N+U)	-- Narrow along dimension 1 from index N+1 to N+U
 	d12Con:add(d12)
 	d12Con:add(nn.Unsqueeze(1))
 	d12Con:add(nn.Replicate(N, 1))	-- Expand constraint into 4th dimension - (U, T, D) -> (N, U, T, D)
+	d12Con:add(nn.Transpose(2, 3))
+	d12Con:add(nn.Transpose(3, 4))	-- (N, U, T, D) -> (N, T, D, U) for later use.
 	d1:add(d11)
-d1:add(d12Con)
+	d1:add(d12Con)
 	self.decodeNet:add(d1)
-		-- Output at this point is {decoded input(N, T, D), decoded C (N, U, T, D)}
+		-- Output at this point is {decoded input(N, T, D), decoded C (N, T, D, U)}
 	
 	--[[ Construct Parameter finding network --]]
   self.paramNet = nn.Sequential()		-- Network to calculate the parameters of the window.
@@ -155,6 +165,7 @@ d1:add(d12Con)
 	--[[ Construct parameter -> phi network --]]
 	--Input is a table of 3 things: {a, b, k}
 	--These will have been set manually in the break.
+	-- All should be of dimension (N, T, D)
 	self.phiNet = nn.Sequential()
 	local phiCol1 = nn.Sequential()		-- Input is self.a, dim (N, T, D)
 	local phiCol2 = nn.Sequential()		-- Input is self.b, dim (N, T, D)
@@ -162,9 +173,9 @@ d1:add(d12Con)
 	phiCol1:add(nn.SelectTable(1))
 	phiCol2:add(nn.SelectTable(2))
 	phiCol3:add(nn.SelectTable(3))
-	self.phiCol1Rep = nn.Replicate(U, 4)	
-	self.phiCol2Rep = nn.Replicate(U, 4)	
-	self.phiCol3Rep = nn.Replicate(U, 4)	
+	local phiCol1Rep = nn.Replicate(U, 4)	
+	local phiCol2Rep = nn.Replicate(U, 4)	
+	local phiCol3Rep = nn.Replicate(U, 4)	
 	phiCol1:add(self.phiCol1Rep)
 	phiCol2:add(self.phiCol2Rep)
 	phiCol3:add(self.phiCol3Rep)
@@ -205,9 +216,44 @@ d1:add(d12Con)
 	phiNet:add(nn.CMulTable())
 	phiNet:add(nn.Sum(3, 4))	-- Sum over D.
 
-	
+	phiNet:add(nn.Unsqueeze(3, 4))
+	phiNet:add(nn.Replicate(D, 3))
 
+	--[[Build last layer out of phi, needs a C input for the actual mixture. --]]
+	self.phiOut = nn.Sequential()	-- Should be fed a table: {C, phi_altered}, dimensions {(N, T, D, U), (N, T, D, U)}
+	phiOut:add(nn.CMulTable())
+	phiOut:add(nn.Sum(4))
+		-- Output should be of shape (N, T, D))
+	
+	--[[ Build any possibly high level structure --]]
+	--[[ Built modules:
+	--		self.decodeNet (in: input, out: {encoded input, encoded constraint})
+	--					(N+U, T, V) -> {(N, T, D), (N, T, D, U)}, for input and constraint vector respectively
+	--		self.paramNet (in: LSTM1 output, out: {alpha, beta, exp_k_bar})
+	--					(N, T, H) -> {(N, T, D), (N, T, D), (N, T, D)}
+	--		self.phiNet (in: {alpha, beta, k}, out: phi.)
+	--					{(N, T, D), (N, T, D), (N, T, D)} -> (N, T, U)
+	--		self.phiOut (in: {C, Phi}, out: w)
+	--					{(N, T, D, U), (N, T, U)} -> (N, T, D)
+	--]]
+
+	local LSTM1 = nn.LSTM((2*D), H)	-- First hidden layer
+	local LSTM2 = nn.LSTM(H+D+D, H)	-- Second hidden layer, batchnorm and dropout disabled for brevity.
+	LSTM1.remember_states = true
+	LSTM2.remember_states = true
+	table.insert(self.rnns, LSTM1)
+	table.insert(self.rnns, LSTM2)
+	
+	-- Make 2 modules to hold the LSTMs and their input concatenators
+	self.LSTM1Seq = nn.Sequential()
+	self.LSTM2Seq = nn.Sequential()
+	LSTM1Seq:add(nn.JoinTable(3))
+	LSTM1Seq:add(LSTM1)
+	LSTM2Seq:add(nn.JoinTable(3))
+	LSTM2Seq:add(LSTM2)
+	
 	--[[ CONSTRUCT self.net1 --]]
+	--[[
 	for i = 1, self.num_layers do
     -- Selecting input dimensions for LSTM cells
 		local prev_dim = D+H								
@@ -261,7 +307,7 @@ d1:add(d12Con)
 			self.net:add(l2)
 		end
   end
-	
+	--]]
   -- After all the RNNs run, we will have a tensor of shape (N, T, H);
   -- we want to apply a 1D temporal convolution to predict scores for each
   -- vocab element, giving a tensor of shape (N, T, V). Unfortunately
@@ -269,14 +315,7 @@ d1:add(d12Con)
   -- views (N, T, H) -> (NT, H) and (NT, V) -> (N, T, V) with a nn.Linear in
   -- between. Unfortunately N and T can change on every minibatch, so we need
   -- to set them in the forward pass.
-	--
-	-- MODIFICATION:
-	-- Introducing skip connections means that after running, the tensor is of shape (N, T, self.num_layers * H)
-	-- The same approach is used as in the original language model, but will be modified so that the layers are:
-	-- view (N, T, self.num_layers * H) -> (NT, self.num_layers * H)
-	-- nn.Linear(self.num_layers * H, V)
-	-- view (NT, V) -> (N, T, V)
-	--
+	
   self.view1 = nn.View(1, 1, -1):setNumInputDims(3)
   self.view2 = nn.View(1, -1):setNumInputDims(2)
 
@@ -297,6 +336,8 @@ function LM:updateOutput(input)
 	self.paramView1:resetSize(N * T, -1)
 	self.paramView2:resetSize(N, T, -1)
 
+	
+	--[[
 	-- Set up the batch normalisation views according to the current N and T.
   for _, view_in in ipairs(self.bn_view_in) do
     view_in:resetSize(N * T, -1)
@@ -304,8 +345,37 @@ function LM:updateOutput(input)
   for _, view_out in ipairs(self.bn_view_out) do
     view_out:resetSize(N, T, -1)
   end
+	--]]
+	--[[ Built modules:
+	--		self.decodeNet (in: input, out: {encoded input, encoded constraint})
+	--					(N+U, T, V) -> {(N, T, D), (N, T, D, U)}, for input and constraint vector respectively
+	--		self.paramNet (in: LSTM1 output, out: {alpha, beta, exp_k_bar})
+	--					(N, T, H) -> {(N, T, D), (N, T, D), (N, T, D)}
+	--		self.phiNet (in: {alpha, beta, k}, out: phi.)
+	--					{(N, T, D), (N, T, D), (N, T, D)} -> (N, T, U)
+	--		self.phiOut (in: {C, Phi}, out: w)
+	--					{(N, T, D, U), (N, T, U)} -> (N, T, D)
+	--		self.LSTM1Seq = nn.Sequential()
+	--					{prev_w, dec_in} -> (N, T, 2D)
+	--		self.LSTM2Seq = nn.Sequential()
+	--]]
 
-  return self.net:forward(input)
+	-- START: input
+	local decodeFOut = self.decodeNet:forward(input)
+	self.dec_in, self.dec_con = decodeFOut[1], decodeFOut[0]
+
+	local LSTM1NetOut = self.LSTM1Seq:forward({self.curr_w, self.dec_in})
+	self.LSTM1_out = {LSTM1NetOut[1], LSTM1NetOut[2]}
+
+	local paramNetOut = self.paramNet:forward(self.LSTM1_out)
+	self.a, self.b, self.exp_k_bar = paramNetOut[1], paramNetOut[2], paramNetOut[3]
+	self.k = self.k + self.exp_k_bar
+
+	self.phiNetOut = self.phiNet:forward({self.a, self.b, self.k})
+	self.prev_w = self.curr_w
+	self.curr_w =  self.phiOut:forward({self.phiNetOut, self.dec_con})
+	self.LSTM2SeqOut = self.LSTM2Seq:forward({self.LSTM1_out, self.curr_w, self.dec_in}))
+	return self.net:forward(self.LSTM2SeqOut)
 end
 
 function LM:backward(input, gradOutput, scale)
@@ -321,7 +391,20 @@ function LM:backward(input, gradOutput, scale)
 	--net2:backward(input, gradOutput, scale)
 	--	-- Assume that the intermediary value (forward output of net1) is self.n12Temp
 	--net1:backward(n12Temp, net2.gradInput, scale)
-	return self.net:backward(input, gradOutput, scale)
+	--
+	--When two backwards modules join (e.g. between LSTM1 and paramNet), get both gradInputs and put them in a table
+	--i.e. net:backward(in, {gradInput1, gradInput2}
+	
+	self.net:backward(self.LSTM2SeqOut, gradOutput, scale)
+	self.LSTM2Seq:backward({self.LSTM1_out, self.curr_w, self.dec_in}, self.net.gradInput, scale)
+	
+	self.phiOut:backward({self.phiNetOut, self.dec_con}, self.LSTM2Seq.gradInput, scale)
+	self.phiNet:backward({self.a, self.b, self.k}, self.phiOut.gradInput, scale)
+	self.paramNet:backward(self.LSTM1_out, self.phiNet.gradInput, scale)
+	self.LSTM1Seq:backward({self.prev_w, self.dec_in}, {self.paramNet.gradInput, self.LSTM2Seq.gradInput}, scale)
+	return self.decodeNet:backward(input, {self.LSTM1Seq.gradInput, self.LSTM2Seq.gradInput, self.phiOut.gradInput}, scale)
+	
+	--return self.net:backward(input, gradOutput, scale)
 end
 
 
