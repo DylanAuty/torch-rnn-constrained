@@ -53,6 +53,8 @@ cmd:option('-num_layers', 2)
 cmd:option('-dropout', 0)
 cmd:option('-batchnorm', 0)
 
+cmd:option('-con_length', 3000)	-- Added option for maximum size of the constraint window.
+
 -- Optimization options
 cmd:option('-max_epochs', 50)
 cmd:option('-learning_rate', 2e-3)
@@ -168,16 +170,25 @@ local function f(w)
 	--[[GETTING DATA FROM THE VAL SET FOR SPEED OF DEBUGGING
 	--]]
 	
-	--local x, y, c = loader:nextBatch('train')
-	local x, y, c = loader:nextBatch('val')
+	--local x, y = loader:nextBatch('train')
+	local x, y = loader:nextBatch('val')
 	-- The modified loader returns x, y, c - input, output, constraint vector respectively.
-
-	x, y, c = x:type(dtype), y:type(dtype), c:type(dtype)
+	-- EDIT: NO IT DOESN'T it now returns just x and y, but x is input + c concatenated together.
+	-- Network will take this in and split it apart as needed.
+	
+	x, y = x:type(dtype), y:type(dtype)
 	if opt.speed_benchmark == 1 then
     if cutorch then cutorch.synchronize() end
     timer = torch.Timer()
   end
-	local scores = model:forward({x, c})
+
+	-- model:forward needs to take a TENSOR as input.
+	-- Therefore concatenate x and c along dimension 2
+	-- x has dim (N, T, D)
+	-- c has dim (N, T, C)
+	-- NOTE THAT THIS IS DONE IN THE DATALOADER - RESULT IS IN x!!
+
+	local scores = model:forward(x)
 	-- Use the Criterion to compute loss; we need to reshape the scores to be
   -- two-dimensional before doing so. Annoying.
   local scores_view = scores:view(N * T, -1)
