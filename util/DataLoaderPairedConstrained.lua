@@ -10,8 +10,9 @@ function DataLoader:__init(kwargs)
   local h5_file = utils.get_kwarg(kwargs, 'input_h5')
   self.batch_size = utils.get_kwarg(kwargs, 'batch_size')
   self.seq_length = utils.get_kwarg(kwargs, 'seq_length')
-  local N, T = self.batch_size, self.seq_length
-	
+  self.con_length = utils.get_kwarg(kwargs, 'con_length')
+	local N, T = self.batch_size, self.seq_length
+	local U = self.con_length
 	-- Structure of the itemized h5:
 	-- /
 	-- /train
@@ -138,13 +139,22 @@ function DataLoader:__init(kwargs)
 			--	Every constraint appended to that minibatch should correspond to the same example.
 			
 			vc = set.data[datasetNum] -- vc is a vector of size (C)
-			temp = torch.ByteTensor(vc:nElement(), vx:size(1), T) -- Currently (C, E, T), will change later to (E, C, T)
-			-- Append vc to temp column by column
-			-- This currently takes five billion years
-			-- Would make more sense to repeat vc in the relevant dimensions, then append in one go.
-			for x=1,vx:size(1) do	-- vx:size(1) = E.
-				for y=1,T do	
-					temp[{{}, x, y}] = vc
+			
+			temp = torch.ByteTensor(U, vx:size(1), T):fill(0) -- Currently (C, E, T), will change later to (E, C, T)
+			if vc:nElement > U then
+				-- Append vc to temp column by column
+				-- This currently takes five billion years
+				-- Would make more sense to repeat vc in the relevant dimensions, then append in one go.
+				for x=1,vx:size(1) do	-- vx:size(1) = E.
+					for y=1,T do	
+						temp[{{}, x, y}] = vc[{1, U}]	-- truncate vc if too long
+					end
+				end
+			else
+				for x=1,vx:size(1) do	-- vx:size(1) = E.
+					for y=1,T do	
+						temp[{{1, U}, x, y}] = vc	-- truncate vc if too long
+					end
 				end
 			end
 			temp = temp:transpose(1, 2)		-- (C, E, T) -> (E, C, T)
