@@ -29,9 +29,10 @@ function LM:__init(kwargs)
 	self.num_layers = 2
   self.dropout = utils.get_kwarg(kwargs, 'dropout')
   self.batchnorm = utils.get_kwarg(kwargs, 'batchnorm')
+	self.batch_size = utils.get_kwarg(kwargs, 'batch_size')
 
   local V, D, H = self.vocab_size, self.wordvec_dim, self.rnn_size
-
+	local N = self.batch_size
 	--[[ Adding the Window of Graves Et. Al --]]
 	-- The window:
 	-- 	window at time t (w_t) is sum over u of phi(t, u)*c_u
@@ -55,63 +56,68 @@ function LM:__init(kwargs)
 	--]]
 	--
 	--[[ IMPLEMENTATION NOTES --]]
-	-- INPUT: single vector containing x, and c concatenated together.
+	-- INPUT: single matrix containing x, and c concatenated together, dim (N + U, V)
 	-- decodeNet: Split input apart, run through the lookup table.
+	-- 		After lookupTable, need to stretch the constraint vectors so there are enough of them.
+	-- 		(N+U, T, V) -> {(N, T, D), (N, U, T, D)}, for input and constraint vector respectively
+	-- 
 	--
-	-- WINDOW CELL:
+	-- WINDOW CELL: 2 inputs, {input and C}
 	-- 	2 sub-networks:
 	--		net1 : PARAMETER HANDLING
-	--				dimensions: {(N, T, H), (N, T, D, U}) -> {{(N, T, D), (N, T, D), (N, T, D)}, (N, T, D, U)}
+	--				dimensions: {(N, T, H), (U, T, D}) -> {{(N, T, D), (N, T, D), (N, T, D)}, (U, T, D)}
 	--				input: output from first LSTM hidden layer, C.
 	--				outputs: {{alpha, beta, exp_k_bar}, C} (C is forwarded).
 	--					NB: alpha and beta go in self.a and self.b
 	--							self.k = self.k + exp_k_bar (needs to be done elementwise)
 	--		
 	--		net2 : PHI GENERATION
-	--				dimensions: {{(N, T, D), (N, T, D), (N, T, D)}, (N, T, D, U)} -> {(N, T, U), (N, T, D, U)}
+	--				dimensions: {{(N, T, D), (N, T, D), (N, T, D)}, (U, T, D)} -> {(N, T, U), (U, T, D)}
 	--				input: table of (table of parameters alpha, beta, k.), and C
 	--				output: table of Phi (for all T and all U, in one tensor), C (C is forwarded)
 	--
-	--		net3 : PHI APPLICATION
+	--		net3 : PHI APPLICATION (TO BE MERGED INTO net2)
 	--				dimensions: {(N, T, U), (N, T, D, U)} -> (N, T, D)
 	--				inputs: table of {Phi, C}
 	--				outputs: window vector (to be fed into a hidden layer somewhere).
 	
 
+	--[[ Declaration of sub-networks --]]
 	self.decodeNet = nn.Sequential() 	-- Network containing the decoder, returns table of {x, c} decoded.
-  self.net1 = nn.Sequential()
-  self.net2 = nn.Sequential()
+  self.HL1 = nn.Sequential()				-- Contains the first hidden layer
+	self.window = nn.Sequential()			-- Contains net1 and net2 of the window layer.
+	self.net1 = nn.Sequential()				-- Contains subnet 1 of the window layer (parameter handling)
+  self.net2 = nn.Sequential()				-- Phi generation and application 
+	
+	--[[ Holders for quick reference of the hidden cells and the batch normalisation views --]]
 	self.rnns = {}
   self.bn_view_in = {}
   self.bn_view_out = {}
 
-  local LUT = nn.LookupTable(V, D)
-	--self.net:add(nn.LookupTable(V, D))
  	-- V is the vocabulary size (number of symbols)
 	-- D is the size of each individual one-hot vector
+	-- N and U are minibatch and constraint vector size.
+	--
 	-- This lookup table converts a symbol (one of V possible symbols) to a vector of size D.
 	-- Note that as long as the vocab size is the same, this just doesn't care about batch size.
-
+	--	If input is size (N, T) then it should output (N, T, D)
+	--	To extract C (which is appended to N) - slice over dimension 1.
+  
 	-- Construct a layer to decode both inputs in the input table.
-	-- Input to the whole network will be a CONCATENATED TENSOR: input x (dim V) + constraint c (dim V_C)
-	local t1 = nn.ConcatTable()
-	local t11 = nn.Sequential()
-	local t12 = nn.Sequential()
-	
-	--[[ CONSTRUCT self.decodeNet --]]
-	self.InSplitC = nn.Narrow(3, V+1, V+2)	-- THIS WILL BE RESET EVERY ITERATION in updateOutputs
-	--t11:add(nn.SelectTable(1))	-- Selecting the input x
-	t11:add(nn.Narrow(3, 1, V))		-- Select x from the input - dimensions 1 to V
-	t11:add(LUT)
-	--t12:add(nn.SelectTable(2))	-- Selecting the constraint vector c
-	t12:add(self.InSplitC)
-	t12:add(LUT)	-- Both inputs go through a copy of the same nn.LookupTable (I think)
-			
-	t1:add(t11)		-- Add the sublayers to the concatTable
-	t1:add(t12)
-
-	self.decodeNet:add(t1)	-- Add the concatTable to the network.
-
+	self.decodeNet:add(nn.LookupTable(V, D))	-- Decodes all input, needs slicing along dimension 1.
+		-- Output shape (N+U, T, D)
+	local d1 = nn.ConcatTable()
+	local d11 = nn.Narrow(1, 1, N)	-- Narrow along dimension 1 from index 1 to N
+	local d12Con = nn.Sequential()
+	self.d12 = nn.Narrow(1, N+1, N+2)	-- Defining as a self so that the second dimension can be fixed
+				-- Every iteration, it should be remade to nn.Narrow(1, N+1, U) where U is the size of the constraint vector
+	d12Con:add(d12)
+	d12Con:add(nn.Unsqueeze(1))
+	d12Con:add(nn.Replicate(N, 1)	-- Expand constraint into 4th dimension - (U, T, D) -> (N, U, T, D)
+	d1:add(d11)
+	d1:add(d12Con)
+	self.decodeNet:add(d1)
+		-- Output at this point {decoded input(N, T, D), decoded C (N, U, T, D)}
 
 	--[[ CONSTRUCT self.net1 --]]
 	for i = 1, self.num_layers do
@@ -193,16 +199,14 @@ function LM:__init(kwargs)
 end
 
 function LM:updateOutput(input)
+  local N, T = self.batch_size, input:size(2)
+	local U = input:size(1) - N
   -- Set the view sizes according to the batch size and number of timesteps to unroll
-	local N, T = input:size(1), input:size(2)
-  self.view1:resetSize(N * T, -1)
+	self.view1:resetSize(N * T, -1)
   self.view2:resetSize(N, T, -1)
 
 	-- Set the input splitter up according to the size of the input.
-	local LC = input:size()
-	print(LC)
-	print(self.vocab_size)
-	self.InSplitC = nn.Narrow(3, self.vocab_size + 1, LC)	
+	self.d12 = nn.Narrow(1, self.vocab_size + 1, input:size(1))	-- To select the constraint from the input.
 
 	-- Set up the batch normalisation views according to the current N and T.
   for _, view_in in ipairs(self.bn_view_in) do
