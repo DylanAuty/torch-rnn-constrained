@@ -21,7 +21,9 @@ cmd:option('-seq_length', 50)
 -- Architecture options
 -- This section will allow the user to switch between different network architectures
 -- Skip connections, methods of constraint etc.
+-- options are 'reg', 'skipcon', 'skip_win1' (not working), 'skip_dIn'
 cmd:option('-arch', 'reg')
+
 
 -- Model options
 cmd:option('-init_from', '')
@@ -111,6 +113,9 @@ else
 	elseif opt.arch == 'skip_win1' then
 		model = nn.LanguageModelSkip_win1(opt_clone):type(dtype)
 		print("Network Architecture: Skip connections, window method 1")
+	elseif opt.arch == 'skip_dIn' then
+		model = nn.LanguageModelSkip_dIn(opt_clone):type(dtype)
+		print("Network Archtiecture: Skip connections, data vector input method 1")
 	else
 		model = nn.LanguageModel(opt_clone):type(dtype)
 		print("Architecture option not recognised: using standard")
@@ -149,7 +154,13 @@ local function f(w)
     if cutorch then cutorch.synchronize() end
     timer = torch.Timer()
   end
+	-- x and y both of size (N, T)
+	-- In modification, x will be size (N, T, C) where C is the size of the constraint vector
+	-- It won't be put through a lookup table on input to the network.
+	-- y will still be (N, T) and will just be what x is presently.
+	
 	local scores = model:forward(x)
+	-- To do multiple inputs: Don't put them in a table, just "model:forward(in1, in2)".
 	-- Use the Criterion to compute loss; we need to reshape the scores to be
   -- two-dimensional before doing so. Annoying.
   local scores_view = scores:view(N * T, -1)
