@@ -45,8 +45,11 @@ def encodeData(inString, modeDict):
             # for every element above 1, split on a space and take the first result.
             temp = tempString[i].split("\t")[0]
             # If it's come from a mode field then run it through the decoder
-            if tempString[i-1].split("\t")[1][0:2] == "@m": 
+            if len(temp) == 0:
+                continue
+            elif tempString[i-1].split("\t")[1][0:2] == "@m": 
                 temp = modeDict[str(temp)]
+            
             retArr.append(int(str(temp)))
 
     return retArr
@@ -82,7 +85,7 @@ def main(argv):
     token_to_idx = fjson["token_to_idx"]
     idx_to_token = fjson["idx_to_token"]
     
-    testSet = f.get('train')
+    testSet = f.get('val')
     testSet = np.array(testSet)
     tString = ''
     outData = []
