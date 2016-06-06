@@ -159,11 +159,13 @@ local function f(w)
 	-- It won't be put through a lookup table on input to the network.
 	-- y will still be (N, T) and will just be what x is presently.
 	
-	local scores = model:forward(x)
 	-- To do multiple inputs: Don't put them in a table, just "model:forward(in1, in2)".
 	-- Use the Criterion to compute loss; we need to reshape the scores to be
   -- two-dimensional before doing so. Annoying.
-  local scores_view = scores:view(N * T, -1)
+	
+	local scores = model:forward(x)
+  
+	local scores_view = scores:view(N * T, -1)
 	local y_view = y:view(N * T)
   local loss = crit:forward(scores_view, y_view)
 
