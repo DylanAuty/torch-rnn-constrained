@@ -7,6 +7,7 @@ require 'LanguageModelSkipCon'
 require 'LanguageModelSkip_win1'
 require 'LanguageModelSkip_dIn'
 require 'util.DataLoader'
+require 'util.DataLoader_dVec'
 
 local utils = require 'util.utils'
 local unpack = unpack or table.unpack
@@ -83,7 +84,10 @@ end
 
 
 -- Initialize the DataLoader and vocabulary
-local loader = DataLoader(opt)
+if opt.arch == 'skip_dIn' then
+	local loader = DataLoaderSkip_dIn(opt)
+else
+	local loader = DataLoader(opt)
 local vocab = utils.read_json(opt.input_json)
 local idx_to_token = {}
 for k, v in pairs(vocab.idx_to_token) do
