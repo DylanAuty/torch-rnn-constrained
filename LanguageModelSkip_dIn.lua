@@ -8,7 +8,7 @@ require 'dimPrint'		-- Self-written debugging module whose purpose is to print t
 local utils = require 'util.utils'
 
 
-local LM, parent = torch.class('nn.LanguageModelSkipCon', 'nn.Module')
+local LM, parent = torch.class('nn.LanguageModelSkip_dIn', 'nn.Module')
 
 
 function LM:__init(kwargs)

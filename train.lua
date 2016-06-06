@@ -5,6 +5,7 @@ require 'optim'
 require 'LanguageModel'
 require 'LanguageModelSkipCon'
 require 'LanguageModelSkip_win1'
+require 'LanguageModelSkip_dIn'
 require 'util.DataLoader'
 
 local utils = require 'util.utils'
