@@ -25,30 +25,29 @@ def encodeData(inString, modeDict):
     # Example line of the string input.
     # .id:2 .type:windSpeed .date:2009-02-08  .label:Tonight  @time:17-30 #min:9  #mean:13  #max:16 @mode-bucket-0-20-2:10-20
     inLines = inString.split("\n.id:")
+
+    # Elements 0 to 4 of the split are always to be discarded.
+    # Elements 5 to len(line) are valuable and also variable in number.
+    # The values following colons in every subsequent string should be extracted.
+    # bucket types + mappings:
+    #   - (0,100) in splits of 25 each ("0-25", "25-50". "50-75", "75-100") -> (0, 1, 2, 3)
+    #   - (0, 20) in splits of 10 each ("0-10", "0-20") -> (0, 1)
+    # @mode: - ("--", "SChc", "Chc", "Lkly", "Def") -> (0, 1, 2, 3, 4)
+    #       for id:3 only: ("N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "SE", "SSW", "SW", "WSW", "W", "WNW", "NW", "NWN")
+    #               -> (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
     for line in inLines:
-        # Elements 0 to 4 of the split are always to be discarded.
-        # Elements 5 to len(line) are valuable and also variable in number.
-        # The values following colons in every subsequent string should be extracted.
-        # bucket types + mappings:
-        #   - (0,100) in splits of 25 each ("0-25", "25-50". "50-75", "75-100") -> (0, 1, 2, 3)
-        #   - (0, 20) in splits of 10 each ("0-10", "0-20") -> (0, 1)
-        # @mode: - ("--", "SChc", "Chc", "Lkly", "Def") -> (0, 1, 2, 3, 4)
-        #       for id:3 only: ("N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "SE", "SSW", "SW", "WSW", "W", "WNW", "NW", "NWN")
-        #               -> (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
-        for line in inLines:
-            timeSplit = line.split("@time:")
-            # first output of this array is garbage (discard data), rest needs to be dealt with elem by elem
-            # Now split on every colon
-            tempString = timeSplit[1].split(":")
-            #['17-30 #min', '9  #mean', '13  #max', '16 @mode-bucket-0-20-2', '10-20']
-            for i in range(1, len(tempString)):
-                # for every element above 1, split on a space and take the first result.
-                
-                    temp = tempString[i].split(" ")[0]
-                    # If it's come from a mode field then run it through the decoder
-                    if tempString[i-1].split(" ")[1][0:4] == "@mod": 
-                        temp = modeDict[temp]
-                    retArr.append(int(temp))
+        timeSplit = line.split("@time:")
+        # first output of this array is garbage (discard data), rest needs to be dealt with elem by elem
+        # Now split on every colon
+        tempString = timeSplit[1].split(":")
+        #['17-30 #min', '9  #mean', '13  #max', '16 @mode-bucket-0-20-2', '10-20']
+        for i in range(1, len(tempString)):
+            # for every element above 1, split on a space and take the first result.
+            temp = tempString[i].split("\t")[0]
+            # If it's come from a mode field then run it through the decoder
+            if tempString[i-1].split("\t")[1][0:2] == "@m": 
+                temp = modeDict[str(temp)]
+            retArr.append(int(str(temp)))
 
     return retArr
 
@@ -57,10 +56,11 @@ def main(argv):
     inputJson = ''
     outputJson = ''
     
+
     ## MANUALLY BUILD A COMPASS DIRECTION AND @MODE LOOKUP TABLE
-    modeKeys = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "SE", "SSW", "SW", "WSW", "W", "WNW", "NW", "NWN", "--", "SChc", "Chc", "Lkly", "Def", "0-10", "10-20", "0-25", "25-50", "50-75", "75-100"]
+    modeKeys = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW", "--", "SChc", "Chc", "Lkly", "Def", "0-10", "10-20", "0-25", "25-50", "50-75", "75-100"]
     modeIndices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 0, 1, 0, 1, 2, 3] # Yes I did it manually please don't hate me
-    modeDict = dict(zip(modeKeys, modeIndices))
+    modeDict = dict(zip(modeKeys, modeIndices)) 
 
     try:
         opts, args = getopt.getopt(argv,":hi:j:o:")
@@ -134,8 +134,6 @@ def main(argv):
         
         outDict[subsetLoopCounter] = {}
         outDict[subsetLoopCounter]['data'] = encodeData(tSSplit[0], modeDict) # Call the encodeData function defined above
-        print(outDict[dubsetLoopCounter]['data'])
-        os.exit("HAHAHAHA")
         outDict[subsetLoopCounter]['forecast'] = tSSplit[1]
         subsetLoopCounter += 1
         
