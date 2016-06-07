@@ -141,19 +141,20 @@ function DataLoader:__init(kwargs)
 			vc = set.data[datasetNum] -- vc is a vector of size (C)
 			
 			temp = torch.ByteTensor(U, vx:size(1), T):fill(0) -- Currently (C, E, T), will change later to (E, C, T)
-			if vc:nElement > U then
+			if (vc:nElement() > U) then	-- If there's more data than space in C, trim the data.
 				-- Append vc to temp column by column
 				-- This currently takes five billion years
 				-- Would make more sense to repeat vc in the relevant dimensions, then append in one go.
 				for x=1,vx:size(1) do	-- vx:size(1) = E.
 					for y=1,T do	
-						temp[{{}, x, y}] = vc[{1, U}]	-- truncate vc if too long
+						temp[{{}, x, y}] = vc[{{1, U}}]	-- truncate vc if too long
 					end
 				end
-			else
+			else	-- If there's just enough or too much space for the data, only fill a bit of the data.
 				for x=1,vx:size(1) do	-- vx:size(1) = E.
-					for y=1,T do	
-						temp[{{1, U}, x, y}] = vc	-- truncate vc if too long
+					for y=1,T do
+						local temp2 = temp[{{1, U}, x, y}]
+						temp2 = vc
 					end
 				end
 			end
