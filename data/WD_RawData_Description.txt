@@ -1,0 +1,22 @@
+Fields in every line: .id:, .type:, .date:, .label: @time:
+Data fields possible: @mode*: (asterisk is wildcard), #min:, #mean:, #max:
+Approach - For each line, split on space, then look in order for #min:, #mean:, #max:, @mode*:, @mode:
+		Add every char after the colon of these labels to an array.
+		Note that @mode: is used for text things - compass direction in .id:3 or chance (--, SChc, Chc, Lkly, Def)
+				Could replace this with a number? Compass direction 1 - 16 for N to NWN 
+					(N, NNE, NE, ENE, E, ESE, SE, SSE, SE, SSW, SW, WSW, W, WNW, NW, NWN)
+				For Mode: (0, 1, 2, 3, 4, 5) for (--, SChc, Chc, Lkly, Def)
+
+Line + fields:
+
+0 - 3 (min, mean, max temp)
+1 - 3
+2 - 4 (min, mean, max, mode-bucket)
+3 - 1 field, Value is a compass direction (ENE, SE, SW etc.)
+4 - 3 (min mean max)
+5 to 9: 1 each, a range of temps (25-50, or 50-75 etc)
+10 - 3
+11-15: 1 each, a mode
+16-35: 1 each, a mode
+
+=> 47 fields in total
