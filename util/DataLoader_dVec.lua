@@ -3,14 +3,15 @@ require 'hdf5'
 
 local utils = require 'util.utils'
 
-local DataLoader = torch.class('DataLoaderPairedConstrained')
+local DataLoader = torch.class('DataLoader_dVec')
 
 
 function DataLoader:__init(kwargs)
   local h5_file = utils.get_kwarg(kwargs, 'input_h5')
   self.batch_size = utils.get_kwarg(kwargs, 'batch_size')
   self.seq_length = utils.get_kwarg(kwargs, 'seq_length')
-  self.con_length = utils.get_kwarg(kwargs, 'con_length')
+  --self.con_length = utils.get_kwarg(kwargs, 'con_length')
+	self.con_length = 47	-- Counted manually
 	local N, T = self.batch_size, self.seq_length
 	local U = self.con_length
 	-- Structure of the itemized h5:
@@ -31,9 +32,9 @@ function DataLoader:__init(kwargs)
 	local testForecasts = {}	
 	local valForecasts  = {}
   local f = hdf5.open(h5_file, 'r')
-  --splits.train = f:read('/train'):all()
-  --splits.val = f:read('/val'):all()
-  --splits.test = f:read('/test'):all()
+  splits.train = f:read('/train'):all()
+  splits.val = f:read('/val'):all()
+  splits.test = f:read('/test'):all()
 	
 	--print(f:read("/train/data"):all())	-- This returns a boatload of key/tensor pairs where the tensors are the data
 	-- Write every training example to the trainEx table
@@ -47,12 +48,10 @@ function DataLoader:__init(kwargs)
 	--end	
 	
 	print("Loading data from HDF5 to Memory...")
-	--[[
 	trainData = f:read('/train/data'):all()
 	trainForecasts = f:read('/train/forecast'):all()
 	testData = f:read('/test/data'):all()
-	trainForecasts = f:read('/test/forecast'):all()
-	--]]
+	testForecasts = f:read('/test/forecast'):all()
 	valData = f:read('/val/data'):all()
 	valForecasts = f:read('/val/forecast'):all()
 
@@ -60,21 +59,20 @@ function DataLoader:__init(kwargs)
 	-- Now it contains 3 groups of 2 groups each of many datasets.
 	
 	-- The splits
-	--[[
 	splits.train = {}
 	splits.train.data = {}
 	splits.train.forecasts = {}
 	splits.test = {}
 	splits.test.data = {}
 	splits.test.forecasts = {}
-	--]]
 	splits.val = {}
 	splits.val.data = {}
 	splits.val.forecasts = {}
 	
+
 	print("Sorting the data into sets...")
 	-- Fill the sets
-	--[[
+	
 	for key, item in pairs(trainData) do
 		splits.train.data[key] = item
 		splits.train.forecasts[key] = trainForecasts[key]
@@ -83,106 +81,87 @@ function DataLoader:__init(kwargs)
 		splits.test.data[key] = item
 		splits.test.forecasts[key] = testForecasts[key]
 	end
-	--]]
 	for key, item in pairs(valData) do
 		splits.val.data[key] = item
 		splits.val.forecasts[key] = valForecasts[key]
 	end
 	
 	-- The sub-splits, one each for data and forecasts
-	--splits.train.data = trainData
-	--splits.train.forecasts = trainForecasts
-	--splits.test.data = testData
-	--splits.test.forecasts = testForecasts
-	--splits.val.data = valData
-	--splits.val.forecasts = valForecasts
-	
+	splits.train.data = trainData
+	splits.train.forecasts = trainForecasts
+	splits.test.data = testData
+	splits.test.forecasts = testForecasts
+	splits.val.data = valData
+	splits.val.forecasts = valForecasts
+
   self.x_splits = {}
   self.y_splits = {}
   self.split_sizes = {}
+
+	-- Aim of this is to construct a set of tuples of [dataVec][forecastChar]
+	-- At the end of this, the number of these can be counted and batches made
+	-- Allows sensibly sized batches this way...
 
 	-- This loop constructs minibatches ready for use
   -- To make life simpler, aim is to keep this loop with the same output:
 	-- 	Just x_splits, y_splits, split_sizes.
 	-- All constraint stuff should be sorted out in here.
+	--[[
 	for split, set in pairs(splits) do -- For every top level dataset split (train/test/val)
     -- Split is one of 3 sets of datasets
 		local firstFlag = 0
-		print("Reshaping data")
+		print("Reshaping data in split:", split)
+
+		local split_x = {}
+		local split_y = {}
+		local vx = torch.ByteTensor()
+		local vy = torch.ByteTensor()
+
+		-- First, for every example, we append to x and y.
 		for datasetNum, v in pairs(set.forecasts) do
-			-- v is an array of encoded characters.
-			local num = v:nElement()
-			local extra = num % (N * T)
-			-- num is number of chars in the split
-			-- N is batch length
-			-- T is sequence length
+			--print(#set.data[datasetNum])
 
-			if extra == 0 then	-- If the batch size fits exactly, then we append one so that we can construct y properly.
-				t1 = torch.ByteTensor(1)
-				t1[1] = 0
-				v = torch.cat(v, t1)
-			end
-
-    	-- Chop out the extra bits at the end to make it evenly divide
-			-- If it fits perfectly... append 
-			-- vx is of dimension (E, N, T), E is the index of the training example
-			-- 	Need to make it (E, N + C, T) where C is constraint size
-			local vx = v[{{1, num - extra}}]:view(N, -1, T):transpose(1, 2):clone()	
-			local vy = v[{{2, num - extra + 1}}]:view(N, -1, T):transpose(1, 2):clone()
-
-			-- Now vx has dim (E, N, T)
-
-			-- Now extract and append the constraint vector in the right place...
-			-- Needs to be appended to N in every place
-			-- Appending along the minibatch direction because it will be sliced off on arrival
-			-- 	Every minibatch must come from the same example
-			--	Every constraint appended to that minibatch should correspond to the same example.
-			
-			vc = set.data[datasetNum] -- vc is a vector of size (C)
-			
-			temp = torch.ByteTensor(U, vx:size(1), T):fill(0) -- Currently (C, E, T), will change later to (E, C, T)
-			if (vc:nElement() > U) then	-- If there's more data than space in C, trim the data.
-				-- Append vc to temp column by column
-				-- This currently takes five billion years
-				-- Would make more sense to repeat vc in the relevant dimensions, then append in one go.
-				for x=1,vx:size(1) do	-- vx:size(1) = E.
-					for y=1,T do	
-						temp[{{}, x, y}] = vc[{{1, U}}]	-- truncate vc if too long
-					end
-				end
-			else	-- If there's just enough or too much space for the data, only fill a bit of the data.
-				for x=1,vx:size(1) do	-- vx:size(1) = E.
-					for y=1,T do
-						local temp2 = temp[{{1, U}, x, y}]
-						temp2 = vc
-					end
-				end
-			end
-			temp = temp:transpose(1, 2)		-- (C, E, T) -> (E, C, T)
-			-- After this loop, temp has dimensions (C, E, T)
-			-- Append to vx (dim (E, N, T)) along 2nd dimension.
-			-- We want an output of size (E, N + C, T)
-			-- 				That way, out[1] has dim (N+C, T)
-			-- 					=> for time t, it's a vector of (N+C)
-			-- 		Think of V as indexing whole examples
-			-- 		Each example consists of N + C characters.
-
-			vx = torch.cat(vx, temp, 2) 			-- Now, the constraint is on the end of every minibatch. It can be chopped off on receipt.
-			-- x and y are the input and reference output respectively
-			-- y is the same as x, just transposed by 1
-			-- Note that the outputs are indexed by split alone.
-			-- x_splits and y_splits are empty tables, NOT TENSORS.
+			-- Dimensions now:
+			-- 	v (forecast): (L) (where L is the length of the forecast)
+			-- 	set.data[datasetNum]: (L, 47)
 			if firstFlag == 0 then
-				self.x_splits[split] = vx
-				self.y_splits[split] = vy
-				self.split_sizes[split] = vx:size(1)
+				vx = set.data[datasetNum]:clone()	
+				vy = v:clone()
+				firstFlag = 1
 			else
-				self.x_splits[split] = torch.cat(vx, self.x_splits[split], 1)
-    		self.y_splits[split] = torch.cat(vy, self.y_splits[split], 1)	-- Add to the vector of example slices
-    		self.split_sizes[split] = self.split_sizes[split] + vx:size(1)
-  		end
+				vx = torch.cat(vx, set.data[datasetNum], 1)
+				vy = torch.cat(vy, v, 1)
+			end
 		end
+		
+		
+		-- Now we slice according to batch size and return
+		local num = vy:nElement()
+		local extra = num % (N * T)
+		
+		-- If L is number of samples total and B is number of batches produced,
+		-- then for data we need to do (L, 47) -> (B, N, T, 47)
+		-- 			for forecasts we need to do (L) -> (B, N, T)
+		local vvx = vx[{{1, num - extra}, {}}]:view(-1, N, T, 47):clone()
+		local vvy = vy[{{1, num - extra}}]:view(N, -1, T):transpose(1, 2):clone()
+		self.x_splits[split] = vvx
+		self.y_splits[split] = vvy
+		self.split_sizes[split] = vvx:size(1)
 	end
+	
+	--]]
+	--torch.save("charByChar_dVec_x_splits", self.x_splits)
+	--torch.save("charByChar_dVec_y_splits", self.y_splits)
+	--torch.save("charByChar_dVec_split_sizes", self.split_sizes)
+
+	print("Loading files...")
+	print("Loading x_splits")
+	self.x_splits = torch.load("charByChar_dVec_x_splits")
+	print("Loading y_splits")
+	self.y_splits = torch.load("charByChar_dVec_y_splits")
+	print("Loading split_sizes")
+	self.split_sizes = torch.load("charByChar_dVec_split_sizes")
+	print("Finished loading Torch objects from file")
 
   self.split_idxs = {train=1, val=1, test=1}
 end
@@ -193,10 +172,9 @@ function DataLoader:nextBatch(split)
   local idx = self.split_idxs[split]
 	assert(idx, 'invalid split ' .. split)
   
-	local x = self.x_splits[split][idx]	 		-- x of size (N+C, T)
-	local y = self.y_splits[split][idx]			-- y of size (N, T)
-			-- Intention is that receiving network unpacks x to retrieve C,
-			-- but will know 100% that the C it gets is supposed to be with the minibatch of size N.
+	local x = self.x_splits[split][idx]	
+	local y = self.y_splits[split][idx]	
+
   if idx == self.split_sizes[split] then
     self.split_idxs[split] = 1
   else
