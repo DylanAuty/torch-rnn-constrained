@@ -131,13 +131,12 @@ def main(argv):
     subsetLoopCounter = 0
     for subset in outData[:-1]: # Note that we need to discard the last split since it's 99% likely to be borked beyond use.
         tString = ''.join([idx_to_token[`subset[i]`] for i in range(0, len(subset))])
-        
         # Split the data/forecast pair again and shove it into a dict to be written to a JSON object later.
         tSSplit = tString.split("\n\n", 1)  # Take only the first split - should handle any forecasts with linebreaks.
         
         outDict[subsetLoopCounter] = {}
         outDict[subsetLoopCounter]['data'] = encodeData(tSSplit[0], modeDict) # Call the encodeData function defined above
-        outDict[subsetLoopCounter]['forecast'] = tSSplit[1]
+        outDict[subsetLoopCounter]['forecast'] = ''.join([tSSplit[1], "\n\n.")
         subsetLoopCounter += 1
         
     print("Finished converting. Dumping to JSON.")
