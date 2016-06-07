@@ -84,10 +84,13 @@ end
 
 
 -- Initialize the DataLoader and vocabulary
-if opt.arch == 'skip_dIn' then
-	local loader = DataLoaderSkip_dIn(opt)
-else
-	local loader = DataLoader(opt)
+local loader = DataLoader_dVec(opt)
+--if opt.arch == 'skip_dIn' then
+--	print("Selecting DataLoader_dVec")
+--	loader = DataLoader_dVec(opt)
+--else
+--	loader = DataLoader(opt)
+--end
 local vocab = utils.read_json(opt.input_json)
 local idx_to_token = {}
 for k, v in pairs(vocab.idx_to_token) do
