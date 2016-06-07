@@ -27,43 +27,23 @@ function LM:__init(kwargs)
   self.dropout = utils.get_kwarg(kwargs, 'dropout')
   self.batchnorm = utils.get_kwarg(kwargs, 'batchnorm')
 
-  local V, D, H = self.vocab_size, self.wordvec_dim, self.rnn_size
-	
-	--[[ Building Skip Connected network --]]
-	--[[ Structure after nn.LookupTable(V, D):
-	--	First layer, composed of 2 sub-layers:
-	--	l1 is nn.Sequential(), l1[1] is first layer of l1, l1[1][1] is first module of first layer of l1
-	--	l1[1][1] = LSTM						
-	--	l1[1][2] = nn.Identity()	(For incoming skip connections)
-	--	Connections:
-	--		l1 -> l1[1][1]					Copying the input to both cells of the first sub-layer
-	--		l1 -> l1[1][2]
-	--	------------------------
-	--	l1[2][1] = nn.Identity()	(For outgoing skip connections - will turn into a join in future layers)
-	--	l1[2][2] = nn.Join()			(Join input and previous LSTM output for incoming skip connections)
-	--	l1[2][3] = nn.Identity()	(For incoming skip connections, transferring forwards)
-	--	Connections:
-	--		l1[1][1] -> l1[2][1]		(LSTM -> Outgoing skip 'accumulator' (line of repeated table joins))
-	--		
-	--		l1[1][1] -> l1[2][2]		(LSTM -> Join with network input (for incoming skip connctions))
-	--		l1[1][2] -> l1[2][2]		(Input forwarder -> Join with LSTM (for incoming skip connctions))
-	--		
-	--		l1[1][2] -> l1[2][3]		(network input forwarder -> network input forwarder))
-	--	------------------------
-	--	Layers n != 1 are identical to layer 1, EXCEPT:
-	--	ln[1][3] = nn.Identity()	(For forwarding network input)
-	--	ln[2][3] = nn.Join()			(Outgoing skip 'accumulator' (line of repeated table joins with LSTM outputs))
-	--	Additional connections:
-	--		ln[1][1] -> ln[2][3]		(LSTM -> outgoing skip accumulator)
-	--		ln[1][3] -> ln[2][1]		(network input forwarder -> network input forwarder)
-	--]]
+  -- This model is identical to the skip connected network (LanguageModelSkipCon.lua), except
+	-- It expects to receive a 47 long vector as the input, for every corresponding output character
+	-- In the normal network, input is (N, T) tensor of character indices - they get put through a LUT
+	-- Here the data has already been decoded
+	-- An input batch is therefore of size (N, T, 47) instead of (N, T) as it is when taking character input
+	-- As a result, removing the nn.LookupTable should sort it out.
+	-- Also dimensions of the hidden cells need to be changed accordingly.
 
+	local V, H = self.vocab_size, self.rnn_size
+	local D = 47	-- Hard setting the input vector, data is a 47 wide vector
+	
   self.net = nn.Sequential()
   self.rnns = {}
   self.bn_view_in = {}
   self.bn_view_out = {}
 
-  self.net:add(nn.LookupTable(V, D))
+  --self.net:add(nn.LookupTable(V, D))	
  	
 	for i = 1, self.num_layers do
     -- Selecting input dimensions for LSTM cells
