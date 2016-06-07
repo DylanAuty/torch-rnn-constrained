@@ -79,13 +79,15 @@ if __name__ == '__main__':
         print("Encoding training set...")
         for i, ex in trainData.iteritems(): 
             # i is a unicode string, containing an int. Helpful as a chocolate teapot, that.
+            # Modification for dVec data - dataString is already a list, so don't bother encoding it.
             dataString = ex['data']
             forecastString = ex['forecast']
+            
 
             dataLength = len(dataString)
             forecastLength = len(forecastString)
             # Create some numpy arrays to hold the encoded strings
-            dataArr = np.zeros(dataLength, dtype=dtype)
+            #dataArr = np.zeros(dataLength, dtype=dtype)
             forecastArr = np.zeros(forecastLength, dtype=dtype)
             
             # Sanity check all the strings
@@ -98,11 +100,17 @@ if __name__ == '__main__':
                 ignored += 1
             
             # Encode the data and the forecast
-            it = 0
-            for char in dataString:
-                dataArr[it] = token_to_idx[char]
-                it += 1
             
+            # V1: to be used when using strings of forecast data
+            #it = 0
+            #for char in dataString:
+            #    dataArr[it] = token_to_idx[char]
+            #    dataArr[it] = char
+            #    it += 1
+
+            # V2: to be used when using lists of encoded forecast data
+            dataArr = np.asarray(dataString, dtype=dtype)
+
             it = 0
             for char in forecastString:
                 forecastArr[it] = token_to_idx[char]
@@ -121,7 +129,7 @@ if __name__ == '__main__':
 
             dataLength = len(dataString)
             forecastLength = len(forecastString)
-            dataArr = np.zeros(dataLength, dtype=dtype)
+            #dataArr = np.zeros(dataLength, dtype=dtype)
             forecastArr = np.zeros(forecastLength, dtype=dtype)
             
             if len(dataString) == 0:
@@ -133,16 +141,19 @@ if __name__ == '__main__':
                 ignored += 1
             
             # Encoding
-            it = 0
-            for char in dataString:
-                dataArr[it] = token_to_idx[char]
-                it += 1
+            dataArr = np.asarray(dataString, dtype=dtype)
+            
+            #it = 0
+            #for char in dataString:
+            #    dataArr[it] = token_to_idx[char]
+            #    it += 1
             
             it = 0
             for char in forecastString:
                 forecastArr[it] = token_to_idx[char]
                 it += 1
 
+            
             # Write to the HDF5
             h.create_dataset("test/data/" + i, data=dataArr)
             h.create_dataset("test/forecast/" + i, data=dataArr)
@@ -155,7 +166,7 @@ if __name__ == '__main__':
 
             dataLength = len(dataString)
             forecastLength = len(forecastString)
-            dataArr = np.zeros(dataLength, dtype=dtype)
+            #dataArr = np.zeros(dataLength, dtype=dtype)
             forecastArr = np.zeros(forecastLength, dtype=dtype)
             
             if len(dataString) == 0:
@@ -167,10 +178,12 @@ if __name__ == '__main__':
                 ignored += 1
             
             # Encoding
-            it = 0
-            for char in dataString:
-                dataArr[it] = token_to_idx[char]
-                it += 1
+            dataArr = np.asarray(dataString, dtype=dtype)
+            
+            #it = 0
+            #for char in dataString:
+            #    dataArr[it] = token_to_idx[char]
+            #    it += 1
             
             it = 0
             for char in forecastString:
