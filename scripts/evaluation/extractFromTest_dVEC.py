@@ -136,7 +136,7 @@ def main(argv):
         
         outDict[subsetLoopCounter] = {}
         outDict[subsetLoopCounter]['data'] = encodeData(tSSplit[0], modeDict) # Call the encodeData function defined above
-        outDict[subsetLoopCounter]['forecast'] = ''.join([tSSplit[1], "\n\n.")
+        outDict[subsetLoopCounter]['forecast'] = ''.join([tSSplit[1], "\n\n."])
         subsetLoopCounter += 1
         
     print("Finished converting. Dumping to JSON.")
