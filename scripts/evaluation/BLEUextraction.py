@@ -63,7 +63,8 @@ if __name__ == '__main__':
             iterationNum += 1
             # Generate the command to run a sample through
             commArgs = shlex.split(comm)
-            dataString = ex['data']
+            # BELOW LINE: MODIFIED FOR dVec USAGE
+            dataString = str(ex['data']).strip('[]')    # LM:sample expects a comma separated list of ints, in a string. Yeah.
             commArgs.append(dataString)
             if len(dataString) == 0:
                 print("Data error in iteration " + `i` + ", ignoring...")
