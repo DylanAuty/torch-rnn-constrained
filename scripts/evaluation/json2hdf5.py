@@ -119,7 +119,7 @@ if __name__ == '__main__':
             # Write to the HDF5
             # Each example is technically a 'dataset'
             h.create_dataset("train/data/" + i, data=dataArr)
-            h.create_dataset("train/forecast/" + i, data=dataArr)
+            h.create_dataset("train/forecast/" + i, data=forecastArr)
 
         # Iterate over the test data
         print("Encoding test set...")
@@ -156,7 +156,7 @@ if __name__ == '__main__':
             
             # Write to the HDF5
             h.create_dataset("test/data/" + i, data=dataArr)
-            h.create_dataset("test/forecast/" + i, data=dataArr)
+            h.create_dataset("test/forecast/" + i, data=forecastArr)
 
         # Iterate over the validation data
         print("Encoding validation set...")
@@ -193,7 +193,7 @@ if __name__ == '__main__':
             # Write to the HDF5
             # Each example is technically a 'dataset'
             h.create_dataset("val/data/" + i, data=dataArr)
-            h.create_dataset("val/forecast/" + i, data=dataArr)
+            h.create_dataset("val/forecast/" + i, data=forecastArr)
         
         # Could I have done this in one loop? Yes. Did I? No.
 
