@@ -248,7 +248,7 @@ for i = start_i + 1, num_iterations do
     for j = 1, num_val do
       local xv, yv = loader:nextBatch('val')
       xv = xv:type(dtype)
-      yv = yv:type(dtype):view(N * T)
+			yv = yv:type(dtype):view(N * T)
       local scores = model:forward(xv):view(N * T, -1)
       val_loss = val_loss + crit:forward(scores, yv)
     end
