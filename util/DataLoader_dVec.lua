@@ -1,6 +1,5 @@
 require 'torch'
 require 'hdf5'
-require 'nn'
 
 local utils = require 'util.utils'
 
@@ -117,6 +116,10 @@ function DataLoader:__init(kwargs)
 		local split_y = {}
 		local vx = torch.ByteTensor()
 		local vy = torch.ByteTensor()
+		local vvx = torch.ByteTensor()
+		local vvy = torch.ByteTensor()
+		local vvchars = torch.ByteTensor()
+		local vvdata = torch.ByteTensor()
 
 		-- First, for every example, we append to x and y.
 		for datasetNum, v in pairs(set.forecasts) do
@@ -150,12 +153,14 @@ function DataLoader:__init(kwargs)
 		-- (B, N, T, 47) + (B, N, T)
 		-- Add singleton dimension to characters (B, N, T) -> (B, N, T, 1)
 		-- Concatenate along the 4th dimension.
-		local unsqueezer = nn.Unsqueeze(4, 3)	-- This is a hassle to do without nn so, uh... I'm using nn.
 
-		local vvdata = vx[{{1, num - extra}, {}}]:view(N, -1, T, 47):transpose(1, 2):clone()
-		local vvchars = vy[{{1, num - extra}}]:view(N, -1, T):transpose(1, 2):clone()
-		local vvx = torch.cat(vvdata, unsqueezer:forward(vvchars), 4)
-		local vvy = vy[{{2, num - extra + 1}}]:view(N, -1, T):transpose(1, 2):clone()
+		vvdata = vx[{{1, num - extra}, {}}]:view(N, -1, T, 47):transpose(1, 2):clone()
+		vvchars = vy[{{1, num - extra}}]:view(N, -1, T):transpose(1, 2):clone()
+	
+		vvcharsUnsqueezed = torch.ByteTensor(vvchars:size(1), vvchars:size(2), vvchars:size(3), 1)
+		vvcharsUnsqueezed[{{}, {}, {}, 1}] = vvchars -- Unsqueezing isn't fun with ByteTensors
+		vvx = torch.cat(vvdata, vvcharsUnsqueezed, 4)
+		vvy = vy[{{2, num - extra + 1}}]:view(N, -1, T):transpose(1, 2):clone()
 		
 		self.x_splits[split] = vvx
 		self.y_splits[split] = vvy
