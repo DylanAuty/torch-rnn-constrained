@@ -43,6 +43,7 @@ function LM:__init(kwargs)
   self.bn_view_in = {}
   self.bn_view_out = {}
 	
+	--[[
 	-- Building a sub-module to handle the double inputs
 	local decoderContainer = nn.Sequential()
 	--decoderContainer:add(nn.ConcatTable())	-- Network now takes 2 inputs, {data, char} and outputs {nextChar}
@@ -57,8 +58,27 @@ function LM:__init(kwargs)
 	decoderConcat:add(dc2)	-- decoderConcat should output a table.
 	decoderContainer:add(decoderConcat)
 	decoderContainer:add(nn.JoinTable(3, 3))
-
+	--]]
+	
+	-- Building a sub-module to handle splitting of data/char tuple, encoding of char, re-concatenation.
+	-- Input is size (N, T, 47 + V)
+	-- 	Split to (N, T, 47), (N, T, V)
+	-- 	Decode (N, T, V) -> (N, T, D)
+	-- 	merge along dimension 3: (N, T, 47) + (N, T, D) -> (N, T, D+47)
+	local decoderContainer = nn.Sequential()
+	local dConcat1 = nn.ConcatTable()
+	local dCSeq1 = nn.Sequential()
+	local dCSeq2 = nn.Sequential()
+	dCSeq1:add(nn.Narrow(3, 1, 47))			-- Slice out the data
+	dCSeq2:add(nn.Narrow(3, 48, 1))	-- Slice out the characters
+	dcSeq2:add(nn.LookupTable(V, (D-47)))	-- D - 47 because it should be only the size of one character.
+	dConcat1:add(dCSeq1)
+	dConcat1:add(dCSeq2)
+	decoderContainer:add(dConcat1)
+	decoderContainer:add(nn.JoinTable(3, 3))
+	
 	self.net:add(decoderContainer)
+	
 
 	for i = 1, self.num_layers do
     -- Selecting input dimensions for LSTM cells
