@@ -36,15 +36,30 @@ function LM:__init(kwargs)
 	-- Also dimensions of the hidden cells need to be changed accordingly.
 
 	local V, H = self.vocab_size, self.rnn_size
-	local D = 47	-- Hard setting the input vector, data is a 47 wide vector
+	local D = 47 + self.wordvec_dim	-- Hard setting the input vector, data is a 47 wide vector, char comes out as self.wordvec_dim.
 	
   self.net = nn.Sequential()
   self.rnns = {}
   self.bn_view_in = {}
   self.bn_view_out = {}
+	
+	-- Building a sub-module to handle the double inputs
+	local decoderContainer = nn.Sequential()
+	--decoderContainer:add(nn.ConcatTable())	-- Network now takes 2 inputs, {data, char} and outputs {nextChar}
+ 	local decoderConcat = nn.ConcatTable()
+	local dc1 = nn.Sequential()
+	local dc2 = nn.Sequential()
+	dc1:add(nn.SelectTable(1))	-- This gets the data vector
+			-- We don't change this vector.
+	dc2:add(nn.SelectTable(2))	-- this gets the char to be decoded
+	dc2:add(nn.LookupTable(V, (D-47)))	-- D - 47 because it should be only the size of one character.
+ 	decoderConcat:add(dc1)
+	decoderConcat:add(dc2)	-- decoderConcat should output a table.
+	decoderContainer:add(decoderConcat)
+	decoderContainer:add(nn.JoinTable(3, 3))
 
-  --self.net:add(nn.LookupTable(V, D))	
- 	
+	self.net:add(decoderContainer)
+
 	for i = 1, self.num_layers do
     -- Selecting input dimensions for LSTM cells
 		local prev_dim = D+H								-- All LSTMs in layers 2 onwards have input dimension D+H (H because of skip connections)
@@ -225,6 +240,16 @@ function LM:decode_string(encoded)
   return s
 end
 
+-- The below function modified from http://stackoverflow.com/questions/1426954/split-string-in-lua
+function LM:parseInArr(inputstr)
+        sep = ", "
+        local t={}; i=1 
+        for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+                t[i] = tonumber(str) 
+                i = i + 1 
+        end 
+        return torch.ByteTensor(t)
+end
 
 --[[
 Sample from the language model. Note that this will reset the states of the
@@ -253,16 +278,16 @@ function LM:sample(kwargs)
   self:resetStates()
 	
 
-  local scores, first_t
+  local scores, first_t, x_in
   if #start_text > 0 then
     if verbose > 0 then
       print('Seeding with: "' .. start_text .. '"')
     end
-    local x = self:encode_string(start_text):view(1, -1)
-    local T0 = x:size(2)
-    sampled[{{}, {1, T0}}]:copy(x)
-    scores = self:forward(x)[{{}, {T0, T0}}]
-    first_t = T0 + 1
+    local x_in = self:parseInArr(start_text):view(1, 1, -1)
+    local T0 = 1
+    --sampled[{{}, {1, T0}}]:copy(x)
+    scores = self:forward(x_in)[{{}, {T0, T0}}]
+    first_t = 1
   else
     if verbose > 0 then
       print('Seeding with uniform probabilities')
@@ -288,7 +313,8 @@ function LM:sample(kwargs)
   	  end
 
 			sampled[{{}, {t, t}}]:copy(next_char)
-  	  scores = self:forward(next_char)
+  	  --scores = self:forward(next_char)
+  	  scores = self:forward(x_in)
 			
 			if (n1Flag == 0 and n2Flag == 0) then	-- No newlines detected yet.
 				if (self:decode_string(next_char[1]) == "\n") then
@@ -322,7 +348,7 @@ function LM:sample(kwargs)
   	  end
   	  
 			sampled[{{}, {t, t}}]:copy(next_char)
-  	  scores = self:forward(next_char)
+  	  scores = self:forward(x_in)
 		end
 	end
 	
