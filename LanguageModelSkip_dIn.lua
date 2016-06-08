@@ -71,7 +71,8 @@ function LM:__init(kwargs)
 	local dCSeq2 = nn.Sequential()
 	dCSeq1:add(nn.Narrow(3, 1, 47))			-- Slice out the data
 	dCSeq2:add(nn.Narrow(3, 48, 1))	-- Slice out the characters
-	dcSeq2:add(nn.LookupTable(V, (D-47)))	-- D - 47 because it should be only the size of one character.
+	dCSeq2:add(nn.Squeeze(3))				-- Get rid of the singleton dimension
+	dCSeq2:add(nn.LookupTable(V, (D-47)))	-- D - 47 because it should be only the size of one character.
 	dConcat1:add(dCSeq1)
 	dConcat1:add(dCSeq2)
 	decoderContainer:add(dConcat1)
