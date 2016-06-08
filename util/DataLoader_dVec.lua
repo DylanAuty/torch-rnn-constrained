@@ -107,6 +107,7 @@ function DataLoader:__init(kwargs)
 	-- 	Just x_splits, y_splits, split_sizes.
 	-- All constraint stuff should be sorted out in here.
 	
+	--[[
 	for split, set in pairs(splits) do -- For every top level dataset split (train/test/val)
     -- Split is one of 3 sets of datasets
 		local firstFlag = 0
@@ -171,8 +172,8 @@ function DataLoader:__init(kwargs)
 	torch.save("charByChar_dVec_x_splits", self.x_splits)
 	torch.save("charByChar_dVec_y_splits", self.y_splits)
 	torch.save("charByChar_dVec_split_sizes", self.split_sizes)
+	--]]
 	
-	--[[
 	print("Loading files...")
 	print("Loading x_splits")
 	self.x_splits = torch.load("charByChar_dVec_x_splits")
@@ -181,8 +182,9 @@ function DataLoader:__init(kwargs)
 	print("Loading split_sizes")
 	self.split_sizes = torch.load("charByChar_dVec_split_sizes")
 	print("Finished loading Torch objects from file")
---]]
-  self.split_idxs = {train=1, val=1, test=1}
+	
+  
+	self.split_idxs = {train=1, val=1, test=1}
 end
 
 
@@ -192,7 +194,6 @@ function DataLoader:nextBatch(split)
 	assert(idx, 'invalid split ' .. split)
   
 	local x = self.x_splits[split][idx]	
-	local x2 = self.x2_splits[split][idx]
 	local y = self.y_splits[split][idx]	
 
   if idx == self.split_sizes[split] then
@@ -200,6 +201,6 @@ function DataLoader:nextBatch(split)
   else
     self.split_idxs[split] = idx + 1
   end
-	return x, x2, y
+	return x, y
 end
 
