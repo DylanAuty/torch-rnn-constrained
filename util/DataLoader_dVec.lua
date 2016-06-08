@@ -1,5 +1,6 @@
 require 'torch'
 require 'hdf5'
+require 'nn'
 
 local utils = require 'util.utils'
 
@@ -95,7 +96,6 @@ function DataLoader:__init(kwargs)
 	splits.val.forecasts = valForecasts
 
   self.x_splits = {}
-  self.x2_splits = {}
 	self.y_splits = {}
   self.split_sizes = {}
 
@@ -144,21 +144,26 @@ function DataLoader:__init(kwargs)
 		-- If L is number of samples total and B is number of batches produced,
 		-- then for data we need to do (L, 47) -> (B, N, T, 47)
 		-- 			for forecasts we need to do (L) -> (B, N, T)
-		local vvx = vx[{{1, num - extra}, {}}]:view(N, -1, T, 47):transpose(1, 2):clone()
-		-- Introducing vvx2 for second input, which is one character of the reference forecast at a time.
-		local vvx2 = vy[{{1, num - extra}}]:view(N, -1, T):transpose(1, 2):clone
+		-- Want data to then have a forecast character appended to the end
+		-- -- MODIFICATON
+		-- Concatenate characters to the end of the batches
+		-- (B, N, T, 47) + (B, N, T)
+		-- Add singleton dimension to characters (B, N, T) -> (B, N, T, 1)
+		-- Concatenate along the 4th dimension.
+		local unsqueezer = nn.Unsqueeze(4, 3)	-- This is a hassle to do without nn so, uh... I'm using nn.
+
+		local vvdata = vx[{{1, num - extra}, {}}]:view(N, -1, T, 47):transpose(1, 2):clone()
+		local vvchars = vy[{{1, num - extra}}]:view(N, -1, T):transpose(1, 2):clone()
+		local vvx = torch.cat(vvdata, unsqueezer:forward(vvchars), 4)
 		local vvy = vy[{{2, num - extra + 1}}]:view(N, -1, T):transpose(1, 2):clone()
 		
 		self.x_splits[split] = vvx
-		-- self.x2_splits for holding the second input (a char)
-		self.x2_splits[split] = vvx2
 		self.y_splits[split] = vvy
 		self.split_sizes[split] = vvx:size(1)
 	end
 	
 	
 	torch.save("charByChar_dVec_x_splits", self.x_splits)
-	torch.save("charByChar_dVec_x2_splits", self.x2_splits)
 	torch.save("charByChar_dVec_y_splits", self.y_splits)
 	torch.save("charByChar_dVec_split_sizes", self.split_sizes)
 	
