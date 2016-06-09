@@ -77,7 +77,6 @@ function LM:__init(kwargs)
 	dConcat1:add(dCSeq2)
 	decoderContainer:add(dConcat1)
 	decoderContainer:add(nn.JoinTable(3, 3))
-	
 	self.net:add(decoderContainer)
 	
 
@@ -239,7 +238,7 @@ end
 
 
 function LM:encode_string(s)
-  local encoded = torch.LongTensor(#s)
+  local encoded = torch.DoubleTensor(#s)
 	for i = 1, #s do
 		local token = s:sub(i, i)
     local idx = self.token_to_idx[token]
@@ -264,12 +263,12 @@ end
 -- The below function modified from http://stackoverflow.com/questions/1426954/split-string-in-lua
 function LM:parseInArr(inputstr)
         sep = ", "
-        local t={}; i=1 
+        local t={}; i=1
         for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
-                t[i] = tonumber(str) 
+								t[i] = tonumber(str) 
                 i = i + 1 
         end 
-        return torch.ByteTensor(t)
+        return torch.LongTensor(t)
 end
 
 --[[
@@ -304,10 +303,18 @@ function LM:sample(kwargs)
     if verbose > 0 then
       print('Seeding with: "' .. start_text .. '"')
     end
-    local x_in = self:parseInArr(start_text):view(1, 1, -1)
+    x_in = self:parseInArr(start_text):view(1, 1, -1)
     local T0 = 1
     --sampled[{{}, {1, T0}}]:copy(x)
-    scores = self:forward(x_in)[{{}, {T0, T0}}]
+		--x_in is (1, 1, 47) at the moment
+		local start_char = torch.LongTensor(1, 1, 1)
+		local temp1 = self:encode_string("."):view(1, -1)
+		start_char[{{}, {}, 1}] = temp1	-- Seed with start character "a".
+					-- encoder produces vector of (1, stringlength)
+		local netInput = torch.cat(x_in, start_char, 3)	-- Concatenate data+char to make (1, 1, 48) tensor 
+		--netInput = netInput:type('torch.CudaTensor')
+		netInput = netInput:type('torch.FloatTensor')
+		scores = self:forward(netInput)[{{}, {T0, T0}}]
     first_t = 1
   else
     if verbose > 0 then
@@ -332,10 +339,17 @@ function LM:sample(kwargs)
   	     probs:div(torch.sum(probs))
 				 next_char = torch.multinomial(probs, 1):view(1, 1)
   	  end
-
 			sampled[{{}, {t, t}}]:copy(next_char)
   	  --scores = self:forward(next_char)
-  	  scores = self:forward(x_in)
+			-- netInput will now contain a concatenation of the previous character and the data
+			-- 		i.e. [x_in][next_char]
+			
+			--print("next_char DIMENSIONS: ", #next_char)
+			--os.exit()
+			
+			netInput = torch.cat(x_in, next_char, 3)
+  	  netInput = netInput:type('torch.FloatTensor')
+			scores = self:forward(netInput)
 			
 			if (n1Flag == 0 and n2Flag == 0) then	-- No newlines detected yet.
 				if (self:decode_string(next_char[1]) == "\n") then
