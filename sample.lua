@@ -3,6 +3,9 @@ require 'nn'
 
 require 'LanguageModel'
 require 'LanguageModelSkipCon'
+require 'LanguageModelSkip_dIn'
+
+require 'util.DataLoader_dVec'
 
 local cmd = torch.CmdLine()
 cmd:option('-checkpoint', 'cv/checkpoint_4000.t7')
@@ -19,6 +22,7 @@ local opt = cmd:parse(arg)
 
 local checkpoint = torch.load(opt.checkpoint)
 local model = checkpoint.model
+
 
 local msg
 if opt.gpu >= 0 and opt.gpu_backend == 'cuda' then
