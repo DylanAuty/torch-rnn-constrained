@@ -65,6 +65,7 @@ if __name__ == '__main__':
             commArgs = shlex.split(comm)
             # BELOW LINE: MODIFIED FOR dVec USAGE
             dataString = str(ex['data']).strip('[]')    # LM:sample expects a comma separated list of ints, in a string. Yeah.
+            
             commArgs.append(dataString)
             if len(dataString) == 0:
                 print("Data error in iteration " + `i` + ", ignoring...")
@@ -77,16 +78,18 @@ if __name__ == '__main__':
             except:
                 print("Sample Error in iteration " + `i` + ", ignoring...")
                 ignored += 1
-                break   # This means a problem with the sampling.
+                continue   # This means a problem with the sampling.
             else:
                 # Process the returned string
                 #retString = p.stdout.read()
                 retStringSplit = retString.split(dataString, 1) # Split on newline to remove the input argument...
-                if len(retStringSplit) < 2:
-                    ignored += 1
-                    print("Output error: No output seems to be present. Ignoring...")
-                    continue
-                genString = retStringSplit[1]   # genString now contains the sampled forecast
+                #print(retStringSplit)
+                #if len(retStringSplit) < 2:
+                #    ignored += 1
+                #    print("Output error: No output seems to be present. Ignoring...")
+                #    continue
+                #genString = retStringSplit[1]   # genString now contains the sampled forecast
+                genString = retStringSplit[0]   # genString now contains the sampled forecast.
                 genString = genString.strip()
 
                 # Now compute BLEU score
@@ -97,7 +100,6 @@ if __name__ == '__main__':
                 genStringToken = word_tokenize(genString)
                 refStringToken = word_tokenize(ex['forecast'])
                 bleuScore = bleu_score.sentence_bleu([refStringToken], genStringToken)
-            
                 # Appending to the end of a file
                 outFile.write(`bleuScore` + "\n")
 
