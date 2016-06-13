@@ -1,0 +1,691 @@
+Mostly clear ,
+with a low around 40 .
+Southwest wind around 5 mph becoming calm .
+
+.
+BEGIN GENERATED
+New raincreasing clouds ,
+with a low around 39 .
+South wind around 5 mph becoming calm .
+END
+Iteration: 2902
+BEGIN REFERENCE
+Partly sunny ,
+with a high near 69 .
+South wind between 5 and 10 mph ,
+with gusts as high as 15 mph .
+
+.
+BEGIN GENERATED
+.A slight chance of showers after 10am .
+Mostly cloudy ,
+with a high near 68 .
+Calm wind becoming south between 5 and 10 mph .
+END
+Iteration: 2903
+BEGIN REFERENCE
+Mostly cloudy ,
+with a low around 49 .
+South wind between 5 and 10 mph .
+
+.
+BEGIN GENERATED
+.Patchy fog after 1am .
+Otherwise ,
+mostly cloudy ,
+with a low around 49 .
+South wind around 7 mph .
+END
+Iteration: 2904
+BEGIN REFERENCE
+Partly sunny ,
+with a high near 67 .
+Calm wind becoming south between 5 and 10 mph .
+
+.
+BEGIN GENERATED
+.Mostly sunny ,
+with a high near 68 .
+Calm wind becoming southeast between 6 and 9 mph .
+END
+Iteration: 2905
+BEGIN REFERENCE
+Mostly cloudy ,
+with a low around 45 .
+South wind around 5 mph becoming calm .
+
+.
+BEGIN GENERATED
+New rainfall amounts of less than a tenth of an inch possible .
+
+.Raind fog after 1am .
+Otherwise ,
+mostly cloudy ,
+with a low around 44 .
+South wind around 5 mph .
+END
+Iteration: 2906
+BEGIN REFERENCE
+Partly sunny ,
+with a high near 67 .
+Calm wind becoming west around 5 mph .
+
+.
+BEGIN GENERATED
+Wind chill values as low around 5 mph .
+
+.A 20 percent chance of showers and thunderstorms before 10am .
+Otherwise ,
+partly sunny ,
+with a high near 67 .
+Calm wind becoming southwest around 5 mph .
+END
+Iteration: 2907
+BEGIN REFERENCE
+Partly cloudy ,
+with a low around 41 .
+Calm wind .
+
+.
+BEGIN GENERATED
+.A 20 percent chance of showers between 4 and 7 mph becoming calm .
+
+.Mostly cloudy ,
+with a low around 42 .
+Calm wind .
+END
+Iteration: 2908
+BEGIN REFERENCE
+Mostly cloudy ,
+with a high near 53 .
+Wind chill values as low as 40 early .
+East wind around 9 mph .
+
+.
+BEGIN GENERATED
+.Rain or drizzle after midnight .
+Mostly cloudy ,
+with a high near 54 .
+North wind around 10 mph .
+END
+Iteration: 2909
+BEGIN REFERENCE
+Cloudy ,
+with a low around 51 .
+Southeast wind between 7 and 11 mph .
+
+.
+BEGIN GENERATED
+.Mostly cloudy ,
+with a low around 50 .
+South southeast wind between 7 and 11 mph .
+END
+Iteration: 2910
+BEGIN REFERENCE
+A chance of snow before 1pm ,
+then a chance of freezing rain .
+Mostly cloudy ,
+with a high near 33 .
+South wind between 3 and 6 mph .
+Chance of precipitation is 50 % .
+New snow accumulation of less than a half inch possible .
+
+.
+BEGIN GENERATED
+.A chance of freezing calm before 1pm ,
+then a chance of snow before 1pm ,
+then a chance of snow before 1pm ,
+then a chance of freezing calm .
+Chance of precipitation is 50 % .
+New snow accumulation on around 5 mph becoming calm .
+Chance of precipitation is 50 % .
+New snow accumulation of less than a half inch possible .
+END
+Iteration: 2911
+BEGIN REFERENCE
+A chance of rain before 1am ,
+then a chance of freezing drizzle .
+Areas of fog .
+Otherwise ,
+cloudy ,
+with a low around 32 .
+Calm wind .
+Chance of precipitation is 30 % .
+
+.
+BEGIN GENERATED
+.A chance of rain before 1am falle freezing rain before 1am .
+Mostly cloudy ,
+with a low around 31 .
+Light south wind .
+Chance of precipitation is 30 % .
+END
+Iteration: 2912
+BEGIN REFERENCE
+A slight chance of showers after 3pm .
+Mostly cloudy ,
+with a high near 48 .
+Light west wind .
+Chance of precipitation is 20 % .
+
+.
+BEGIN GENERATED
+.Rain likely before 10am .
+Mostly cloudy ,
+with a high near 51 .
+Calm wind becoming southwest around 5 mph .
+Chance of precipitation is 30 % .
+END
+Iteration: 2913
+BEGIN REFERENCE
+Mostly cloudy ,
+with a low around 32 .
+West wind between 7 and 9 mph .
+
+.
+BEGIN GENERATED
+Winds could gust as high as 20 mph .
+
+.Partly sunny ,
+with a high near 36 .
+Southwest wind around 10 mph .
+END
+Iteration: 2914
+BEGIN REFERENCE
+A chance of freezing rain and sleet before 2pm ,
+then a chance of rain and sleet .
+Mostly cloudy ,
+with a high near 36 .
+East wind at 8 mph becoming south .
+Chance of precipitation is 50 % .
+Little or no snow accumulation expected .
+
+.
+BEGIN GENERATED
+West wind between 3 and 8 mph .
+Chance of precipitation is 50 % .
+Little or no snow accumulation expected .
+END
+Iteration: 2915
+BEGIN REFERENCE
+A chance of rain or freezing rain before midnight ,
+then a slight chance of freezing rain between midnight and 1am .
+Mostly cloudy ,
+with a low around 28 .
+Light and variable wind .
+Chance of precipitation is 40 % .
+
+.
+BEGIN GENERATED
+.Scattere f0 feet .
+Cloudy ,
+with a low around 28 .
+Light south wind .
+Chance of precipitation is 40 % .
+END
+Iteration: 2916
+BEGIN REFERENCE
+Sunny ,
+with a high near 26 .
+West wind between 7 and 15 mph .
+
+.
+BEGIN GENERATED
+.Areas of f th west southwest wind between 8 and 13 mph .
+
+.Partly cloudy during thwest wind around 11 .
+Wind chill values as low as zero .
+West wind between 8 and 16 mph .
+END
+Iteration: 2917
+BEGIN REFERENCE
+Increasing clouds ,
+with a low around 9 .
+Light west wind .
+
+.
+BEGIN GENERATED
+.A 10 percent chance of frees 10 % .
+
+.Partly cloudy ,
+with a low around 13 .
+West wind around 5 mph becoming calm .
+END
+Iteration: 2918
+BEGIN REFERENCE
+A slight chance of showers .
+Mostly cloudy ,
+with a high near 45 .
+Breezy ,
+with a west wind 9 to 12 mph increasing to between 20 and 23 mph .
+Winds could gust as high as 41 mph .
+Chance of precipitation is 20 % .
+
+.
+BEGIN GENERATED
+New rainfall amounts of less than a tertheast wind 9 to 12 mph increasing to between 20 and 23 mph .
+Winds could gust as high as 40 mph .
+Chance of precipitation is 20 % .
+END
+Iteration: 2919
+BEGIN REFERENCE
+Mostly clear ,
+with a low around 15 .
+West wind between 10 and 17 mph .
+
+.
+BEGIN GENERATED
+.Areas ,
+with a northwest wind 17 to 20 mph decreasing to between 9 and 11 mph .
+END
+Iteration: 2920
+BEGIN REFERENCE
+Cloudy ,
+then gradually becoming partly cloudy ,
+with a low around 50 .
+Breezy ,
+with a south wind between 13 and 23 mph ,
+with gusts as high as 32 mph .
+
+.
+BEGIN GENERATED
+.Mostly cloudy ,
+with a low around 52 .
+Breezy ,
+with a south wind between 13 and 22 mph ,
+with gusts as high as 30 mph .
+END
+Iteration: 2921
+BEGIN REFERENCE
+Mostly sunny ,
+with a high near 70 .
+Calm wind becoming south between 5 and 10 mph .
+Winds could gust as high as 15 mph .
+
+.
+BEGIN GENERATED
+.A 20 percent chance of showers and thunderstorms before 9am .
+Otherwise ,
+mostly sunny ,
+with a high near 70 .
+East wind between 5 and 10 mph .
+END
+Iteration: 2922
+BEGIN REFERENCE
+Showers likely and possibly a thunderstorm after noon .
+Cloudy ,
+with a high near 63 .
+Breezy ,
+with a southeast wind 10 to 13 mph increasing to between 20 and 23 mph .
+Winds could gust as high as 33 mph .
+Chance of precipitation is 70 % .
+
+.
+BEGIN GENERATED
+.Mostly cloudy ,
+with a high near 61 .
+Breezy ,
+with a south wind between 15 and 25 mph ,
+with gusts as high as 33 mph .
+Chance of precipitation is 60 % .
+New rainfall amounts between a tenth and quarter of an inch ,
+except higher amounts possible in thunderstorms .
+END
+Iteration: 2923
+BEGIN REFERENCE
+Mostly cloudy ,
+with a low around 50 .
+South wind between 5 and 10 mph .
+
+.
+BEGIN GENERATED
+.Patchy fog after 1am .
+Otherwise ,
+mostly cloudy ,
+with a low around 49 .
+South wind between 6 and 8 mph .
+END
+Iteration: 2924
+BEGIN REFERENCE
+A chance of drizzle after midnight .
+Mostly cloudy ,
+with a temperature rising to around 46 by 5am .
+East wind around 8 mph .
+
+.
+BEGIN GENERATED
+.A chance of drizzle after midnight .
+Increasing clouds ,
+with a low around 40 .
+East wind around 8 mph .
+END
+Iteration: 2925
+BEGIN REFERENCE
+Scattered showers before 10pm .
+Mostly cloudy ,
+with a low around 33 .
+Calm wind becoming south between 5 and 8 mph .
+Chance of precipitation is 30 % .
+
+.
+BEGIN GENERATED
+.Scattered showers ,
+mainly before 11am .
+Mostly cloudy ,
+with a high near 40 .
+Southeast wind between 3 and 9 mph .
+Chance of precipitation is 30 % .
+END
+Iteration: 2926
+BEGIN REFERENCE
+Mostly cloudy ,
+with a high near 50 .
+North wind around 9 mph becoming east .
+
+.
+BEGIN GENERATED
+.A 30 percent chance of showers before 60 f showers before 6 mph becoming east southeast .
+END
+Iteration: 2927
+BEGIN REFERENCE
+A 30 percent chance of showers after midnight .
+Cloudy ,
+with a low around 42 .
+East southeast wind between 14 and 18 mph ,
+with gusts as high as 26 mph .
+
+.
+BEGIN GENERATED
+.Showers likely ,
+mainly after 3am .
+Mostly cloudy ,
+with a low around 42 .
+Breezy ,
+with a south southeast wind between 13 and 20 mph ,
+with gusts as high as 25 mph .
+END
+Iteration: 2928
+BEGIN REFERENCE
+Occasional showers and thunderstorms before noon ,
+then a chance of showers .
+Some of the storms could produce heavy rainfall .
+Temperature rising to near 55 by noon ,
+then falling to around 49 during the remainder of the day .
+Breezy ,
+with a east wind 13 to 16 mph becoming west between 21 and 24 mph .
+Winds could gust as high as 33 mph .
+Chance of precipitation is 90 % .
+
+.
+BEGIN GENERATED
+.A chance of showers and thunderstorms before noon ,
+then falling torms .
+END
+Iteration: 2929
+BEGIN REFERENCE
+Occasional showers and thunderstorms .
+Some of the storms could produce heavy rainfall .
+Low around 51 .
+South wind between 11 and 13 mph .
+Chance of precipitation is 90 % .
+
+.
+BEGIN GENERATED
+.Showers and thunderstorms .
+Low around 52 .
+South wind between 11 and 13 mph .
+Chance of precipitation is 80 % .
+END
+Iteration: 2930
+BEGIN REFERENCE
+A slight chance of freezing rain after midnight .
+Increasing clouds ,
+with a low around 22 .
+South southeast wind between 6 and 13 mph .
+Chance of precipitation is 20 % .
+
+.
+BEGIN GENERATED
+.A 20 mph .
+
+.A slight chance of snow after 2pm .
+Mostly cloudy ,
+with a low around 23 .
+South southeast wind between 6 and 10 mph .
+END
+Iteration: 2931
+BEGIN REFERENCE
+Mostly sunny ,
+with a high near 70 .
+South wind between 13 and 18 mph ,
+with gusts as high as 26 mph .
+
+.
+BEGIN GENERATED
+.A 20 percent chance of showers after noon .
+Increasing clouds ,
+with a high near 69 .
+South wind between 14 and 18 mph ,
+with gusts as high as 23 mph .
+END
+Iteration: 2932
+BEGIN REFERENCE
+Partly sunny ,
+with a high near 66 .
+Calm wind becoming southeast between 5 and 10 mph .
+
+.
+BEGIN GENERATED
+Southeast wind between 5 and 8 mph becoming calm .
+
+.Rain light chance of showers before 10am .
+Patchy fog before 8am .
+Otherwise ,
+mostly sunny ,
+with a high near 66 .
+Calm wind becoming south between 5 and 9 mph .
+END
+Iteration: 2933
+BEGIN REFERENCE
+Mostly cloudy ,
+with a low around 47 .
+South wind around 5 mph .
+
+.
+BEGIN GENERATED
+Wind between 3 and 5 mph .
+
+.Increasing clouds ,
+with a low around 45 .
+South wind around 6 mph .
+END
+Iteration: 2934
+BEGIN REFERENCE
+A slight chance of showers .
+Mostly cloudy ,
+with a high near 46 .
+Breezy ,
+with a west wind 10 to 13 mph increasing to between 20 and 23 mph .
+Winds could gust as high as 40 mph .
+Chance of precipitation is 20 % .
+
+.
+BEGIN GENERATED
+.A chance of rain showers .
+Mostly cloudy ,
+with a high near 45 .
+Breezy ,
+with a west wind between 14 and 23 mph ,
+with gusts as high as 40 mph .
+Chance of precipitation is 20 % .
+END
+Iteration: 2935
+BEGIN REFERENCE
+Mostly clear ,
+with a low around 24 .
+Northwest wind between 9 and 18 mph .
+
+.
+BEGIN GENERATED
+.A 20 percent chance of snow after 11pm .
+Partly cloudy ,
+with a low around 26 .
+Northwest wind between 10 and 15 mph .
+END
+Iteration: 2936
+BEGIN REFERENCE
+A chance of showers ,
+mainly after 4pm .
+Mostly cloudy ,
+with a high near 49 .
+Light west wind .
+Chance of precipitation is 30 % .
+
+.
+BEGIN GENERATED
+.Patchy fog before 10am .
+Otherwise ,
+mostly cloudy ,
+with a high near 49 .
+Calm wind becoming south around 5 mph .
+Chance of precipitation is 30 % .
+END
+Iteration: 2937
+BEGIN REFERENCE
+Mostly cloudy ,
+with a low around 34 .
+West wind between 9 and 11 mph .
+
+.
+BEGIN GENERATED
+1chance of drizzle before 11pm .
+Mostly cloudy ,
+with a low around 34 .
+Southwest wind between 10 and 11 mph .
+END
+Iteration: 2938
+BEGIN REFERENCE
+A chance of freezing rain and sleet before 1pm ,
+then a chance of rain and sleet between 1pm and 4pm ,
+then a chance of rain after 4pm .
+Mostly cloudy ,
+with a high near 36 .
+East wind at 7 mph becoming south .
+Chance of precipitation is 50 % .
+Little or no snow accumulation expected .
+
+.
+BEGIN GENERATED
+Mostly cloudy ,
+with a high near 37 .
+Calm wind becoming south between 5 and 8 mph .
+Chance of precipitation is 50 % .
+Little or no snow accumulation expected .
+END
+Iteration: 2939
+BEGIN REFERENCE
+A chance of rain or freezing rain before midnight ,
+then a slight chance of freezing rain between midnight and 1am .
+Mostly cloudy ,
+with a low around 29 .
+Calm wind .
+Chance of precipitation is 40 % .
+
+.
+BEGIN GENERATED
+.A chance of rain or freezing rain before midnight ,
+then a slight chance of rain of freezing fog before 10pm .
+Areas of fog before 10pm .
+Otherwise ,
+cloudy ,
+with a low around 30 .
+Light southwest wind .
+Chance of precipitation is 40 % .
+END
+Iteration: 2940
+BEGIN REFERENCE
+Mostly sunny ,
+with a high near 68 .
+Calm wind becoming west between 5 and 10 mph .
+
+.
+BEGIN GENERATED
+New rainfall amounts of less than a tenth of an inch possible .
+
+.Sunny ,
+with a high near 68 .
+Wind chill values as low as 40 early .
+Southwest wind between 33 and 7 mph .
+END
+Iteration: 2941
+BEGIN REFERENCE
+Partly cloudy ,
+with a low around 46 .
+West wind around 5 mph becoming calm .
+
+.
+BEGIN GENERATED
+Newith a low around 46 .
+South wind around 5 mph becoming calm .
+
+.A 20 percent chance of storms before 9pm .
+Otherwise ,
+partly cloudy ,
+with a low around 45 .
+Calm wind .
+END
+Iteration: 2942
+BEGIN REFERENCE
+Mostly sunny ,
+with a high near 48 .
+Breezy ,
+with a west wind between 15 and 20 mph ,
+with gusts as high as 30 mph .
+
+.
+BEGIN GENERATED
+New showers likely .
+Partly cloudy ,
+with a low around 25 .
+West wind between 11 and 16 mph ,
+with gusts as high as 26 mph .
+END
+Iteration: 2943
+BEGIN REFERENCE
+A chance of snow and freezing rain before 1pm ,
+then a chance of rain .
+Mostly cloudy ,
+with a high near 37 .
+South wind between 3 and 7 mph .
+Chance of precipitation is 50 % .
+New snow accumulation of less than a half inch possible .
+
+.
+BEGIN GENERATED
+.Mostly cloudy ,
+with a high near 40 .
+East wind around 5 mph becoming calm .
+Chance of precipitation is 40 % .
+Little or no snow accumulation expected .
+END
+Iteration: 2944
+BEGIN REFERENCE
+A chance of rain before 1am ,
+then a chance of freezing drizzle .
+Areas of fog .
+Otherwise ,
+cloudy ,
+with a low around 35 .
+Light south wind .
+Chance of precipitation is 30 % .
+
+.
+BEGIN GENERATED
+.Mostly cloudy ,
+with a low around 37 .
+Calm wind .
+Chance of precipitation is 30 % .
+END
+Done.
+Ignored Examples: 7
+

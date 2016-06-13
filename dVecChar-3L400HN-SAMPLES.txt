@@ -1,0 +1,406 @@
+Iteration: 483
+Mostly cloudy ,
+with a low around 34 .
+North northeast wind at 6 mph becoming south southeast .
+
+.
+.Patchy fog after 11pm .
+Otherwise ,
+partly cloudy ,
+with a low around 33 .
+Southeast wind around 6 mph becoming calm .
+END
+Iteration: 484
+Mostly cloudy ,
+with a high near 43 .
+South southeast wind between 8 and 10 mph .
+
+.
+.Showers likely ,
+mainly after 10am .
+Mostly cloudy ,
+with a high near 41 .
+South southeast wind between 7 and 8 mph .
+Chance of precipitation is 50 % .
+New rainfall amounts between a tenth and quarter of an inch possible .
+END
+Iteration: 485
+Rain likely .
+Snow level 1100 feet .
+Cloudy ,
+with a low around 36 .
+South wind around 9 mph .
+Chance of precipitation is 60 % .
+
+.
+.A chance of rain .
+Mostly cloudy ,
+with a high near 40 .
+Southwest wind around 7 mph .
+Chance of precipitation is 60 % .
+END
+Iteration: 486
+A chance of snow showers .
+Mostly cloudy ,
+with a high near 38 .
+West northwest wind between 3 and 11 mph .
+Chance of precipitation is 40 % .
+New snow accumulation of less than a half inch possible .
+
+.
+ent chance of rain and snow .
+Mostly cloudy ,
+with a high near 42 .
+Northwest wind between 6 and 10 mph .
+Chance of precipitation is 50 % .
+New snow accumulation of around an inch possible .
+END
+Iteration: 487
+Scattered snow showers before 10pm .
+Cloudy ,
+with a low around 32 .
+Calm wind becoming south southeast between 5 and 8 mph .
+Chance of precipitation is 40 % .
+New snow accumulation of less than a half inch possible .
+
+.
+Cloudy ,
+with a low around 33 .
+South southeast wind between 5 and 10 mph becoming calm .
+END
+Iteration: 488
+Periods of showers and thunderstorms ,
+mainly after midnight .
+Low around 42 .
+North northwest wind between 3 and 10 mph .
+Chance of precipitation is 80 % .
+New rainfall amounts between a quarter and half of an inch possible .
+
+.
+Some storms could be severe .
+Low around 42 .
+North northwest wind between 8 and 11 mph becoming calm .
+South southeast wind between 5 and 10 mph becoming east northeast .
+Chance of precipitation is 80 % .
+END
+Iteration: 489
+Mostly cloudy ,
+with a high near 43 .
+North northeast wind between 6 and 8 mph .
+
+.
+.Partly sunny ,
+with a high near 41 .
+North northwest wind around 8 mph .
+END
+Iteration: 490
+Areas of fog after 10pm .
+Areas of freezing fog after 10pm .
+Otherwise ,
+increasing clouds ,
+with a low around 29 .
+Light north northeast wind .
+
+.
+.Mostly cloudy ,
+with a low around 29 .
+North wind around 5 mph .
+
+.Sunny ,
+with a south wind .
+END
+Iteration: 491
+A 50 percent chance of showers .
+Mostly cloudy ,
+with a high near 39 .
+Southwest wind between 3 and 7 mph .
+
+.
+Cloudy ,
+with a high near 40 .
+South southwest wind at northwest wind between 3 and 8 mph .
+Chance of precipitation is 50 % .
+END
+Iteration: 492
+A 40 percent chance of showers .
+Mostly cloudy ,
+with a high near 39 .
+East northeast wind around 11 mph .
+
+.
+East southeast wind between 8 and 10 mph .
+
+.Mostly cloudy ,
+with a high near 38 .
+North northwest wind between 7 and 10 mph .
+END
+Iteration: 493
+Mostly cloudy ,
+with a low around 34 .
+East northeast wind between 3 and 7 mph .
+
+.
+.Areas of fog after 10pm .
+Otherwise ,
+partly cloudy ,
+with a low around 36 .
+East wind around 5 mph becoming calm .
+END
+Iteration: 494
+A 30 percent chance of rain after 10am .
+Cloudy ,
+with a high near 44 .
+Calm wind becoming north northeast around 5 mph .
+
+.
+Winds could gust as high as 10 mph becoming north becoming calm .
+Chance of precipitation is 50 % .
+Little or no snow accumulation expected .
+END
+Iteration: 495
+Rain likely .
+Cloudy ,
+with a low around 36 .
+Southwest wind between 8 and 13 mph .
+Chance of precipitation is 60 % .
+
+.
+Winds could gust as high as 18 mph .
+Chance of precipitation is 60 % .
+
+.Patchy fog before 10am .
+High near 46 .
+Calm wind becoming west between 11 and 14 mph .
+Chance of precipitation is 50 % .
+END
+Iteration: 496
+A 50 percent chance of showers .
+Mostly cloudy ,
+with a high near 40 .
+South southwest wind between 3 and 7 mph .
+
+.
+.Showers likely ,
+mainly before 10am ,
+then sccamounts of less than a half inch possible .
+END
+Iteration: 497
+A 20 percent chance of showers and thunderstorms before 9pm .
+Partly cloudy ,
+with a low around 46 .
+Breezy ,
+with a south southwest wind between 18 and 25 mph ,
+with gusts as high as 33 mph .
+
+.
+With a south wind between 21 and 25 mph ,
+with gusts as high as 30 mph .
+END
+Iteration: 498
+Rain ,
+mainly after 10am .
+High near 39 .
+South southeast wind around 9 mph .
+Chance of precipitation is 80 % .
+
+.
+Wind between 8 and 9 mph .
+Chance of precipitation is 70 % .
+
+.Periontinigh near 46 .
+South wind between 7 and 9 mph .
+Chance of precipitation is 70 % .
+END
+Iteration: 499
+Rain ,
+mainly before 10pm .
+Low around 32 .
+South wind between 6 and 9 mph becoming calm .
+Chance of precipitation is 80 % .
+
+.
+Wind becoming rain before 10am .
+High near 41 .
+South wind between 5 and 11 mph .
+Chance of precipitation is 70 % .
+Little or no snow accumulation expected .
+END
+Iteration: 500
+A 20 percent chance of rain before 10am .
+Mostly cloudy ,
+with a high near 43 .
+West southwest wind between 7 and 11 mph .
+
+.
+.Sunny ,
+with a high near 43 .
+Southwest wind between 7 and 10 mph .
+Chance of precipitation is 20 % .
+END
+Iteration: 501
+Showers and thunderstorms ,
+mainly after noon .
+High near 62 .
+Breezy ,
+with a southeast wind 15 to 18 mph increasing to between 25 and 28 mph .
+Winds could gust as high as 37 mph .
+Chance of precipitation is 80 % .
+New rainfall amounts between a tenth and quarter of an inch ,
+except higher amounts possible in thunderstorms .
+
+.
+Some of the storms could be severe .
+
+.Mostly cloudy ,
+with a high near 63 .
+Breezy ,
+with a south southeast wind between 18 and 25 mph ,
+with gusts as high as 35 mph .
+Chance of precipitation is 90 % .
+END
+Iteration: 502
+Sunny ,
+with a high near 67 .
+West wind between 6 and 10 mph .
+
+.
+Winds could gust as high as 11 mph .
+
+.Rain light chance of showers after 4pm .
+Otherwise ,
+mostly sunny ,
+with a high near 69 .
+Wind chill values between 5 and 7 mph .
+END
+Iteration: 503
+Partly cloudy ,
+with a low around 50 .
+South wind 5 to 8 mph becoming west .
+
+.
+Winds could gust as high as 21 mph .
+
+.Sunny ,
+with a high near 61 .
+North wind between 5 and 10 mph .
+END
+Iteration: 504
+Mostly sunny ,
+with a high near 76 .
+Calm wind becoming south between 6 and 9 mph .
+
+.
+.Partly sunny ,
+with a high near 75 .
+Calm wind becoming south between 5 and 10 mph .
+END
+Iteration: 505
+Patchy fog after 11pm .
+Otherwise ,
+partly cloudy ,
+with a low around 50 .
+South wind between 3 and 7 mph .
+
+.
+.Areas of fog after midnight .
+Otherwise ,
+mostly cloudy ,
+with a low around 51 .
+South wind between 5 and 7 mph .
+END
+Iteration: 506
+A slight chance of showers after 3pm .
+Mostly cloudy ,
+with a high near 77 .
+South wind 5 to 8 mph increasing to between 14 and 17 mph .
+Chance of precipitation is 20 % .
+
+.
+Winds could gust as high as 20 mph .
+
+.Mostly cloudy ,
+with a high near 75 .
+South wind between 5 and 17 mph .
+END
+Iteration: 507
+Clear ,
+with a low around 41 .
+Southwest wind between 3 and 8 mph .
+
+.
+Winds could gust as high as 20 mph .
+
+.Rain light chance of showers ,
+mainly after 3am .
+Otherwise ,
+partly clear ,
+with a low around 40 .
+Southwest wind between 5 and 8 mph .
+END
+Iteration: 508
+Sunny ,
+with a high near 72 .
+Calm wind becoming west between 6 and 9 mph .
+
+.
+Wind clear ,
+with a high near 71 .
+Calm wind becoming west between 6 and 9 mph .
+END
+Iteration: 509
+Partly cloudy ,
+with a low around 44 .
+Light west wind .
+
+.
+Winds could gust as high as 10 mph .
+
+.A 20 percent chance of showers after 4am .
+Otherwise ,
+mostly clear ,
+with a low around 45 .
+Light and variable wind .
+END
+Iteration: 510
+Mostly sunny ,
+with a high near 72 .
+Calm wind becoming east around 6 mph .
+
+.
+Winds could gust as high as 20 mph .
+
+.Areas of .
+Otherwise ,
+mostly sunny ,
+with a high near 71 .
+Calm wind becoming east southeast around 6 mph .
+END
+Iteration: 511
+Patchy fog after 1am .
+Otherwise ,
+partly cloudy ,
+with a low around 48 .
+Southeast wind around 6 mph becoming calm .
+
+.
+.A chance of showers after 4am .
+Southwest wind around 5 mph becoming calm .
+END
+Iteration: 512
+Mostly cloudy ,
+with a high near 44 .
+Southeast wind between 6 and 9 mph .
+
+.
+.Mostly cloudy ,
+with a high near 41 .
+East wind around 7 mph .
+
+.A slight chance of rain and snow showers after 11am .
+Mostly cloudy ,
+with a high near 41 .
+South wind between 6 and 9 mph .
+Chance of precipitation is 50 % .
+Little or no snow accumulation expected .
+END
+
