@@ -9,10 +9,10 @@ The dataset itself is extremely large and unwieldy, and makes development with g
 This section will explain the files in the repository and their purpose.
 
 ### Models
--`LanguageModel.lua`: Implements a fully connected feed-forward RNN. This file written as part of the original `torch-rnn` repository.
--`LanguageModelSkipCon.lua`: An adaptation of `LanguageModel.lua` to include skip connections, from the network input to all hidden layers, and from the output of all hidden layers to the network output.
--`LanguageModelSkip_dIn`: An implementation of the `dVecChar` experiment model detailed in the report. Modified from `LanguageModelSkipCon.lua`. Designed to take a single tensor as sampling input, the 47 element data vector. It then concatenates a character index to the end of this vector. On every sampling step, it feeds back to the network the same data vector, with the previously generated character appended in place of the first appended character.
--`LanguageModelSkip_dVec`: An implementation of the `dVec` experiment model detailed in the report. Modified from `LanguageModelSkipCon.lua`. Sampling input is a single 47 element data vector. Repeatedly passes this vector to the network. There is no feedback of generated characters to input in this experiment.
+- `LanguageModel.lua`: Implements a fully connected feed-forward RNN. This file written as part of the original `torch-rnn` repository.
+- `LanguageModelSkipCon.lua`: An adaptation of `LanguageModel.lua` to include skip connections, from the network input to all hidden layers, and from the output of all hidden layers to the network output.
+- `LanguageModelSkip_dIn`: An implementation of the `dVecChar` experiment model detailed in the report. Modified from `LanguageModelSkipCon.lua`. Designed to take a single tensor as sampling input, the 47 element data vector. It then concatenates a character index to the end of this vector. On every sampling step, it feeds back to the network the same data vector, with the previously generated character appended in place of the first appended character.
+- `LanguageModelSkip_dVec`: An implementation of the `dVec` experiment model detailed in the report. Modified from `LanguageModelSkipCon.lua`. Sampling input is a single 47 element data vector. Repeatedly passes this vector to the network. There is no feedback of generated characters to input in this experiment.
 
 Below is copied the full text of the existing README for torch-rnn.
 
