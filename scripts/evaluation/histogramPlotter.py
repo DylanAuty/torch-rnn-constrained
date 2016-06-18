@@ -29,11 +29,12 @@ if __name__ == '__main__':
     
     mean = sum(data) / float(len(data))
     print("Data mean = " + `mean`)
-
+    print("data.mean() = " + `data.mean()`)
     fig1 = plt.figure()
-    n, bins, patches = plt.hist(data, 50, normed=1, facecolor='blue', alpha=0.75)
+    resultGraph = plt.hist(data, bins=100, color='blue', alpha=0.75)
+    plt.axvline(data.mean(), color='b', linestyle='dashed', linewidth=2)
     plt.xlabel("BLEU Score")
-    plt.ylabel("Probability")
+    plt.ylabel("Frequency")
     plt.savefig(args.output_file)
     plt.close(fig1)
 

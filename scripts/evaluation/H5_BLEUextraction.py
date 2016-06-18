@@ -1,4 +1,4 @@
-# BLEUextraction.py
+# H5_BLEUextraction.py
 # Script to run every member of a test set through a given model checkpoint,
 # then compare the output to the reference in order to calculate the BLEU score.
 # It dumps the list of BLEU scores to a file, in a single column.
@@ -9,14 +9,18 @@
 #   --output_file /path/to/output/file.csv 
 #       Note that the output extension is a csv just for forms sake... it's a single column so it's not necessary.
 #
-# Data JSON is of structure:
-# { i : {
-#       'data' : "<STRING OF DATA HERE>",
-#       'forecast' : "<NL FORECAST HERE>"
-#       }
-# }
-# i is an int, not a string.
-#
+# This version adapted from BLEUextraction.py.
+# BLEUextraction.py works with 1 JSON, representing a single data split.
+# This version will deal with an HDF5 file of this structure:
+# 3 main groups, one per data split:
+# /train
+# /test
+# /val
+# Subgroups are:
+# /train/data   /train/forecast
+# From there, every item has a unique numeric ID that corresponds between data and forecast groups.
+
+
 # Dylan Auty, 29/05/16
 
 import argparse, json
@@ -65,7 +69,6 @@ if __name__ == '__main__':
             commArgs = shlex.split(comm)
             # BELOW LINE: MODIFIED FOR dVec USAGE
             dataString = str(ex['data']).strip('[]')    # LM:sample expects a comma separated list of ints, in a string. Yeah.
-            
             commArgs.append(dataString)
             if len(dataString) == 0:
                 print("Data error in iteration " + `i` + ", ignoring...")
@@ -78,18 +81,16 @@ if __name__ == '__main__':
             except:
                 print("Sample Error in iteration " + `i` + ", ignoring...")
                 ignored += 1
-                continue   # This means a problem with the sampling.
+                break   # This means a problem with the sampling.
             else:
                 # Process the returned string
                 #retString = p.stdout.read()
                 retStringSplit = retString.split(dataString, 1) # Split on newline to remove the input argument...
-                #print(retStringSplit)
-                #if len(retStringSplit) < 2:
-                #    ignored += 1
-                #    print("Output error: No output seems to be present. Ignoring...")
-                #    continue
-                #genString = retStringSplit[1]   # genString now contains the sampled forecast
-                genString = retStringSplit[0]   # genString now contains the sampled forecast.
+                if len(retStringSplit) < 2:
+                    ignored += 1
+                    print("Output error: No output seems to be present. Ignoring...")
+                    continue
+                genString = retStringSplit[1]   # genString now contains the sampled forecast
                 genString = genString.strip()
 
                 # Now compute BLEU score
@@ -100,12 +101,8 @@ if __name__ == '__main__':
                 genStringToken = word_tokenize(genString)
                 refStringToken = word_tokenize(ex['forecast'])
                 bleuScore = bleu_score.sentence_bleu([refStringToken], genStringToken)
+            
                 # Appending to the end of a file
-                print("BEGIN REFERENCE")
-                print(ex['forecast'])
-                print("BEGIN GENERATED")
-                print(genString)
-                print("END")
                 outFile.write(`bleuScore` + "\n")
 
     print("Done.")

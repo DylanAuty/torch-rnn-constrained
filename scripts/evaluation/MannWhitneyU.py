@@ -21,7 +21,7 @@ if __name__ == '__main__':
     data1 = np.genfromtxt(args.input_1, delimiter=", ")
     data2 = np.genfromtxt(args.input_2, delimiter=", ")
     
-    statistic, pValue = mannwhitneyu(data1, data2, alternative=two-sided)
+    statistic, pValue = mannwhitneyu(data1, data2, alternative='two-sided')
     
     print("=== INPUT 1 ===")
     print("     input_1 MEAN : " + `data1.mean()`)
