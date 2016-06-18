@@ -5,6 +5,35 @@ This fork will aim to implement and run tests on various novel methods of semant
 
 The dataset itself is extremely large and unwieldy, and makes development with git difficult. In it's raw form it will be used read-only, no new data points will be created nor will any existing data-points be modified. A zip containing the dataset can be downloaded [here](http://cs.stanford.edu/~pliang/data/weather-data.zip).
 
+## Files
+This section will explain the files in the repository and their purpose.
+
+### Models
+- `LanguageModel.lua`: Implements a fully connected feed-forward RNN. This file written as part of the original `torch-rnn` repository.
+- `LanguageModelSkipCon.lua`: An adaptation of `LanguageModel.lua` to include skip connections, from the network input to all hidden layers, and from the output of all hidden layers to the network output.
+- `LanguageModelSkip_dIn`: An implementation of the `dVecChar` experiment model detailed in the report. Modified from `LanguageModelSkipCon.lua`. Designed to take a single tensor as sampling input, the 47 element data vector. It then concatenates a character index to the end of this vector. On every sampling step, it feeds back to the network the same data vector, with the previously generated character appended in place of the first appended character.
+- `LanguageModelSkip_dVec`: An implementation of the `dVec` experiment model detailed in the report. Modified from `LanguageModelSkipCon.lua`. Sampling input is a single 47 element data vector. Repeatedly passes this vector to the network. There is no feedback of generated characters to input in this experiment.
+
+### Scripts
+Scripts are used for dataset handling, running experiments, and analysis of experiment results. They are kept in `/scripts`.
+#### `/scripts/datasetHandling`
+- `concatenate_monolithic.sh`: Script to concatenate all the files ending with the extension ".text" in all subdirectories of a specified folder.
+- `concatenate_pairwise.sh`: Script to concatenate all pairs of *.events and *.text, corresponding to the raw weather data and the text forecast respectively, together.
+- `endForecast.txt`: A line of equals signs, in a text file, because of an early difficulty with bash scripts and text concatenation.
+- `tagAndCopy.sh`: Script to give each pair of *.events and *.text a numerical ID, while copying them to a new dataset file structure. Generates a subfolder for forecasts, a subfolder for data, and a subfolder for JSON objects containing both. All filenames are numbers, and will correspond to the same example for each of data, forecase, and JSON pair.
+- `tagged_to_splitMonolith.sh`: Script that will take a dataset of the format output by `tagAndCopy.sh` and create monoliths in the proportions required. Was not used for any final experiments.
+
+#### `scripts/evaluation`
+- `BLEUextraction.py`: Script to run every member of a test set through a given model checkpoint, then compare the output to the reference in order to calculate the BLEU score. It dumps the list of BLEU scores to a file, in a single column. 
+- `MannWhitneyU.py`: Script to compute the Mann Whitney U statistic and p value of two distributions, then print them out. Also prints out data means and standard deviations for each input dataset.
+- `TESTpair.txt`: Contains a single pair of data/forecast, formatted in a disused manner.
+- `evalTest1.py`: A test script, to show the function of the Python `nltk` BLEU calculation function.
+- `extractFromTest.py`: Script to extract individual examples from the test dataset created by `scripts/preprocess.py`.
+- `extractFromTest_dVEC`: Unfinished script, was meant to adapt `extractFromTest.py` to convert data into the format required by the `dVec` experiment, but this was accomplished in `utils/DataLoader_dVec.lua` in the end.
+- `fileBLEU.py`: Script to take as input two text files, a candidate and a reference, then return their BLEU score. This script was never used for final experiments; `BLEUextraction.py` was used instead.
+- `histogramPlotter.py`: Script to plot a histogram of data, with a mean line included.
+
+
 Below is copied the full text of the existing README for torch-rnn.
 
 # torch-rnn
